@@ -15,7 +15,6 @@ import App from './App.tsx'
 import AuthLayout from './pages/auth/AuthLayout.tsx'
 import Login from './pages/auth/Login.tsx'
 import SignUp from './pages/auth/SignUp.tsx'
-import ForgotPassword from './pages/auth/ForgotPassword.tsx'
 import ResetPassword from './pages/auth/ResetPassword.tsx'
 
 const rootRoute = createRootRoute({
@@ -51,12 +50,6 @@ const loginRoute = createRoute({
   component: Login,
 })
 
-const forgotPasswordRoute = createRoute({
-  getParentRoute: () => authLayoutRoute,
-  path: 'forgot-password',
-  component: ForgotPassword,
-})
-
 const resetPasswordRoute = createRoute({
   getParentRoute: () => authLayoutRoute,
   path: 'reset-password',
@@ -65,7 +58,7 @@ const resetPasswordRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([indexRoute,
   authLayoutRoute.addChildren([
-    signUpRoute, loginRoute, forgotPasswordRoute, resetPasswordRoute
+    signUpRoute, loginRoute, resetPasswordRoute
   ])
 ])
 
