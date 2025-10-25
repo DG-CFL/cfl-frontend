@@ -8,6 +8,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '@/components/ui/input-group'
+import { Select, SelectTrigger, SelectContent, SelectValue, SelectGroup, SelectItem } from '@/components/ui/select'
 import { CalendarDays, EyeClosed } from 'lucide-react'
 
 export default function SignUp() {
@@ -45,7 +46,17 @@ export default function SignUp() {
           <FieldLabel htmlFor="gender">
             <h3>Gender</h3>
           </FieldLabel>
-          <Input id="gender" />
+          <Select>
+            <SelectTrigger id='gender'>
+              <SelectValue placeholder="Select"/>
+            </SelectTrigger>
+            <SelectContent >
+              <SelectGroup >
+                <SelectItem value='male'>Male</SelectItem>
+                <SelectItem value='female'>Female</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </Field>
         <Field>
           <FieldLabel htmlFor="date-of-birth">
