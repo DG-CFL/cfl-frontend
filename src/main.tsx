@@ -19,6 +19,7 @@ import ResetPassword from './pages/auth/ResetPassword.tsx'
 import SignUpSuccess from './pages/auth/SignUpSuccess.tsx'
 import ResetPasswordSuccess from './pages/auth/ResetPasswordSuccess.tsx'
 import ResetPasswordEmail from './pages/auth/ResetPasswordEmail.tsx'
+import AuthSplitLayout from './pages/auth/AuthSplitLayout.tsx'
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -53,12 +54,6 @@ const signUpSuccessRoute = createRoute({
   component: SignUpSuccess,
 })
 
-const loginRoute = createRoute({
-  getParentRoute: () => authLayoutRoute,
-  path: 'login',
-  component: Login,
-})
-
 const resetPasswordRoute = createRoute({
   getParentRoute: () => authLayoutRoute,
   path: 'reset-password',
@@ -77,10 +72,33 @@ const resetPasswordEmailRoute = createRoute({
   component: ResetPasswordEmail,
 })
 
-const routeTree = rootRoute.addChildren([indexRoute,
+const authSplitLayoutRoute = createRoute({
+  getParentRoute: () => authLayoutRoute,
+  id: 'auth-split-layout',
+  component: AuthSplitLayout,
+})
+
+const loginRoute = createRoute({
+  getParentRoute: () => authSplitLayoutRoute,
+  path: 'login',
+  component: Login,
+})
+
+const forgotPasswordRoute = createRoute({
+  getParentRoute: () => authSplitLayoutRoute,
+  path: '/forgot-password'
+})
+
+const routeTree = rootRoute.addChildren([
+  indexRoute,
   authLayoutRoute.addChildren([
-    signUpRoute, signUpSuccessRoute, loginRoute, resetPasswordRoute, resetPasswordSuccessRoute, resetPasswordEmailRoute
-  ])
+    signUpRoute,
+    signUpSuccessRoute,
+    resetPasswordRoute,
+    resetPasswordSuccessRoute,
+    resetPasswordEmailRoute,
+    authSplitLayoutRoute.addChildren([loginRoute, forgotPasswordRoute]),
+  ]),
 ])
 
 const router = createRouter({
