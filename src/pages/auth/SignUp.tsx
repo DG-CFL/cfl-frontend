@@ -10,6 +10,7 @@ import {
   InputGroupInput,
 } from '@/components/ui/input-group'
 import { Label } from '@/components/ui/label'
+import { Popover } from '@/components/ui/popover'
 import {
   Select,
   SelectTrigger,
@@ -18,6 +19,7 @@ import {
   SelectGroup,
   SelectItem,
 } from '@/components/ui/select'
+import { DatePicker } from '@/components/ui_custom/DatePicker'
 import { CalendarDays, EyeClosed } from 'lucide-react'
 
 export default function SignUp() {
@@ -71,14 +73,7 @@ export default function SignUp() {
           <FieldLabel htmlFor="date-of-birth">
             <h3>Date of Birth</h3>
           </FieldLabel>
-          <InputGroup>
-            <InputGroupInput id="date-of-birth" placeholder="MM / DD / YYYY" />
-            <InputGroupAddon align={'inline-end'}>
-              <InputGroupButton size={'icon-sm'}>
-                <CalendarDays />
-              </InputGroupButton>
-            </InputGroupAddon>
-          </InputGroup>
+          <DatePicker id='date-of-birth' placeholder='MM / DD / YYYY'/>
         </Field>
         <Field>
           <FieldLabel htmlFor="contact-number">
