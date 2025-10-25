@@ -14,9 +14,15 @@ import {
 } from '@/components/ui/select'
 import { DatePicker } from '@/components/ui_custom/DatePicker'
 import { MaskableInput } from '@/components/ui_custom/MaskableInput'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 
 export default function SignUp() {
+  const navigate = useNavigate()
+
+  const handleSignUp = () => {
+    navigate({ to: '/sign-up-success' })
+  }
+
   return (
     <div className="w-full max-w-6xl space-y-10 flex flex-col justify-center items-center text-center">
       <img src={logo} alt="CFL Logo" />
@@ -91,7 +97,7 @@ export default function SignUp() {
         <Button variant={'link'}>
           <Link to="/login">Back to Login</Link>
         </Button>
-        <Button>Sign Up</Button>
+        <Button onClick={handleSignUp}>Sign Up</Button>
       </div>
     </div>
   )
