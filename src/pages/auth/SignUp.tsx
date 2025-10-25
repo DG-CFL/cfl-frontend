@@ -1,5 +1,6 @@
 import logo from '@/assets/cfl-logo.png'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import {
@@ -8,6 +9,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '@/components/ui/input-group'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectTrigger,
@@ -20,7 +22,7 @@ import { CalendarDays, EyeClosed } from 'lucide-react'
 
 export default function SignUp() {
   return (
-    <div className="w-full max-w-6xl space-y-6 flex flex-col justify-center items-center text-center">
+    <div className="w-full max-w-6xl space-y-10 flex flex-col justify-center items-center text-center">
       <img src={logo} alt="CFL Logo" />
       <h1>Sign Up</h1>
       <FieldGroup className="grid sm:grid-cols-2 gap-x-40">
@@ -85,8 +87,23 @@ export default function SignUp() {
           <Input id="contact-number" />
         </Field>
       </FieldGroup>
-      <div className="w-full gap-x-40 mt-10 grid grid-cols-2">
-        <Button variant={"link"}>Back to Login</Button>
+      <div className="flex flex-col w-full gap-6">
+        <div className="flex items-center gap-3">
+          <Checkbox id="notifications" />
+          <Label htmlFor="notifications" className="text-lg text-muted-foreground">
+            I want to receive email notifications from Caring for Life
+          </Label>
+        </div>
+        <div className="flex items-center gap-3">
+          <Checkbox id="terms" />
+          <Label htmlFor="terms" className="text-lg text-muted-foreground">
+            I acknowledge that I agree to the Terms of Use and have read the
+            Privacy Policy
+          </Label>
+        </div>
+      </div>
+      <div className="w-full gap-x-40 grid grid-cols-2">
+        <Button variant={'link'}>Back to Login</Button>
         <Button>Sign Up</Button>
       </div>
     </div>
