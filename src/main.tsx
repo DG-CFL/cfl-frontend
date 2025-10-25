@@ -18,6 +18,7 @@ import SignUp from './pages/auth/SignUp.tsx'
 import ResetPassword from './pages/auth/ResetPassword.tsx'
 import SignUpSuccess from './pages/auth/SignUpSuccess.tsx'
 import ResetPasswordSuccess from './pages/auth/ResetPasswordSuccess.tsx'
+import ResetPasswordEmail from './pages/auth/ResetPasswordEmail.tsx'
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -70,9 +71,15 @@ const resetPasswordSuccessRoute = createRoute({
   component: ResetPasswordSuccess,
 })
 
+const resetPasswordEmailRoute = createRoute({
+  getParentRoute: () => authLayoutRoute,
+  path: 'reset-password-email',
+  component: ResetPasswordEmail,
+})
+
 const routeTree = rootRoute.addChildren([indexRoute,
   authLayoutRoute.addChildren([
-    signUpRoute, signUpSuccessRoute, loginRoute, resetPasswordRoute, resetPasswordSuccessRoute
+    signUpRoute, signUpSuccessRoute, loginRoute, resetPasswordRoute, resetPasswordSuccessRoute, resetPasswordEmailRoute
   ])
 ])
 
