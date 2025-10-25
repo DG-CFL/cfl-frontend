@@ -86,7 +86,7 @@ export default function SignUp() {
         </Field>
       </FieldGroup>
       <div className="w-full gap-x-40 mt-10 grid grid-cols-2">
-        <Button>Back to Login</Button>
+        <Button variant={"link"}>Back to Login</Button>
         <Button>Sign Up</Button>
       </div>
     </div>
