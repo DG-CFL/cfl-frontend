@@ -1,5 +1,6 @@
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { Button } from '@/components/ui/button'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
 
 export default function SignUp() {
   return (
@@ -7,16 +8,26 @@ export default function SignUp() {
       <h1>Sign Up</h1>
       <FieldGroup className="w-[426px]">
         <Field>
-          <FieldLabel htmlFor="username"><h2>Username</h2></FieldLabel>
-          <Input id="username" autoComplete="off"/>
+          <FieldLabel htmlFor="username">
+            <h2>Username</h2>
+          </FieldLabel>
+          <Input id="username" autoComplete="off" />
         </Field>
         <Field>
-          <FieldLabel htmlFor="email"><h2>Email</h2></FieldLabel>
-          <Input id="email" autoComplete="off"/>
+          <FieldLabel htmlFor="email">
+            <h2>Email</h2>
+          </FieldLabel>
+          <Input id="email" autoComplete="off" />
         </Field>
         <Field>
-          <FieldLabel htmlFor="password"><h2>Password</h2></FieldLabel>
-          <Input id="password" autoComplete="off"/>
+          <FieldLabel htmlFor="password">
+            <h2>Password</h2>
+          </FieldLabel>
+          <Input id="password" autoComplete="off" />
+        </Field>
+        <Field className='mt-10'>
+          <Button>Sign Up</Button>
+          <Button variant={'link'}>Back to Login</Button>
         </Field>
       </FieldGroup>
     </>
