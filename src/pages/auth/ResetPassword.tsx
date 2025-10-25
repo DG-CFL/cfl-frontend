@@ -2,8 +2,17 @@ import logo from '@/assets/cfl-logo.png'
 import { Button } from '@/components/ui/button'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { MaskableInput } from '@/components/ui_custom/MaskableInput'
+import { useNavigate } from '@tanstack/react-router'
 
 export default function ResetPassword() {
+  const navigate = useNavigate()
+
+  const handleResetPassword = () => {
+    navigate({
+      to: '/reset-password-success',
+    })
+  }
+
   return (
     <div className="space-y-10 flex flex-col justify-center items-center">
       <img src={logo} alt="CFL Logo" />
@@ -21,7 +30,7 @@ export default function ResetPassword() {
           </FieldLabel>
           <MaskableInput id="confirm-password" />
         </Field>
-        <Button>Reset</Button>
+        <Button onClick={handleResetPassword}>Reset</Button>
       </FieldGroup>
     </div>
   )
