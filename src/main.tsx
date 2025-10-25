@@ -10,9 +10,12 @@ import {
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
 import './styles.css'
-import reportWebVitals from './reportWebVitals.ts'
 
 import App from './App.tsx'
+import AuthLayout from './pages/auth/AuthLayout.tsx'
+import Login from './pages/auth/Login.tsx'
+import SignUp from './pages/auth/SignUp.tsx'
+import ResetPassword from './pages/auth/ResetPassword.tsx'
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -29,7 +32,35 @@ const indexRoute = createRoute({
   component: App,
 })
 
-const routeTree = rootRoute.addChildren([indexRoute])
+const authLayoutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  id: 'auth',
+  component: AuthLayout,
+})
+
+const signUpRoute = createRoute({
+  getParentRoute: () => authLayoutRoute,
+  path: 'sign-up',
+  component: SignUp,
+})
+
+const loginRoute = createRoute({
+  getParentRoute: () => authLayoutRoute,
+  path: 'login',
+  component: Login,
+})
+
+const resetPasswordRoute = createRoute({
+  getParentRoute: () => authLayoutRoute,
+  path: 'reset-password',
+  component: ResetPassword,
+})
+
+const routeTree = rootRoute.addChildren([indexRoute,
+  authLayoutRoute.addChildren([
+    signUpRoute, loginRoute, resetPasswordRoute
+  ])
+])
 
 const router = createRouter({
   routeTree,
@@ -55,8 +86,3 @@ if (rootElement && !rootElement.innerHTML) {
     </StrictMode>,
   )
 }
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals()
