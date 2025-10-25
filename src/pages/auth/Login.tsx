@@ -32,12 +32,18 @@ export default function Login() {
             Remember me
           </Label>
         </div>
-        <Link to="/forgot-password">Forgot Password</Link>
+        <Link to="/forgot-password" className="link">
+          Forgot Password
+        </Link>
       </div>
-      <Button className='w-full'>Login</Button>
+      <Button className="w-full">Login</Button>
       <div className="w-full flex justify-between">
-        <span className="text-muted-foreground text-lg">Don't have an account?</span>
-        <Link to="/sign-up">Sign up now</Link>
+        <span className="text-muted-foreground text-lg">
+          Don't have an account?
+        </span>
+        <Link to="/sign-up" className="link">
+          Sign up now
+        </Link>
       </div>
     </div>
   )
