@@ -16,6 +16,7 @@ import AuthLayout from './pages/auth/AuthLayout.tsx'
 import Login from './pages/auth/Login.tsx'
 import SignUp from './pages/auth/SignUp.tsx'
 import ResetPassword from './pages/auth/ResetPassword.tsx'
+import SignUpSuccess from './pages/auth/SignUpSuccess.tsx'
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -44,6 +45,12 @@ const signUpRoute = createRoute({
   component: SignUp,
 })
 
+const signUpSuccessRoute = createRoute({
+  getParentRoute: () => authLayoutRoute,
+  path: 'sign-up-success',
+  component: SignUpSuccess,
+})
+
 const loginRoute = createRoute({
   getParentRoute: () => authLayoutRoute,
   path: 'login',
@@ -58,7 +65,7 @@ const resetPasswordRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([indexRoute,
   authLayoutRoute.addChildren([
-    signUpRoute, loginRoute, resetPasswordRoute
+    signUpRoute, signUpSuccessRoute, loginRoute, resetPasswordRoute
   ])
 ])
 
