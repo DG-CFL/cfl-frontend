@@ -1,3 +1,4 @@
+import logo from '@/assets/cfl-logo.png'
 import { Button } from '@/components/ui/button'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -11,9 +12,10 @@ import { CalendarDays, EyeClosed } from 'lucide-react'
 
 export default function SignUp() {
   return (
-    <div className="w-full max-w-7xl space-y-6 text-center">
+    <div className="w-full max-w-6xl space-y-6 flex flex-col justify-center items-center text-center">
+      <img src={logo} alt="CFL Logo" />
       <h1>Sign Up</h1>
-      <FieldGroup className='grid sm:grid-cols-2 gap-x-40'>
+      <FieldGroup className="grid sm:grid-cols-2 gap-x-40">
         <Field>
           <FieldLabel htmlFor="email">
             <h3>Email Address</h3>

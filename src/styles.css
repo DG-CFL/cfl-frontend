@@ -110,7 +110,7 @@
     @apply font-sans
   }
   h1 {
-    @apply text-4xl font-extrabold
+    @apply text-5xl font-extrabold
   }
   h2 {
     @apply text-3xl font-semibold
