@@ -113,6 +113,9 @@
     @apply text-4xl font-extrabold
   }
   h2 {
-    @apply text-xl font-semibold
+    @apply text-3xl font-semibold
+  }
+  h3 {
+    @apply text-2xl font-semibold
   }
 }
