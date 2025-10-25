@@ -11,9 +11,9 @@ import { CalendarDays, EyeClosed } from 'lucide-react'
 
 export default function SignUp() {
   return (
-    <div className="w-full p-20 max-w-7x space-y-6 text-center">
+    <div className="w-full max-w-7xl space-y-6 text-center">
       <h1>Sign Up</h1>
-      <FieldGroup className='grid grid-cols-2 gap-x-40'>
+      <FieldGroup className='grid sm:grid-cols-2 gap-x-40'>
         <Field>
           <FieldLabel htmlFor="email">
             <h3>Email Address</h3>
