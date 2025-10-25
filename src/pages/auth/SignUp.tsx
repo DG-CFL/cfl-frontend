@@ -8,7 +8,14 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '@/components/ui/input-group'
-import { Select, SelectTrigger, SelectContent, SelectValue, SelectGroup, SelectItem } from '@/components/ui/select'
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectValue,
+  SelectGroup,
+  SelectItem,
+} from '@/components/ui/select'
 import { CalendarDays, EyeClosed } from 'lucide-react'
 
 export default function SignUp() {
@@ -47,13 +54,13 @@ export default function SignUp() {
             <h3>Gender</h3>
           </FieldLabel>
           <Select>
-            <SelectTrigger id='gender'>
-              <SelectValue placeholder="Select"/>
+            <SelectTrigger id="gender">
+              <SelectValue placeholder="Select" />
             </SelectTrigger>
-            <SelectContent >
-              <SelectGroup >
-                <SelectItem value='male'>Male</SelectItem>
-                <SelectItem value='female'>Female</SelectItem>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="male">Male</SelectItem>
+                <SelectItem value="female">Female</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -77,11 +84,11 @@ export default function SignUp() {
           </FieldLabel>
           <Input id="contact-number" />
         </Field>
-        <Field className="mt-10">
-          <Button>Sign Up</Button>
-          <Button variant={'link'}>Back to Login</Button>
-        </Field>
       </FieldGroup>
+      <div className="w-full gap-x-40 mt-10 grid grid-cols-2">
+        <Button>Back to Login</Button>
+        <Button>Sign Up</Button>
+      </div>
     </div>
   )
 }
