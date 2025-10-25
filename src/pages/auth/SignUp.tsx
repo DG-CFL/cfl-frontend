@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select'
 import { DatePicker } from '@/components/ui_custom/DatePicker'
 import { MaskableInput } from '@/components/ui_custom/MaskableInput'
+import { Link } from '@tanstack/react-router'
 
 export default function SignUp() {
   return (
@@ -87,7 +88,9 @@ export default function SignUp() {
         </div>
       </div>
       <div className="w-full gap-x-40 grid grid-cols-2">
-        <Button variant={'link'}>Back to Login</Button>
+        <Button variant={'link'}>
+          <Link to="/login">Back to Login</Link>
+        </Button>
         <Button>Sign Up</Button>
       </div>
     </div>
