@@ -1,0 +1,10 @@
+<svg width="115" height="115" viewBox="0 0 115 115" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Bottom layer: green circle -->
+  <circle cx="57.5" cy="57.5" r="57.238" fill="#65A30D"/>
+  
+  <!-- Middle layer: light gray circle -->
+  <circle cx="57.5" cy="57.5" r="49.6063" fill="#F5F5F5"/>
+  
+  <!-- Top layer: check mark, perfectly centered -->
+  <path d="M88.02695 36.5127L46.05235 78.4873L26.97285 59.4079" stroke="#65A30D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
