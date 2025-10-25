@@ -3,24 +3,17 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from '@/components/ui/input-group'
 import { Label } from '@/components/ui/label'
-import { Popover } from '@/components/ui/popover'
 import {
   Select,
-  SelectTrigger,
   SelectContent,
-  SelectValue,
   SelectGroup,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select'
 import { DatePicker } from '@/components/ui_custom/DatePicker'
-import { CalendarDays, EyeClosed } from 'lucide-react'
+import { MaskableInput } from '@/components/ui_custom/MaskableInput'
 
 export default function SignUp() {
   return (
@@ -38,14 +31,7 @@ export default function SignUp() {
           <FieldLabel htmlFor="password">
             <h3>Password</h3>
           </FieldLabel>
-          <InputGroup>
-            <InputGroupInput id="password" autoComplete="off" />
-            <InputGroupAddon align={'inline-end'}>
-              <InputGroupButton size={'icon-sm'}>
-                <EyeClosed />
-              </InputGroupButton>
-            </InputGroupAddon>
-          </InputGroup>
+          <MaskableInput id="password" />
         </Field>
         <Field>
           <FieldLabel htmlFor="full-name">
@@ -73,7 +59,7 @@ export default function SignUp() {
           <FieldLabel htmlFor="date-of-birth">
             <h3>Date of Birth</h3>
           </FieldLabel>
-          <DatePicker id='date-of-birth' placeholder='MM / DD / YYYY'/>
+          <DatePicker id="date-of-birth" placeholder="MM / DD / YYYY" />
         </Field>
         <Field>
           <FieldLabel htmlFor="contact-number">
@@ -85,7 +71,10 @@ export default function SignUp() {
       <div className="flex flex-col w-full gap-6">
         <div className="flex items-center gap-3">
           <Checkbox id="notifications" />
-          <Label htmlFor="notifications" className="text-lg text-muted-foreground">
+          <Label
+            htmlFor="notifications"
+            className="text-lg text-muted-foreground"
+          >
             I want to receive email notifications from Caring for Life
           </Label>
         </div>
