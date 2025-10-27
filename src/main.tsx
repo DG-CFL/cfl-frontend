@@ -23,6 +23,7 @@ import AuthSplitLayout from './pages/auth/AuthSplitLayout.tsx'
 import ForgotPassword from './pages/auth/ForgotPassword.tsx'
 import EventsLayout from './pages/events/EventsLayout.tsx'
 import ManageEvents from './pages/events/ManageEvents.tsx'
+import ViewEvent from './pages/events/ViewEvent.tsx'
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -105,10 +106,15 @@ const manageEventsRoute = createRoute({
   component: ManageEvents,
 })
 
+const viewEventRoute = createRoute({
+  getParentRoute: () => eventsLayoutRoute,
+  path: '$eventId',
+  component: ViewEvent,
+})
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
-  eventsLayoutRoute.addChildren([manageEventsRoute]),
+  eventsLayoutRoute.addChildren([manageEventsRoute, viewEventRoute]),
   authLayoutRoute.addChildren([
     signUpRoute,
     signUpSuccessRoute,
