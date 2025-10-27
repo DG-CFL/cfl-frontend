@@ -52,19 +52,19 @@ const placeholderEvents: Array<EventSummary> = [
 export default function ManageEvents() {
   return (
     <section className="min-h-screen bg-background">
-      <div className="mx-auto max-w-[1320px] px-10 py-14 2xl:max-w-[1500px]">
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          <div className="col-span-full flex items-center gap-6">
-            <h1>Manage events</h1>
-            <Button
-              variant="default"
-              className="ml-auto h-[42px] w-[190px] gap-2.5 rounded-md bg-[var(--color-primary)] px-4 py-3 text-base font-medium"
-            >
-              <PlusCircle className="size-5" aria-hidden="true" />
-              Create New Event
-            </Button>
-          </div>
+      <div className="mx-auto w-full space-y-12 px-10 py-14 md:max-w-[calc(403px*2+24px)] xl:max-w-[calc(403px*3+24px*2)]">
+        <div className="flex items-center justify-between">
+          <h1>Manage events</h1>
+          <Button
+            variant="default"
+            className="h-[42px] w-[190px] gap-2.5 rounded-md bg-[#545F71] px-4 py-3 text-base font-medium"
+          >
+            <PlusCircle className="size-5" aria-hidden="true" />
+            Create New Event
+          </Button>
+        </div>
 
+        <div className="grid gap-x-10 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
           {placeholderEvents.map((event) => (
             <EventCard
               key={event.id}
