@@ -102,13 +102,13 @@ const eventsLayoutRoute = createRoute({
 
 const manageEventsRoute = createRoute({
   getParentRoute: () => eventsLayoutRoute,
-  path: '/',
+  path: '/manage-events',
   component: ManageEvents,
 })
 
 const viewEventRoute = createRoute({
   getParentRoute: () => eventsLayoutRoute,
-  path: '$eventId',
+  path: 'view-event',
   component: ViewEvent,
 })
 
