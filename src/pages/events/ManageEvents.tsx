@@ -1,6 +1,6 @@
+import { PlusCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { EventCard } from '@/components/ui_custom/EventCard'
-import { PlusCircle } from 'lucide-react'
 
 type EventSummary = {
   id: string
@@ -10,7 +10,7 @@ type EventSummary = {
 }
 
 // Placeholder data for events
-const placeholderEvents: EventSummary[] = [
+const placeholderEvents: Array<EventSummary> = [
   {
     id: 'event-1',
     name: 'Community Charity Gala',
