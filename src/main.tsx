@@ -21,6 +21,7 @@ import ResetPasswordSuccess from './pages/auth/ResetPasswordSuccess.tsx'
 import ResetPasswordEmail from './pages/auth/ResetPasswordEmail.tsx'
 import AuthSplitLayout from './pages/auth/AuthSplitLayout.tsx'
 import ForgotPassword from './pages/auth/ForgotPassword.tsx'
+import ManageEvents from './pages/events/ManageEvents.tsx'
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -91,8 +92,15 @@ const forgotPasswordRoute = createRoute({
   component: ForgotPassword,
 })
 
+const manageEventsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'manage-events',
+  component: ManageEvents,
+})
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
+  manageEventsRoute,
   authLayoutRoute.addChildren([
     signUpRoute,
     signUpSuccessRoute,
