@@ -138,7 +138,7 @@ export default function ViewEvent({ data = PLACEHOLDER_DATA }: ViewEventProps) {
         </CardContent>
       </Card>
 
-      <Card className="gap-0 rounded-3xl border-muted-foreground/30">
+      <Card className="gap-0 rounded-[10px] border-muted-foreground/30">
         <CardContent className="grid max-h-[600px] gap-10 overflow-y-auto px-8 py-8 lg:grid-cols-2">
           <div className="space-y-6">
             <h2>Volunteer Coordinators</h2>
