@@ -6,15 +6,17 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+
 } from "@tanstack/react-table"
 import type { 
+    Column,
   ColumnDef,
   ColumnFiltersState,
   SortingState,
   VisibilityState,
 } from "@tanstack/react-table"
 import { 
-  ArrowUpDown, ChevronDown, MoreHorizontal, Funnel, 
+  Funnel, 
   CirclePlus, Trash, ChevronRight
 } from "lucide-react"
 
@@ -25,9 +27,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
@@ -116,7 +115,7 @@ export type Volunteer = {
   volunteerHistory : string
 }
 
-const columnFilter = (column, columnName : string, options : string[]) => {
+const columnFilter= <T,>(column :Column<T, any>, columnName : string, options : string[]) => {
   return (
         <DropdownMenu >
           <DropdownMenuTrigger asChild>
@@ -291,7 +290,6 @@ export const columns: ColumnDef<Volunteer>[] = [
   {
     accessorKey: "certifications",
     filterFn: (row, columnId, value) => {
-      // If no filter value is applied, show all rows
       if (value.length === 0) return true;
       
       return value.filter((x : string) => !(row.getValue(columnId) as string[]).includes(x)).length === 0;
@@ -305,7 +303,7 @@ export const columns: ColumnDef<Volunteer>[] = [
   },
   {
     accessorKey: "volunteerHistory",
-    header: ({ column }) => {
+    header: () => {
       return (
         <Button
           className='text-sm'

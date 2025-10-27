@@ -21,7 +21,6 @@ import ResetPasswordSuccess from './pages/auth/ResetPasswordSuccess.tsx'
 import ResetPasswordEmail from './pages/auth/ResetPasswordEmail.tsx'
 import AuthSplitLayout from './pages/auth/AuthSplitLayout.tsx'
 import ForgotPassword from './pages/auth/ForgotPassword.tsx'
-import VolunteerPage from './pages/vms/VolunteerPage.tsx'
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -44,11 +43,6 @@ const authLayoutRoute = createRoute({
   component: AuthLayout,
 })
 
-const vmsTableTestRoute = createRoute({ // temp remove after done
-  getParentRoute: () => rootRoute,
-  path: '/test',
-  component: VolunteerPage,
-})
 
 const signUpRoute = createRoute({
   getParentRoute: () => authLayoutRoute,
@@ -108,7 +102,6 @@ const routeTree = rootRoute.addChildren([
     resetPasswordEmailRoute,
     authSplitLayoutRoute.addChildren([loginRoute, forgotPasswordRoute]),
   ]),
-  vmsTableTestRoute,
 ])
 
 const router = createRouter({
