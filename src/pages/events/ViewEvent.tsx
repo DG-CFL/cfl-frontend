@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CalendarDays, ImageIcon, MapPin, PencilLine } from 'lucide-react'
+import { CalendarDays, ImageIcon, MapPin, SquarePen } from 'lucide-react'
 
 type People = {
   name: string
@@ -49,7 +49,7 @@ export default function ViewEvent({ data = PLACEHOLDER_DATA }: ViewEventProps) {
       <div className="flex items-center gap-6">
         <h1>{data.eventName}</h1>
         <Button className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold">
-          <PencilLine className="size-5" aria-hidden="true" />
+          <SquarePen className="size-5" aria-hidden="true" />
           Edit Event Details
         </Button>
       </div>
