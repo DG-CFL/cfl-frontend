@@ -1,7 +1,8 @@
-import { Button } from '@/components/ui/button'
-import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import { Calendar, MapPin } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
+
+import { Button } from '@/components/ui/button'
+import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 
 export type EventCardProps = {
   id: string
