@@ -46,6 +46,7 @@ const authLayoutRoute = createRoute({
   component: AuthLayout,
 })
 
+
 const signUpRoute = createRoute({
   getParentRoute: () => authLayoutRoute,
   path: 'sign-up',
