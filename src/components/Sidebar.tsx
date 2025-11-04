@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   Home,
@@ -16,9 +16,9 @@ type Item = { label: string; to: string; icon: any };
 
 const TOP: Item[] = [
   { label: "Home", to: "/", icon: Home },
-  { label: "Text", to: "/calendar", icon: Calendar },
-  { label: "Volunteer Management System", to: "/vms", icon: Users },
-  { label: "Text", to: "/stats", icon: BarChart2 },
+  { label: "Calendar", to: "/calendar", icon: Calendar },
+  { label: "Volunteer Management System", to: "/volunteers", icon: Users },
+  { label: "Events", to: "/events/manage-events", icon: BarChart2 },
 ];
 
 const BOTTOM: Item[] = [
@@ -29,15 +29,27 @@ const BOTTOM: Item[] = [
 
 export default function Sidebar() {
   const [expanded, setExpanded] = useState(true);
-  const collapsed = !expanded;
+  const [isMobile, setIsMobile] = useState(false);
+  const collapsed = !expanded || isMobile;
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   return (
     <aside
       style={{
-        width: expanded ? 248 : 72,
+        width: isMobile ? 64 : (expanded ? 248 : 72),
         height: "100vh",
         background: "#DADBDD",
-        padding: 12,
+        padding: isMobile ? 8 : 12,
         boxSizing: "border-box",
         position: "relative",
         transition: "width 160ms ease",
@@ -46,26 +58,28 @@ export default function Sidebar() {
         justifyContent: "space-between",
       }}
     >
-      <button
-        onClick={() => setExpanded((p) => !p)}
-        style={{
-          position: "absolute",
-          top: "50%",
-          right: -10,
-          transform: "translateY(-50%)",
-          width: 22,
-          height: 22,
-          borderRadius: 6,
-          background: "#ECEDEF",
-          border: "1px solid #BFC2C7",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-        }}
-      >
-        {expanded ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
-      </button>
+      {!isMobile && (
+        <button
+          onClick={() => setExpanded((p) => !p)}
+          style={{
+            position: "absolute",
+            top: "50%",
+            right: -10,
+            transform: "translateY(-50%)",
+            width: 22,
+            height: 22,
+            borderRadius: 6,
+            background: "#ECEDEF",
+            border: "1px solid #BFC2C7",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+          }}
+        >
+          {expanded ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
+        </button>
+      )}
 
       <nav style={{ paddingTop: 4 }}>
         {collapsed ? (
