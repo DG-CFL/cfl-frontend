@@ -26,13 +26,18 @@ import ManageEvents from './pages/events/ManageEvents.tsx'
 import ViewEvent from './pages/events/ViewEvent.tsx'
 import CreateEditEvent from './pages/events/CreateEditEvent.tsx'
 import CreateEditEventSuccess from './pages/events/CreateEditEventSuccess.tsx'
+import VolunteerPage from './pages/vms/VolunteerPage.tsx'
+import Sidebar from './components/Sidebar.tsx'
 
 const rootRoute = createRootRoute({
   component: () => (
-    <>
-      <Outlet />
-      <TanStackRouterDevtools />
-    </>
+    <div className="flex">
+      <Sidebar />
+      <div className="flex-1">
+        <Outlet />
+        <TanStackRouterDevtools />
+      </div>
+    </div>
   ),
 })
 
@@ -127,12 +132,19 @@ const createEditEventSuccessRoute = createRoute({
   component: CreateEditEventSuccess,
 })
 
-const routeTree = rootRoute.addChildren([
+const volunteerPageRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'volunteers',
+  component: VolunteerPage,
+})
+
+export const routeTree = rootRoute.addChildren([
   indexRoute,
   eventsLayoutRoute.addChildren([manageEventsRoute,
   viewEventRoute,
   createEditEventRoute,
   createEditEventSuccessRoute]),
+  volunteerPageRoute,
   authLayoutRoute.addChildren([
     signUpRoute,
     signUpSuccessRoute,
