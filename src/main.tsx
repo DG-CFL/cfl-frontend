@@ -24,6 +24,8 @@ import ForgotPassword from './pages/auth/ForgotPassword.tsx'
 import EventsLayout from './pages/events/EventsLayout.tsx'
 import ManageEvents from './pages/events/ManageEvents.tsx'
 import ViewEvent from './pages/events/ViewEvent.tsx'
+import CreateEditEvent from './pages/events/CreateEditEvent.tsx'
+import CreateEditEventSuccess from './pages/events/CreateEditEventSuccess.tsx'
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -103,7 +105,7 @@ const eventsLayoutRoute = createRoute({
 
 const manageEventsRoute = createRoute({
   getParentRoute: () => eventsLayoutRoute,
-  path: '/manage-events',
+  path: 'manage-events',
   component: ManageEvents,
 })
 
@@ -113,9 +115,24 @@ const viewEventRoute = createRoute({
   component: ViewEvent,
 })
 
+const createEditEventRoute = createRoute({
+  getParentRoute: () => eventsLayoutRoute,
+  path: 'create-edit-event',
+  component: CreateEditEvent,
+})
+
+const createEditEventSuccessRoute = createRoute({
+  getParentRoute: () => eventsLayoutRoute,
+  path: 'create-edit-event-success',
+  component: CreateEditEventSuccess,
+})
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
-  eventsLayoutRoute.addChildren([manageEventsRoute, viewEventRoute]),
+  eventsLayoutRoute.addChildren([manageEventsRoute,
+  viewEventRoute,
+  createEditEventRoute,
+  createEditEventSuccessRoute]),
   authLayoutRoute.addChildren([
     signUpRoute,
     signUpSuccessRoute,
