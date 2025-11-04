@@ -1,38 +1,23 @@
-import logo from './logo.svg'
+import Sidebar from "./components/Sidebar";
 
 function App() {
   return (
-    <div className="text-center">
-      <header className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
-        <img
-          src={logo}
-          className="h-[40vmin] pointer-events-none animate-[spin_20s_linear_infinite]"
-          alt="logo"
-        />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
+    <div className="flex h-screen">
+      {/* Sidebar on the left */}
+      <Sidebar />
+
+      {/* Main content preview area */}
+      <main className="flex-1 bg-white p-8">
+        <h1 className="text-2xl font-bold mb-4">Sidebar Preview</h1>
+        <p className="text-gray-600">
+          This is a temporary preview area to test your Sidebar UI.
         </p>
-
-
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://tanstack.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn TanStack
-        </a>
-      </header>
+        <p className="mt-2 text-gray-500">
+          You can collapse or expand the sidebar using the toggle button.
+        </p>
+      </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
