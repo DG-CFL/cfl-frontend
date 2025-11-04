@@ -28,7 +28,7 @@ export default function VolunteerPage () {
               <h1> Volunteer Information </h1> 
             </div>
           </div>
-          <div className='flex-grow'>
+          <div className='grow'>
           <VolunteerInformationPage clickedRow={clickedRow}/>
           </div>
         </div>

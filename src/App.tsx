@@ -1,35 +1,31 @@
-import logo from './logo.svg'
-
 function App() {
   return (
     <div className="text-center">
       <header className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
-        <img
-          src={logo}
-          className="h-[40vmin] pointer-events-none animate-[spin_20s_linear_infinite]"
-          alt="logo"
-        />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
+        <h1 className="text-4xl font-bold mb-8">Welcome to CFL</h1>
+        <p className="mb-6">
+          This is a placeholder page for the CFL application.
         </p>
-
-
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://tanstack.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn TanStack
-        </a>
+        <div className="space-y-4">
+          <a
+            className="text-[#61dafb] hover:underline block"
+            href="/login"
+          >
+            Go to Login
+          </a>
+          <a
+            className="text-[#61dafb] hover:underline block"
+            href="/sign-up"
+          >
+            Go to Sign Up
+          </a>
+          <a
+            className="text-[#61dafb] hover:underline block"
+            href="/events/manage-events"
+          >
+            Manage Events
+          </a>
+        </div>
       </header>
     </div>
   )
