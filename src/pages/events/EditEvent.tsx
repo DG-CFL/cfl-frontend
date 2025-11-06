@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { format, isValid, parse } from 'date-fns'
 import { CalendarDays, ChevronLeft, Upload } from 'lucide-react'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useParams } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Card, CardContent } from '@/components/ui/card'
@@ -15,6 +15,7 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 
 export default function EditEvent() {
+  const { eventId } = useParams({ strict: false })
   const [dragActive, setDragActive] = useState(false)
   const [startDate, setStartDate] = useState<Date>()
   const [endDate, setEndDate] = useState<Date>()

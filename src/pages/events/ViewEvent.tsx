@@ -1,25 +1,17 @@
+import { useNavigate, useParams } from '@tanstack/react-router'
+import { CalendarDays, ImageIcon, MapPin, SquarePen } from 'lucide-react'
+import type { EventData } from '@/pages/events/placeholderEvents'
+import { getEventById } from '@/pages/events/placeholderEvents'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CalendarDays, ImageIcon, MapPin, SquarePen } from 'lucide-react'
 
 type People = {
   name: string
   role: string
 }
 
-type EventData = {
-  eventName: string
-  status: string
-  location: string
-  coverImage: string
-  startDate: string
-  endDate: string
-  description: string
-  coordinators: People[]
-  volunteers: People[]
-}
-
 const PLACEHOLDER_DATA: EventData = {
+  id: 'default',
   eventName: 'Event Name',
   status: 'Active',
   location: 'Orchard Central, Somerset, 666666',
@@ -39,16 +31,26 @@ const PLACEHOLDER_DATA: EventData = {
   ],
 }
 
-type ViewEventProps = {
-  data?: EventData
-}
+export default function ViewEvent() {
+  const { eventId } = useParams({ strict: false })
+  const navigate = useNavigate()
+  
+  // Get event data based on eventId, fallback to placeholder
+  const data = eventId ? getEventById(eventId) || PLACEHOLDER_DATA : PLACEHOLDER_DATA
 
-export default function ViewEvent({ data = PLACEHOLDER_DATA }: ViewEventProps) {
+  const handleEditClick = () => {
+    if (data.id) {
+      navigate({ to: `/events/edit-event/${data.id}` })
+    }
+  }
   return (
     <div className="mx-auto flex w-full max-w-[1662px] flex-col gap-9 px-10 py-14">
       <div className="flex items-center gap-6">
         <h1>{data.eventName}</h1>
-        <Button className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold">
+        <Button 
+          className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold"
+          onClick={handleEditClick}
+        >
           <SquarePen className="size-5" aria-hidden="true" />
           Edit Event Details
         </Button>
