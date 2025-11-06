@@ -24,7 +24,11 @@ import ForgotPassword from './pages/auth/ForgotPassword.tsx'
 import EventsLayout from './pages/events/EventsLayout.tsx'
 import ManageEvents from './pages/events/ManageEvents.tsx'
 import ViewEvent from './pages/events/ViewEvent.tsx'
+import CreateEvent from './pages/events/CreateEvent.tsx'
+import EditEvent from './pages/events/EditEvent.tsx'
 import CreateEditEvent from './pages/events/CreateEditEvent.tsx'
+import CreateEventSuccess from './pages/events/CreateEventSuccess.tsx'
+import EditEventSuccess from './pages/events/EditEventSuccess.tsx'
 import CreateEditEventSuccess from './pages/events/CreateEditEventSuccess.tsx'
 import VolunteerPage from './pages/vms/VolunteerPage.tsx'
 import Sidebar from './components/Sidebar.tsx'
@@ -126,10 +130,34 @@ const createEditEventRoute = createRoute({
   component: CreateEditEvent,
 })
 
+const createEventRoute = createRoute({
+  getParentRoute: () => eventsLayoutRoute,
+  path: 'create-event',
+  component: CreateEvent,
+})
+
+const editEventRoute = createRoute({
+  getParentRoute: () => eventsLayoutRoute,
+  path: 'edit-event',
+  component: EditEvent,
+})
+
 const createEditEventSuccessRoute = createRoute({
   getParentRoute: () => eventsLayoutRoute,
   path: 'create-edit-event-success',
   component: CreateEditEventSuccess,
+})
+
+const createEventSuccessRoute = createRoute({
+  getParentRoute: () => eventsLayoutRoute,
+  path: 'create-event-success',
+  component: CreateEventSuccess,
+})
+
+const editEventSuccessRoute = createRoute({
+  getParentRoute: () => eventsLayoutRoute,
+  path: 'edit-event-success',
+  component: EditEventSuccess,
 })
 
 const volunteerPageRoute = createRoute({
@@ -144,7 +172,11 @@ export const routeTree = rootRoute.addChildren([
     manageEventsRoute,
     viewEventRoute,
     createEditEventRoute,
-    createEditEventSuccessRoute
+    createEventRoute,
+    editEventRoute,
+    createEditEventSuccessRoute,
+    createEventSuccessRoute,
+    editEventSuccessRoute,
   ]),
   volunteerPageRoute,
   authLayoutRoute.addChildren([
