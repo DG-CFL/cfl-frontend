@@ -48,7 +48,7 @@ export default function ViewEvent() {
           className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold"
           onClick={() => {
             if (data.id) {
-              navigate({ to: `/events/edit-event/${data.id}` })
+              navigate({ to: `/events/edit-event/${data.id}` });
             }
           }}
         >
@@ -65,7 +65,7 @@ export default function ViewEvent() {
         </CardHeader>
         <CardContent className="flex-1 overflow-y-auto px-8 pb-8 pt-0">
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            
+
             {/* Row 1: Status, Location, Cover Image */}
             <div className="space-y-3">
               <p className="text-xl leading-7 text-muted-foreground">Status</p>
