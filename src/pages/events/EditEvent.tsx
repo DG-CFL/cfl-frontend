@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/popover'
 import { Textarea } from '@/components/ui/textarea'
 
-export default function CreateEditEvent() {
+export default function EditEvent() {
   const [dragActive, setDragActive] = useState(false)
   const [startDate, setStartDate] = useState<Date>()
   const [endDate, setEndDate] = useState<Date>()
@@ -70,9 +70,9 @@ export default function CreateEditEvent() {
           <ChevronLeft className="size-8" />
         </Button>
         <div className="flex flex-col gap-1">
-          <h1>Edit/Create New Event</h1>
+          <h1>Edit Event</h1>
           <p className="text-xl leading-7 text-muted-foreground">
-            Fill in the details below to define/edit a volunteer project
+            Fill in the details below to edit a volunteer project
           </p>
         </div>
       </div>
@@ -251,7 +251,7 @@ export default function CreateEditEvent() {
             <Button
               className="h-[42px] w-[154px] rounded-md bg-[#545F71] px-4 py-3 text-base font-semibold"
               onClick={() =>
-                navigate({ to: '/events/create-edit-event-success' })
+                navigate({ to: '/events/edit-event-success' })
               }
             >
               Save & Publish

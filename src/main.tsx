@@ -26,10 +26,8 @@ import ManageEvents from './pages/events/ManageEvents.tsx'
 import ViewEvent from './pages/events/ViewEvent.tsx'
 import CreateEvent from './pages/events/CreateEvent.tsx'
 import EditEvent from './pages/events/EditEvent.tsx'
-import CreateEditEvent from './pages/events/CreateEditEvent.tsx'
 import CreateEventSuccess from './pages/events/CreateEventSuccess.tsx'
 import EditEventSuccess from './pages/events/EditEventSuccess.tsx'
-import CreateEditEventSuccess from './pages/events/CreateEditEventSuccess.tsx'
 import VolunteerPage from './pages/vms/VolunteerPage.tsx'
 import Sidebar from './components/Sidebar.tsx'
 
@@ -124,12 +122,6 @@ const viewEventRoute = createRoute({
   component: ViewEvent,
 })
 
-const createEditEventRoute = createRoute({
-  getParentRoute: () => eventsLayoutRoute,
-  path: 'create-edit-event',
-  component: CreateEditEvent,
-})
-
 const createEventRoute = createRoute({
   getParentRoute: () => eventsLayoutRoute,
   path: 'create-event',
@@ -140,12 +132,6 @@ const editEventRoute = createRoute({
   getParentRoute: () => eventsLayoutRoute,
   path: 'edit-event',
   component: EditEvent,
-})
-
-const createEditEventSuccessRoute = createRoute({
-  getParentRoute: () => eventsLayoutRoute,
-  path: 'create-edit-event-success',
-  component: CreateEditEventSuccess,
 })
 
 const createEventSuccessRoute = createRoute({
@@ -171,10 +157,8 @@ export const routeTree = rootRoute.addChildren([
   eventsLayoutRoute.addChildren([
     manageEventsRoute,
     viewEventRoute,
-    createEditEventRoute,
     createEventRoute,
     editEventRoute,
-    createEditEventSuccessRoute,
     createEventSuccessRoute,
     editEventSuccessRoute,
   ]),
