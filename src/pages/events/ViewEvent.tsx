@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { CalendarDays, ImageIcon, MapPin, SquarePen } from 'lucide-react'
-import type { EventData } from '@/pages/events/placeholderEvents'
-import { getEventById } from '@/pages/events/placeholderEvents'
+import { getEventById } from './placeholderEvents'
+import type { EventData } from './placeholderEvents'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 

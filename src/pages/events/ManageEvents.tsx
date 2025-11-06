@@ -1,53 +1,7 @@
 import { PlusCircle } from 'lucide-react'
+import { PLACEHOLDER_EVENTS } from './placeholderEvents'
 import { Button } from '@/components/ui/button'
 import { EventCard } from '@/components/ui_custom/EventCard'
-
-type EventSummary = {
-  id: string
-  name: string
-  location: string
-  dateRange: string
-}
-
-// Placeholder data for events
-const placeholderEvents: Array<EventSummary> = [
-  {
-    id: 'event-1',
-    name: 'Community Charity Gala',
-    location: 'Harborview Conference Center · Seattle, WA',
-    dateRange: 'April 12 – 14, 2025',
-  },
-  {
-    id: 'event-2',
-    name: 'Youth Leadership Summit',
-    location: 'Northside Innovation Hub · Austin, TX',
-    dateRange: 'May 8 – 9, 2025',
-  },
-  {
-    id: 'event-3',
-    name: 'Spring Volunteer Drive',
-    location: 'Civic Green Park · Denver, CO',
-    dateRange: 'April 20, 2025',
-  },
-  {
-    id: 'event-4',
-    name: 'Community Arts Festival',
-    location: 'Riverside Pavilion · Portland, OR',
-    dateRange: 'June 2 – 4, 2025',
-  },
-  {
-    id: 'event-5',
-    name: 'Neighborhood Cleanup Day',
-    location: 'Central Plaza · Chicago, IL',
-    dateRange: 'April 27, 2025',
-  },
-  {
-    id: 'event-6',
-    name: 'Annual Donor Reception',
-    location: 'Skyline Terrace · New York, NY',
-    dateRange: 'May 22, 2025',
-  },
-]
 
 export default function ManageEvents() {
   return (
@@ -64,13 +18,13 @@ export default function ManageEvents() {
       </div>
 
       <div className="grid gap-x-10 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
-        {placeholderEvents.map((event) => (
+        {PLACEHOLDER_EVENTS.map((event) => (
           <EventCard
             key={event.id}
             id={event.id}
-            name={event.name}
+            name={event.eventName}
             location={event.location}
-            dateRange={event.dateRange}
+            dateRange={`${event.startDate} – ${event.endDate}`}
           />
         ))}
       </div>
