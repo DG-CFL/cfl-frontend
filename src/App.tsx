@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { routeTree } from './main'
 
 function App() {
@@ -12,13 +13,13 @@ function App() {
         </p>
         <div className="space-y-4">
           {allRoutes.map((route, index) => (
-            <a
+            <Link
               key={index}
-              className="text-[#61dafb] hover:underline block"
-              href={route.path}
+              className="block text-[#61dafb] hover:underline"
+              to={route.path}
             >
-            {route.name}
-            </a>
+              {route.name}
+            </Link>
           ))}
         </div>
       </header>
@@ -26,25 +27,38 @@ function App() {
   )
 }
 
-function extractAllRoutes(routeTree: any): { path: string; name: string }[] {
-  const routes: { path: string; name: string }[] = []
-  
+function extractAllRoutes(tree: any): Array<{ path: string; name: string }> {
+  const routes: Array<{ path: string; name: string }> = []
+
+  const joinPaths = (base: string, segment: string) => {
+    const normalizedBase = base === '/' ? '' : base.replace(/\/$/, '')
+    const normalizedSegment = segment.startsWith('/')
+      ? segment
+      : `/${segment}`
+    const combined = `${normalizedBase}${normalizedSegment}`
+    return combined || '/'
+  }
+
   function traverseRoute(route: any, basePath: string = '') {
-    const currentPath = basePath + (route.path || '')
-    
-    if (route.id !== '__root__') {
+    const hasPath = Boolean(route.path)
+    const currentPath = hasPath
+      ? joinPaths(basePath, route.path)
+      : basePath || '/'
+    const nextBase = hasPath ? currentPath : basePath
+
+    if (route.id !== '__root__' && route.options?.component) {
       routes.push({
         path: currentPath,
-        name: route.id.replace('Route', '').replace(/([A-Z])/g, ' $1').trim()
+        name: route.id.replace('Route', '').replace(/([A-Z])/g, ' $1').trim(),
       })
     }
-    
+
     if (route.children) {
-      route.children.forEach((child: any) => traverseRoute(child, currentPath))
+      route.children.forEach((child: any) => traverseRoute(child, nextBase))
     }
   }
-  
-  traverseRoute(routeTree)
+
+  traverseRoute(tree)
   return routes
 }
 

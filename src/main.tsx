@@ -140,10 +140,12 @@ const volunteerPageRoute = createRoute({
 
 export const routeTree = rootRoute.addChildren([
   indexRoute,
-  eventsLayoutRoute.addChildren([manageEventsRoute,
-  viewEventRoute,
-  createEditEventRoute,
-  createEditEventSuccessRoute]),
+  eventsLayoutRoute.addChildren([
+    manageEventsRoute,
+    viewEventRoute,
+    createEditEventRoute,
+    createEditEventSuccessRoute
+  ]),
   volunteerPageRoute,
   authLayoutRoute.addChildren([
     signUpRoute,
