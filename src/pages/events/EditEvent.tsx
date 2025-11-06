@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { format, isValid, parse } from 'date-fns'
 import { CalendarDays, ChevronLeft, Upload } from 'lucide-react'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { getEventById } from './placeholderEvents'
+import { PLACEHOLDER_DATA } from './ViewEvent'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Card, CardContent } from '@/components/ui/card'
@@ -16,13 +18,26 @@ import { Textarea } from '@/components/ui/textarea'
 
 export default function EditEvent() {
   const { eventId } = useParams({ strict: false })
-  const [dragActive, setDragActive] = useState(false)
-  const [startDate, setStartDate] = useState<Date>()
-  const [endDate, setEndDate] = useState<Date>()
-  const [startDateInput, setStartDateInput] = useState('')
-  const [endDateInput, setEndDateInput] = useState('')
-
   const navigate = useNavigate()
+
+  // Get event data - this happens once during component initialization
+  const data = eventId ? getEventById(eventId) || PLACEHOLDER_DATA : PLACEHOLDER_DATA
+
+  const [dragActive, setDragActive] = useState(false)
+  const [projectName, setProjectName] = useState(data.eventName)
+  const [projectDescription, setProjectDescription] = useState(data.description)
+  const [venue, setVenue] = useState(data.location.split(',')[0] || '')
+  const [postalCode, setPostalCode] = useState(
+    data.location.split(',').pop()?.trim() || ''
+  )
+  const [startDate, setStartDate] = useState<Date | undefined>(
+    data.startDate ? new Date(data.startDate) : undefined
+  )
+  const [endDate, setEndDate] = useState<Date | undefined>(
+    data.endDate ? new Date(data.endDate) : undefined
+  )
+  const [startDateInput, setStartDateInput] = useState('')
+  const [endDateInput, setEndDateInput] = useState('') 
 
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -116,6 +131,8 @@ export default function EditEvent() {
             <Input
               id="project-name"
               type="text"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
               className="h-12 w-[1254px] rounded-md border border-muted-foreground/30"
             />
           </div>
@@ -130,6 +147,8 @@ export default function EditEvent() {
             </Label>
             <Textarea
               id="project-description"
+              value={projectDescription}
+              onChange={(e) => setProjectDescription(e.target.value)}
               className="h-[114px] w-[1254px] resize-none rounded-md border border-muted-foreground/30"
             />
           </div>
@@ -225,6 +244,8 @@ export default function EditEvent() {
               <Input
                 id="venue"
                 type="text"
+                value={venue}
+                onChange={(e) => setVenue(e.target.value)}
                 className="h-12 rounded-md border border-muted-foreground/30 p-3"
               />
             </div>
@@ -236,6 +257,8 @@ export default function EditEvent() {
               <Input
                 id="postal-code"
                 type="text"
+                value={postalCode}
+                onChange={(e) => setPostalCode(e.target.value)}
                 className="h-12 rounded-md border border-muted-foreground/30 p-3"
               />
             </div>

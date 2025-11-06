@@ -10,7 +10,8 @@ type People = {
   role: string
 }
 
-const PLACEHOLDER_DATA: EventData = {
+// Data here is for when viewevent page is rendered without an eventId. For testing purpose
+export const PLACEHOLDER_DATA: EventData = {
   id: 'default',
   eventName: 'Event Name',
   status: 'Active',
@@ -36,20 +37,20 @@ export default function ViewEvent() {
   const navigate = useNavigate()
   
   // Get event data based on eventId, fallback to placeholder
+  // To replace with real data fetching api
   const data = eventId ? getEventById(eventId) || PLACEHOLDER_DATA : PLACEHOLDER_DATA
 
-  const handleEditClick = () => {
-    if (data.id) {
-      navigate({ to: `/events/edit-event/${data.id}` })
-    }
-  }
   return (
     <div className="mx-auto flex w-full max-w-[1662px] flex-col gap-9 px-10 py-14">
       <div className="flex items-center gap-6">
         <h1>{data.eventName}</h1>
         <Button 
           className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold"
-          onClick={handleEditClick}
+          onClick={() => {
+            if (data.id) {
+              navigate({ to: `/events/edit-event/${data.id}` })
+            }
+          }}
         >
           <SquarePen className="size-5" aria-hidden="true" />
           Edit Event Details
@@ -64,6 +65,7 @@ export default function ViewEvent() {
         </CardHeader>
         <CardContent className="flex-1 overflow-y-auto px-8 pb-8 pt-0">
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            
             {/* Row 1: Status, Location, Cover Image */}
             <div className="space-y-3">
               <p className="text-xl leading-7 text-muted-foreground">Status</p>
