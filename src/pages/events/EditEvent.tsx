@@ -1,20 +1,14 @@
 import { useState } from 'react'
-import { format, isValid, parse } from 'date-fns'
-import { CalendarDays, ChevronLeft, Upload } from 'lucide-react'
+import { ChevronLeft, Upload } from 'lucide-react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { getEventById } from './placeholderEvents'
 import { PLACEHOLDER_DATA } from './ViewEvent'
 import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
 import { Textarea } from '@/components/ui/textarea'
+import { DateInput } from '@/components/ui_custom/DateInput'
 
 export default function EditEvent() {
   const { eventId } = useParams({ strict: false })
@@ -36,30 +30,6 @@ export default function EditEvent() {
   const [endDate, setEndDate] = useState<Date | undefined>(
     data.endDate ? new Date(data.endDate) : undefined
   )
-  const [startDateInput, setStartDateInput] = useState('')
-  const [endDateInput, setEndDateInput] = useState('') 
-
-  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setStartDateInput(value)
-
-    // Try to parse the date as MM/dd/yyyy or MM / dd / yyyy
-    const parsed = parse(value.replace(/\s/g, ''), 'MM/dd/yyyy', new Date())
-    if (isValid(parsed)) {
-      setStartDate(parsed)
-    }
-  }
-
-  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setEndDateInput(value)
-
-    // Try to parse the date as MM/dd/yyyy or MM / dd / yyyy
-    const parsed = parse(value.replace(/\s/g, ''), 'MM/dd/yyyy', new Date())
-    if (isValid(parsed)) {
-      setEndDate(parsed)
-    }
-  }
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
@@ -154,85 +124,21 @@ export default function EditEvent() {
           </div>
           {/* Start Date & End Date */}
           <div className="flex w-[1254px] gap-3">
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="start-date" className="text-base text-[#545F71]">
-                Start Date
-              </Label>
-              <div className="relative">
-                <Input
-                  id="start-date"
-                  type="text"
-                  value={
-                    startDate
-                      ? format(startDate, 'MM / dd / yyyy')
-                      : startDateInput
-                  }
-                  onChange={handleStartDateChange}
-                  placeholder="MM / DD / YYYY"
-                  className="h-12 rounded-md border border-muted-foreground/30 p-3 pr-10"
-                />
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-1 top-1/2 size-8 -translate-y-1/2 hover:bg-transparent"
-                    >
-                      <CalendarDays className="size-5 text-muted-foreground" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={startDate}
-                      onSelect={(date) => {
-                        setStartDate(date)
-                        setStartDateInput('')
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
+            <DateInput
+              id="start-date"
+              label="Start Date"
+              value={startDate}
+              onChange={setStartDate}
+              className="flex-1 space-y-2"
+            />
 
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="end-date" className="text-base text-[#545F71]">
-                End Date
-              </Label>
-              <div className="relative">
-                <Input
-                  id="end-date"
-                  type="text"
-                  value={
-                    endDate ? format(endDate, 'MM / dd / yyyy') : endDateInput
-                  }
-                  onChange={handleEndDateChange}
-                  placeholder="MM / DD / YYYY"
-                  className="h-12 rounded-md border border-muted-foreground/30 p-3 pr-10"
-                />
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-1 top-1/2 size-8 -translate-y-1/2 hover:bg-transparent"
-                    >
-                      <CalendarDays className="size-5 text-muted-foreground" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={endDate}
-                      onSelect={(date) => {
-                        setEndDate(date)
-                        setEndDateInput('')
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
+            <DateInput
+              id="end-date"
+              label="End Date"
+              value={endDate}
+              onChange={setEndDate}
+              className="flex-1 space-y-2"
+            />
           </div>
 
           {/* Venue & Postal Code */}
