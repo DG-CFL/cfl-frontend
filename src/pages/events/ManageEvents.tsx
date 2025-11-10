@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { EventCard } from '@/components/ui_custom/EventCard'
 
 export default function ManageEvents() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   return (
     <div className="mx-auto w-full space-y-12 px-10 py-14 md:max-w-[calc(403px*2+24px)] xl:max-w-[calc(403px*3+24px*2)]">
@@ -15,7 +15,7 @@ export default function ManageEvents() {
           variant="default"
           className="h-[42px] w-[190px] gap-2.5 rounded-md bg-[#545F71] px-4 py-3 text-base font-medium"
           onClick={() => {
-            navigate({ to: '/events/create-event'})
+            navigate({ to: '/events/create-event' })
           }}
         >
           <PlusCircle className="size-5" aria-hidden="true" />

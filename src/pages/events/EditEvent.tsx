@@ -20,7 +20,9 @@ export default function EditEvent() {
   const navigate = useNavigate()
 
   // Get event data - this happens once during component initialization
-  const data = eventId ? getEventById(eventId) || PLACEHOLDER_DATA : PLACEHOLDER_DATA
+  const data = eventId
+    ? getEventById(eventId) || PLACEHOLDER_DATA
+    : PLACEHOLDER_DATA
 
   const [coverImage, setCoverImage] = useState<Array<File> | undefined>(
     undefined,
@@ -29,20 +31,25 @@ export default function EditEvent() {
   const [projectDescription, setProjectDescription] = useState(data.description)
   const [venue, setVenue] = useState(data.location.split(',')[0] || '')
   const [postalCode, setPostalCode] = useState(
-    data.location.split(',').pop()?.trim() || ''
+    data.location.split(',').pop()?.trim() || '',
   )
   const [startDate, setStartDate] = useState<Date | undefined>(
-    data.startDate ? new Date(data.startDate) : undefined
+    data.startDate ? new Date(data.startDate) : undefined,
   )
   const [endDate, setEndDate] = useState<Date | undefined>(
-    data.endDate ? new Date(data.endDate) : undefined
+    data.endDate ? new Date(data.endDate) : undefined,
   )
 
   return (
     <div className="mx-auto flex w-full max-w-[1662px] flex-col gap-6 px-10 py-14">
       {/* Header with Back Button */}
       <div className="flex items-start gap-4">
-        <Button variant="ghost" size="icon" className="size-10" onClick={() => navigate({ to: '/events/manage-events' })}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-10"
+          onClick={() => navigate({ to: '/events/manage-events' })}
+        >
           <ChevronLeft className="size-8" />
         </Button>
         <div className="flex flex-col gap-1">
@@ -72,7 +79,9 @@ export default function EditEvent() {
             >
               <DropzoneEmptyState className="gap-3">
                 <Upload className="size-12 text-[#545F71]" />
-                <p className="text-base text-[#545F71]">Drag & Drop Files Here</p>
+                <p className="text-base text-[#545F71]">
+                  Drag & Drop Files Here
+                </p>
               </DropzoneEmptyState>
               <DropzoneContent className="gap-3">
                 <Upload className="size-12 text-[#545F71]" />
@@ -166,7 +175,7 @@ export default function EditEvent() {
             <Button
               variant="outline"
               className="h-[42px] w-[154px] rounded-md border border-muted-foreground/30 px-4 py-3 text-base"
-              onClick={() => navigate({ to: '/events/manage-events'})}
+              onClick={() => navigate({ to: '/events/manage-events' })}
             >
               Cancel
             </Button>

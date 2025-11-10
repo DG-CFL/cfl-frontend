@@ -56,7 +56,12 @@ export default function CreateEvent() {
     <div className="mx-auto flex w-full max-w-[1662px] flex-col gap-6 px-10 py-14">
       {/* Header with Back Button */}
       <div className="flex items-start gap-4">
-        <Button variant="ghost" size="icon" className="size-10" onClick={() => navigate({ to: '/events/manage-events' })}>  
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-10"
+          onClick={() => navigate({ to: '/events/manage-events' })}
+        >
           <ChevronLeft className="size-8" />
         </Button>
         <div className="flex flex-col gap-1">
@@ -86,7 +91,9 @@ export default function CreateEvent() {
             >
               <DropzoneEmptyState className="gap-3">
                 <Upload className="size-12 text-[#545F71]" />
-                <p className="text-base text-[#545F71]">Drag & Drop Files Here</p>
+                <p className="text-base text-[#545F71]">
+                  Drag & Drop Files Here
+                </p>
               </DropzoneEmptyState>
               <DropzoneContent className="gap-3">
                 <Upload className="size-12 text-[#545F71]" />
@@ -103,11 +110,7 @@ export default function CreateEvent() {
             <Label htmlFor="project-name" className="text-base text-[#545F71]">
               Project Name
             </Label>
-            <Input
-              id="project-name"
-              type="text"
-              className="h-12 w-[1254px]"
-            />
+            <Input id="project-name" type="text" className="h-12 w-[1254px]" />
           </div>
 
           {/* Project Description */}
@@ -235,15 +238,14 @@ export default function CreateEvent() {
           <div className="flex w-[1254px] justify-end gap-[10px] pt-2">
             <Button
               variant="outline"
-              className="h-[42px] w-[154px] rounded-md border border-muted-foreground/30 px-4 py-3 text-base" onClick={() => navigate({ to: '/events/manage-events' })}
+              className="h-[42px] w-[154px] rounded-md border border-muted-foreground/30 px-4 py-3 text-base"
+              onClick={() => navigate({ to: '/events/manage-events' })}
             >
               Cancel
             </Button>
             <Button
               className="h-[42px] w-[154px] rounded-md bg-[#545F71] px-4 py-3 text-base font-semibold"
-              onClick={() =>
-                navigate({ to: '/events/create-event-success' })
-              }
+              onClick={() => navigate({ to: '/events/create-event-success' })}
             >
               Save & Publish
             </Button>
