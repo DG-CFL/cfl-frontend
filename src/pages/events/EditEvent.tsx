@@ -8,6 +8,11 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import {
+  Dropzone,
+  DropzoneContent,
+  DropzoneEmptyState,
+} from '@/components/ui/dropzone'
 import { DateInput } from '@/components/ui_custom/DateInput'
 
 export default function EditEvent() {
@@ -17,7 +22,9 @@ export default function EditEvent() {
   // Get event data - this happens once during component initialization
   const data = eventId ? getEventById(eventId) || PLACEHOLDER_DATA : PLACEHOLDER_DATA
 
-  const [dragActive, setDragActive] = useState(false)
+  const [coverImage, setCoverImage] = useState<Array<File> | undefined>(
+    undefined,
+  )
   const [projectName, setProjectName] = useState(data.eventName)
   const [projectDescription, setProjectDescription] = useState(data.description)
   const [venue, setVenue] = useState(data.location.split(',')[0] || '')
@@ -30,23 +37,6 @@ export default function EditEvent() {
   const [endDate, setEndDate] = useState<Date | undefined>(
     data.endDate ? new Date(data.endDate) : undefined
   )
-
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true)
-    } else if (e.type === 'dragleave') {
-      setDragActive(false)
-    }
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(false)
-    // Handle file upload here
-  }
 
   return (
     <div className="mx-auto flex w-full max-w-[1662px] flex-col gap-6 px-10 py-14">
@@ -68,29 +58,30 @@ export default function EditEvent() {
         <CardContent className="flex flex-col items-center space-y-4 px-8 py-8">
           {/* Upload Cover Image */}
           <div className="space-y-2">
-            <Label htmlFor="cover-upload" className="text-base text-[#545F71]">
+            <Label className="text-base text-[#545F71]">
               Upload Cover Image
             </Label>
-            <div
-              className={`flex h-[222px] w-[1254px] cursor-pointer flex-col items-center justify-center gap-3 rounded-[10px] border-2 border-dashed transition-colors ${
-                dragActive
-                  ? 'border-primary bg-primary/5'
-                  : 'border-muted-foreground/30 bg-[#99999A]'
-              }`}
-              onDragEnter={handleDrag}
-              onDragLeave={handleDrag}
-              onDragOver={handleDrag}
-              onDrop={handleDrop}
+            <Dropzone
+              accept={{ 'image/*': [] }}
+              maxFiles={1}
+              src={coverImage}
+              onDrop={(acceptedFiles) =>
+                setCoverImage(acceptedFiles.length ? acceptedFiles : undefined)
+              }
+              className="h-[222px] w-[1254px] gap-3 rounded-lg border border-input bg-[#99999a] shadow-md transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 hover:border-ring/50"
             >
-              <Upload className="size-12 text-[#F4F4F4]" />
-              <p className="text-base text-[#F4F4F4]">Drag & Drop Files Here</p>
-              <input
-                id="cover-upload"
-                type="file"
-                className="hidden"
-                accept="image/*"
-              />
-            </div>
+              <DropzoneEmptyState className="gap-3">
+                <Upload className="size-12 text-[#545F71]" />
+                <p className="text-base text-[#545F71]">Drag & Drop Files Here</p>
+              </DropzoneEmptyState>
+              <DropzoneContent className="gap-3">
+                <Upload className="size-12 text-[#545F71]" />
+                <p className="w-full truncate text-base text-[#545F71]">
+                  {coverImage?.[0]?.name ?? 'Drag & Drop Files Here'}
+                </p>
+                <p className="text-sm">Click to replace</p>
+              </DropzoneContent>
+            </Dropzone>
           </div>
 
           {/* Project Name */}
@@ -103,7 +94,7 @@ export default function EditEvent() {
               type="text"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
-              className="h-12 w-[1254px] rounded-md border border-muted-foreground/30"
+              className="h-12 w-[1254px]"
             />
           </div>
 
@@ -119,7 +110,7 @@ export default function EditEvent() {
               id="project-description"
               value={projectDescription}
               onChange={(e) => setProjectDescription(e.target.value)}
-              className="h-[114px] w-[1254px] resize-none rounded-md border border-muted-foreground/30"
+              className="h-[114px] w-[1254px] resize-none"
             />
           </div>
           {/* Start Date & End Date */}
