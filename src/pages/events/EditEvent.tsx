@@ -79,7 +79,7 @@ export default function EditEvent() {
                 <p className="w-full truncate text-base text-[#545F71]">
                   {coverImage?.[0]?.name ?? 'Drag & Drop Files Here'}
                 </p>
-                <p className="text-sm">Click to replace</p>
+                <p className="text-sm text-[#545F71]">Click to replace</p>
               </DropzoneContent>
             </Dropzone>
           </div>

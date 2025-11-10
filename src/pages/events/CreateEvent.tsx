@@ -85,15 +85,15 @@ export default function CreateEvent() {
               className="h-[222px] w-[1254px] gap-3 rounded-lg border border-input bg-[#99999a] shadow-md transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 hover:border-ring/50"
             >
               <DropzoneEmptyState className="gap-3">
-                <Upload className="size-12 text-[#  ]" />
+                <Upload className="size-12 text-[#545F71]" />
                 <p className="text-base text-[#545F71]">Drag & Drop Files Here</p>
               </DropzoneEmptyState>
               <DropzoneContent className="gap-3">
-                <Upload className="size-12" />
-                <p className="w-full truncate text-base">
+                <Upload className="size-12 text-[#545F71]" />
+                <p className="w-full truncate text-base text-[#545F71]">
                   {coverImage?.[0]?.name ?? 'Drag & Drop Files Here'}
                 </p>
-                <p className="text-sm">Click to replace</p>
+                <p className="text-sm text-[#545F71]">Click to replace</p>
               </DropzoneContent>
             </Dropzone>
           </div>
