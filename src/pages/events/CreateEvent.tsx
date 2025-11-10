@@ -66,7 +66,7 @@ export default function CreateEvent() {
     <div className="mx-auto flex w-full max-w-[1662px] flex-col gap-6 px-10 py-14">
       {/* Header with Back Button */}
       <div className="flex items-start gap-4">
-        <Button variant="ghost" size="icon" className="size-10">
+        <Button variant="ghost" size="icon" className="size-10" onClick={() => navigate({ to: '/events/manage-events' })}>  
           <ChevronLeft className="size-8" />
         </Button>
         <div className="flex flex-col gap-1">
@@ -244,7 +244,7 @@ export default function CreateEvent() {
           <div className="flex w-[1254px] justify-end gap-[10px] pt-2">
             <Button
               variant="outline"
-              className="h-[42px] w-[154px] rounded-md border border-muted-foreground/30 px-4 py-3 text-base"
+              className="h-[42px] w-[154px] rounded-md border border-muted-foreground/30 px-4 py-3 text-base" onClick={() => navigate({ to: '/events/manage-events' })}
             >
               Cancel
             </Button>
