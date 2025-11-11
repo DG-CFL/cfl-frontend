@@ -10,7 +10,6 @@ export type EventCardProps = {
   location: string
   dateRange: string
   imageUrl?: string
-  onViewEdit?: (id: string) => void
 }
 
 export function EventCard({
@@ -19,7 +18,6 @@ export function EventCard({
   location,
   dateRange,
   imageUrl,
-  onViewEdit,
 }: EventCardProps) {
   const navigate = useNavigate();
 
@@ -83,7 +81,7 @@ export function EventCard({
             className="h-11 w-full rounded-lg border border-muted-foreground/30 px-4 text-sm font-medium hover:bg-muted/50"
             onClick={() => 
               navigate({
-                to: '/events/view-event',
+                to: `/events/view-event/${id}`,
               })
             }
           >
