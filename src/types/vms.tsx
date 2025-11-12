@@ -10,3 +10,11 @@ export type Volunteer = {
   certifications : string[]
   volunteerHistory : string
 }
+
+export type VolunteerEvent = {
+  event : string;
+  role : string;
+  hours : number;
+  time  : number;
+  date : Date;
+}
