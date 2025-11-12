@@ -20,13 +20,26 @@ import SignUpSuccess from './pages/auth/SignUpSuccess.tsx'
 import ResetPasswordSuccess from './pages/auth/ResetPasswordSuccess.tsx'
 import ResetPasswordEmail from './pages/auth/ResetPasswordEmail.tsx'
 import AuthSplitLayout from './pages/auth/AuthSplitLayout.tsx'
+import ForgotPassword from './pages/auth/ForgotPassword.tsx'
+import EventsLayout from './pages/events/EventsLayout.tsx'
+import ManageEvents from './pages/events/ManageEvents.tsx'
+import ViewEvent from './pages/events/ViewEvent.tsx'
+import CreateEvent from './pages/events/CreateEvent.tsx'
+import EditEvent from './pages/events/EditEvent.tsx'
+import CreateEventSuccess from './pages/events/CreateEventSuccess.tsx'
+import EditEventSuccess from './pages/events/EditEventSuccess.tsx'
+import VolunteerPage from './pages/vms/VolunteerPage.tsx'
+import Sidebar from './components/Sidebar.tsx'
 
 const rootRoute = createRootRoute({
   component: () => (
-    <>
-      <Outlet />
-      <TanStackRouterDevtools />
-    </>
+    <div className="flex">
+      <Sidebar />
+      <div className="flex-1">
+        <Outlet />
+        <TanStackRouterDevtools />
+      </div>
+    </div>
   ),
 })
 
@@ -41,6 +54,7 @@ const authLayoutRoute = createRoute({
   id: 'auth',
   component: AuthLayout,
 })
+
 
 const signUpRoute = createRoute({
   getParentRoute: () => authLayoutRoute,
@@ -86,11 +100,69 @@ const loginRoute = createRoute({
 
 const forgotPasswordRoute = createRoute({
   getParentRoute: () => authSplitLayoutRoute,
-  path: '/forgot-password'
+  path: '/forgot-password',
+  component: ForgotPassword,
 })
 
-const routeTree = rootRoute.addChildren([
+const eventsLayoutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'events',
+  component: EventsLayout,
+})
+
+const manageEventsRoute = createRoute({
+  getParentRoute: () => eventsLayoutRoute,
+  path: 'manage-events',
+  component: ManageEvents,
+})
+
+const viewEventRoute = createRoute({
+  getParentRoute: () => eventsLayoutRoute,
+  path: 'view-event/$eventId',
+  component: ViewEvent,
+})
+
+const createEventRoute = createRoute({
+  getParentRoute: () => eventsLayoutRoute,
+  path: 'create-event',
+  component: CreateEvent,
+})
+
+const editEventRoute = createRoute({
+  getParentRoute: () => eventsLayoutRoute,
+  path: 'edit-event/$eventId',
+  component: EditEvent,
+})
+
+const createEventSuccessRoute = createRoute({
+  getParentRoute: () => eventsLayoutRoute,
+  path: 'create-event-success',
+  component: CreateEventSuccess,
+})
+
+const editEventSuccessRoute = createRoute({
+  getParentRoute: () => eventsLayoutRoute,
+  path: 'edit-event-success',
+  component: EditEventSuccess,
+})
+
+const volunteerPageRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'volunteers',
+  component: VolunteerPage,
+})
+
+export const routeTree = rootRoute.addChildren([
   indexRoute,
+  eventsLayoutRoute.addChildren([
+    manageEventsRoute,
+    viewEventRoute,
+    createEventRoute,
+    editEventRoute,
+    createEventSuccessRoute,
+    editEventSuccessRoute,
+  ]),
+  volunteerPageRoute,
   authLayoutRoute.addChildren([
     signUpRoute,
     signUpSuccessRoute,

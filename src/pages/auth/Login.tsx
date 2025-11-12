@@ -12,7 +12,7 @@ export default function Login() {
       <h1>Login</h1>
       <Field>
         <FieldLabel htmlFor="email">
-          <h3>Email</h3>
+          <h3>Email Address</h3>
         </FieldLabel>
         <Input id="email" />
       </Field>

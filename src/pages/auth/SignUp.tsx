@@ -95,7 +95,7 @@ export default function SignUp() {
       </div>
       <div className="w-full gap-x-40 grid grid-cols-2">
         <Button variant={'link'}>
-          <Link to="/login">Back to Login</Link>
+          <Link to="/login">Back to Login Page</Link>
         </Button>
         <Button onClick={handleSignUp}>Sign Up</Button>
       </div>
