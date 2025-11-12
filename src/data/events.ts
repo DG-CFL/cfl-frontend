@@ -1,22 +1,6 @@
-type People = {
-  name: string
-  role: string
-}
+import type { EventData } from "@/types/events"
 
-export type EventData = {
-  id: string
-  eventName: string
-  status: string
-  location: string
-  coverImage: string
-  startDate: string
-  endDate: string
-  description: string
-  coordinators: Array<People>
-  volunteers: Array<People>
-}
-
-export const PLACEHOLDER_EVENTS: Array<EventData> = [
+export const eventListData: Array<EventData> = [
   {
     id: 'event-1',
     eventName: 'Community Charity Gala',
@@ -139,6 +123,23 @@ export const PLACEHOLDER_EVENTS: Array<EventData> = [
   },
 ]
 
-export function getEventById(id: string): EventData | undefined {
-  return PLACEHOLDER_EVENTS.find((event) => event.id === id)
+export const eventData: EventData = {
+  id: 'default',
+  eventName: 'Event Name',
+  status: 'Active',
+  location: 'Orchard Central, Somerset, 666666',
+  coverImage: 'image123456.jpg',
+  startDate: 'July 1, 2025',
+  endDate: 'December 31, 2025',
+  description:
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+  coordinators: [
+    { name: 'Name', role: 'Overall-in-Charge' },
+    { name: 'Name', role: 'Assistant-in-Charge' },
+  ],
+  volunteers: [
+    { name: 'Name', role: 'Volunteer' },
+    { name: 'Name', role: 'Volunteer' },
+    { name: 'Name', role: 'Volunteer' },
+  ],
 }
