@@ -1,8 +1,8 @@
-import { PlusCircle } from 'lucide-react'
-import { useNavigate } from '@tanstack/react-router'
-import { PLACEHOLDER_EVENTS } from './placeholderEvents'
 import { Button } from '@/components/ui/button'
 import { EventCard } from '@/components/ui_custom/EventCard'
+import { eventListData } from '@/data/events'
+import { useNavigate } from '@tanstack/react-router'
+import { PlusCircle } from 'lucide-react'
 
 export default function ManageEvents() {
   const navigate = useNavigate()
@@ -24,7 +24,7 @@ export default function ManageEvents() {
       </div>
 
       <div className="grid gap-x-10 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
-        {PLACEHOLDER_EVENTS.map((event) => (
+        {eventListData.map((event) => (
           <EventCard
             key={event.id}
             id={event.id}

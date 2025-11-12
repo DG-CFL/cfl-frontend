@@ -1,46 +1,17 @@
-import { useNavigate, useParams } from '@tanstack/react-router'
-import { CalendarDays, ImageIcon, MapPin, SquarePen } from 'lucide-react'
-import { getEventById } from './placeholderEvents'
-import type { EventData } from './placeholderEvents'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { eventData } from '@/data/events'
+import type { Person } from '@/types/events'
+import { useNavigate, useParams } from '@tanstack/react-router'
+import { CalendarDays, ImageIcon, MapPin, SquarePen } from 'lucide-react'
 
-type People = {
-  name: string
-  role: string
-}
 
-// Data here is for when viewevent page is rendered without an eventId. For testing purpose
-export const PLACEHOLDER_DATA: EventData = {
-  id: 'default',
-  eventName: 'Event Name',
-  status: 'Active',
-  location: 'Orchard Central, Somerset, 666666',
-  coverImage: 'image123456.jpg',
-  startDate: 'July 1, 2025',
-  endDate: 'December 31, 2025',
-  description:
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-  coordinators: [
-    { name: 'Name', role: 'Overall-in-Charge' },
-    { name: 'Name', role: 'Assistant-in-Charge' },
-  ],
-  volunteers: [
-    { name: 'Name', role: 'Volunteer' },
-    { name: 'Name', role: 'Volunteer' },
-    { name: 'Name', role: 'Volunteer' },
-  ],
-}
 
 export default function ViewEvent() {
   const { eventId } = useParams({ strict: false })
   const navigate = useNavigate()
 
-  // Get event data based on eventId, fallback to placeholder
-  // To replace with real data fetching api
-  const data = eventId
-    ? getEventById(eventId) || PLACEHOLDER_DATA
-    : PLACEHOLDER_DATA
+  const data = eventData
 
   return (
     <div className="mx-auto flex w-full max-w-[1662px] flex-col gap-9 px-10 py-14">
@@ -171,7 +142,7 @@ export default function ViewEvent() {
   )
 }
 
-function PersonListItem({ person }: { person: People }) {
+function PersonListItem({ person }: { person: Person }) {
   return (
     <div className="flex items-center gap-4">
       <div className="size-12 rounded-full bg-muted" aria-hidden="true" />
