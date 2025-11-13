@@ -29,6 +29,7 @@ import EditEvent from './pages/events/EditEvent.tsx'
 import CreateEventSuccess from './pages/events/CreateEventSuccess.tsx'
 import EditEventSuccess from './pages/events/EditEventSuccess.tsx'
 import VolunteerPage from './pages/vms/VolunteerPage.tsx'
+import CalendarPage from './pages/calendar/CalendarPage.tsx'
 import Sidebar from './components/Sidebar.tsx'
 
 const rootRoute = createRootRoute({
@@ -146,6 +147,12 @@ const editEventSuccessRoute = createRoute({
   component: EditEventSuccess,
 })
 
+const calendarPageRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'calendar',
+  component: CalendarPage,
+})
+
 const volunteerPageRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: 'volunteers',
@@ -162,6 +169,7 @@ export const routeTree = rootRoute.addChildren([
     createEventSuccessRoute,
     editEventSuccessRoute,
   ]),
+  calendarPageRoute,
   volunteerPageRoute,
   authLayoutRoute.addChildren([
     signUpRoute,
