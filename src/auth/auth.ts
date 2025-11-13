@@ -3,9 +3,9 @@ import {
   getAuth,
   signInWithEmailAndPassword,
 } from 'firebase/auth'
-import { app } from './config'
+import { app } from './firebase'
 
-const auth = getAuth(app)
+export const auth = getAuth(app)
 
 export async function signUp(email: string, password: string) {
   try {
