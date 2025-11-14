@@ -1,11 +1,14 @@
 import { signIn } from '@/auth/operations'
+import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { ErrorAlert } from '@/components/ui_custom/ErrorAlert'
 import { MaskableInput } from '@/components/ui_custom/MaskableInput'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 
 type LoginFields = {
@@ -21,10 +24,17 @@ export default function Login() {
     formState: { errors },
   } = useForm<LoginFields>()
 
+  const [error, setError] = useState<string | null>(null)
+
+  const navigate = useNavigate()
+
   const onSubmit: SubmitHandler<LoginFields> = async (data) => {
     try {
       await signIn(data.email, data.password, data.rememberMe)
-    } catch (err) {}
+      navigate({ to: '/' })
+    } catch (err) {
+      setError('Invalid login credentials')
+    }
   }
 
   return (
@@ -40,8 +50,9 @@ export default function Login() {
         <Input
           id="email"
           type="email"
-          {...register('email', { required: true })}
+          {...register('email', { required: 'Email is required' })}
         />
+        {errors.email && <ErrorAlert message={errors.email.message} />}
       </Field>
       <Field>
         <FieldLabel htmlFor="password">
@@ -49,8 +60,9 @@ export default function Login() {
         </FieldLabel>
         <MaskableInput
           id="password"
-          {...register('password', { required: true })}
+          {...register('password', { required: 'Password is required' })}
         />
+        {errors.password && <ErrorAlert message={errors.password.message} />}
       </Field>
       <div className="w-full flex justify-between">
         <div className="flex items-center gap-3">
@@ -66,6 +78,9 @@ export default function Login() {
           Forgot Password
         </Link>
       </div>
+
+      {error && <ErrorAlert message={error} />}
+
       <Button className="w-full">Login</Button>
       <div className="w-full flex justify-between">
         <span className="text-muted-foreground text-lg">
