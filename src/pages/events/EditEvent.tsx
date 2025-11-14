@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import { ChevronLeft, Upload } from 'lucide-react'
 import { useNavigate, useParams } from '@tanstack/react-router'
-import { getEventById } from './placeholderEvents'
-import { PLACEHOLDER_DATA } from './ViewEvent'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -14,15 +12,14 @@ import {
   DropzoneEmptyState,
 } from '@/components/ui/dropzone'
 import { DateInput } from '@/components/ui_custom/DateInput'
+import { eventData } from '@/data/events'
 
 export default function EditEvent() {
   const { eventId } = useParams({ strict: false })
   const navigate = useNavigate()
 
   // Get event data - this happens once during component initialization
-  const data = eventId
-    ? getEventById(eventId) || PLACEHOLDER_DATA
-    : PLACEHOLDER_DATA
+  const data = eventData
 
   const [coverImage, setCoverImage] = useState<Array<File> | undefined>(
     undefined,
