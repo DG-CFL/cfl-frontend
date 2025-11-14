@@ -1,3 +1,1 @@
-export type User = {
-  
-}
+export type Role = "admin" | "volunteer"

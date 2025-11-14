@@ -1,7 +1,7 @@
-import { onAuthStateChanged } from 'firebase/auth'
+import { onAuthStateChanged, type User } from 'firebase/auth'
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { auth } from './auth'
-import type { User } from '@/types/auth'
+import type { Role } from '@/types/auth'
 
 type AuthContextValue = {
   currentUser: User | null
@@ -27,4 +27,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
   return useContext(AuthContext)
+}
+
+export const useCurrentUser = () => {
+  // Temp logic
+  const value = sessionStorage.getItem("user")
+  if (!value) return null
+  return JSON.parse(value)
+  
+  // TODO: return useAuth().currentUser
+}
+
+export async function isAdmin(user: User) {
+  const jwt = await user.getIdTokenResult()
+  const role = jwt.claims.role as Role
+  return role === 'admin'
 }

@@ -17,8 +17,13 @@ export async function signUp(email: string, password: string) {
 
 export async function signIn(email: string, password: string) {
   try {
-    const userCred = await signInWithEmailAndPassword(auth, email, password)
+    // TODO: const userCred = await signInWithEmailAndPassword(auth, email, password)
+    // Temp login logic
   } catch (err) {
     console.log('Sign in failed: ', err)
   }
 }
+
+// Temp dummy credentials
+const adminCredentials = { email: 'admin@cfl.com', password: '123' }
+const volunteerCredentials = { email: 'volunteer@cfl.com', password: '123' }
