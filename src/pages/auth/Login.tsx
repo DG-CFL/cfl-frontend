@@ -33,7 +33,9 @@ export default function Login() {
       await signIn(data.email, data.password, data.rememberMe)
       navigate({ to: '/' })
     } catch (err) {
-      setError('Invalid login credentials')
+      if (err instanceof Error) {
+        setError(err.message)
+      }
     }
   }
 
