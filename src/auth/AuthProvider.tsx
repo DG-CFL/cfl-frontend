@@ -38,11 +38,11 @@ export const useCurrentUser = () => {
   // TODO: return useAuth().currentUser
 }
 
-export async function isAdmin(user: User): Promise<boolean> {
+export function getUserRole(user: User): Role {
   // Temp logic
   const value = sessionStorage.getItem("user")
-  if (!value) return false
-  return JSON.parse(value).role === "admin"
+  if (!value) return "public"
+  return JSON.parse(value).role as Role
 
   // TODO: Actual logic here:
   // const jwt = await user.getIdTokenResult()
