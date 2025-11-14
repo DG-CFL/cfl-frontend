@@ -1,6 +1,6 @@
 import { onAuthStateChanged, type User } from 'firebase/auth'
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { auth } from './auth'
+import { auth } from './operations'
 import type { Role } from '@/types/auth'
 
 type AuthContextValue = {
