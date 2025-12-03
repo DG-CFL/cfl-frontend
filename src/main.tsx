@@ -30,6 +30,7 @@ import CreateEventSuccess from './pages/events/CreateEventSuccess.tsx'
 import EditEventSuccess from './pages/events/EditEventSuccess.tsx'
 import VolunteerPage from './pages/vms/VolunteerPage.tsx'
 import Sidebar from './components/Sidebar.tsx'
+import { AuthProvider } from './auth/AuthProvider.tsx'
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -54,7 +55,6 @@ const authLayoutRoute = createRoute({
   id: 'auth',
   component: AuthLayout,
 })
-
 
 const signUpRoute = createRoute({
   getParentRoute: () => authLayoutRoute,
@@ -193,7 +193,9 @@ if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <StrictMode>
-      <RouterProvider router={router} />
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
     </StrictMode>,
   )
 }
