@@ -24,10 +24,13 @@ import ForgotPassword from './pages/auth/ForgotPassword.tsx'
 import EventsLayout from './pages/events/EventsLayout.tsx'
 import ManageEvents from './pages/events/ManageEvents.tsx'
 import ViewEvent from './pages/events/ViewEvent.tsx'
-import CreateEditEvent from './pages/events/CreateEditEvent.tsx'
-import CreateEditEventSuccess from './pages/events/CreateEditEventSuccess.tsx'
+import CreateEvent from './pages/events/CreateEvent.tsx'
+import EditEvent from './pages/events/EditEvent.tsx'
+import CreateEventSuccess from './pages/events/CreateEventSuccess.tsx'
+import EditEventSuccess from './pages/events/EditEventSuccess.tsx'
 import VolunteerPage from './pages/vms/VolunteerPage.tsx'
 import Sidebar from './components/Sidebar.tsx'
+import { AuthProvider } from './auth/AuthProvider.tsx'
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -52,7 +55,6 @@ const authLayoutRoute = createRoute({
   id: 'auth',
   component: AuthLayout,
 })
-
 
 const signUpRoute = createRoute({
   getParentRoute: () => authLayoutRoute,
@@ -116,20 +118,32 @@ const manageEventsRoute = createRoute({
 
 const viewEventRoute = createRoute({
   getParentRoute: () => eventsLayoutRoute,
-  path: 'view-event',
+  path: 'view-event/$eventId',
   component: ViewEvent,
 })
 
-const createEditEventRoute = createRoute({
+const createEventRoute = createRoute({
   getParentRoute: () => eventsLayoutRoute,
-  path: 'create-edit-event',
-  component: CreateEditEvent,
+  path: 'create-event',
+  component: CreateEvent,
 })
 
-const createEditEventSuccessRoute = createRoute({
+const editEventRoute = createRoute({
   getParentRoute: () => eventsLayoutRoute,
-  path: 'create-edit-event-success',
-  component: CreateEditEventSuccess,
+  path: 'edit-event/$eventId',
+  component: EditEvent,
+})
+
+const createEventSuccessRoute = createRoute({
+  getParentRoute: () => eventsLayoutRoute,
+  path: 'create-event-success',
+  component: CreateEventSuccess,
+})
+
+const editEventSuccessRoute = createRoute({
+  getParentRoute: () => eventsLayoutRoute,
+  path: 'edit-event-success',
+  component: EditEventSuccess,
 })
 
 const volunteerPageRoute = createRoute({
@@ -140,10 +154,14 @@ const volunteerPageRoute = createRoute({
 
 export const routeTree = rootRoute.addChildren([
   indexRoute,
-  eventsLayoutRoute.addChildren([manageEventsRoute,
-  viewEventRoute,
-  createEditEventRoute,
-  createEditEventSuccessRoute]),
+  eventsLayoutRoute.addChildren([
+    manageEventsRoute,
+    viewEventRoute,
+    createEventRoute,
+    editEventRoute,
+    createEventSuccessRoute,
+    editEventSuccessRoute,
+  ]),
   volunteerPageRoute,
   authLayoutRoute.addChildren([
     signUpRoute,
@@ -175,7 +193,9 @@ if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <StrictMode>
-      <RouterProvider router={router} />
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
     </StrictMode>,
   )
 }

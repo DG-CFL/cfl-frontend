@@ -19,7 +19,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 export default function SignUp() {
   const navigate = useNavigate()
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     navigate({ to: '/sign-up-success' })
   }
 

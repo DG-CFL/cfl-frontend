@@ -13,9 +13,16 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Textarea } from '@/components/ui/textarea'
+import {
+  Dropzone,
+  DropzoneContent,
+  DropzoneEmptyState,
+} from '@/components/ui/dropzone'
 
-export default function CreateEditEvent() {
-  const [dragActive, setDragActive] = useState(false)
+export default function CreateEvent() {
+  const [coverImage, setCoverImage] = useState<Array<File> | undefined>(
+    undefined,
+  )
   const [startDate, setStartDate] = useState<Date>()
   const [endDate, setEndDate] = useState<Date>()
   const [startDateInput, setStartDateInput] = useState('')
@@ -45,34 +52,22 @@ export default function CreateEditEvent() {
     }
   }
 
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true)
-    } else if (e.type === 'dragleave') {
-      setDragActive(false)
-    }
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(false)
-    // Handle file upload here
-  }
-
   return (
     <div className="mx-auto flex w-full max-w-[1662px] flex-col gap-6 px-10 py-14">
       {/* Header with Back Button */}
       <div className="flex items-start gap-4">
-        <Button variant="ghost" size="icon" className="size-10">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-10"
+          onClick={() => navigate({ to: '/events/manage-events' })}
+        >
           <ChevronLeft className="size-8" />
         </Button>
         <div className="flex flex-col gap-1">
-          <h1>Edit/Create New Event</h1>
+          <h1>Create New Event</h1>
           <p className="text-xl leading-7 text-muted-foreground">
-            Fill in the details below to define/edit a volunteer project
+            Fill in the details below to define a volunteer project
           </p>
         </div>
       </div>
@@ -82,29 +77,32 @@ export default function CreateEditEvent() {
         <CardContent className="flex flex-col items-center space-y-4 px-8 py-8">
           {/* Upload Cover Image */}
           <div className="space-y-2">
-            <Label htmlFor="cover-upload" className="text-base text-[#545F71]">
+            <Label className="text-base text-[#545F71]">
               Upload Cover Image
             </Label>
-            <div
-              className={`flex h-[222px] w-[1254px] cursor-pointer flex-col items-center justify-center gap-3 rounded-[10px] border-2 border-dashed transition-colors ${
-                dragActive
-                  ? 'border-primary bg-primary/5'
-                  : 'border-muted-foreground/30 bg-[#99999A]'
-              }`}
-              onDragEnter={handleDrag}
-              onDragLeave={handleDrag}
-              onDragOver={handleDrag}
-              onDrop={handleDrop}
+            <Dropzone
+              accept={{ 'image/*': [] }}
+              maxFiles={1}
+              src={coverImage}
+              onDrop={(acceptedFiles) =>
+                setCoverImage(acceptedFiles.length ? acceptedFiles : undefined)
+              }
+              className="h-[222px] w-[1254px] gap-3 rounded-lg border border-input bg-[#99999a] shadow-md transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 hover:border-ring/50"
             >
-              <Upload className="size-12 text-[#F4F4F4]" />
-              <p className="text-base text-[#F4F4F4]">Drag & Drop Files Here</p>
-              <input
-                id="cover-upload"
-                type="file"
-                className="hidden"
-                accept="image/*"
-              />
-            </div>
+              <DropzoneEmptyState className="gap-3">
+                <Upload className="size-12 text-[#545F71]" />
+                <p className="text-base text-[#545F71]">
+                  Drag & Drop Files Here
+                </p>
+              </DropzoneEmptyState>
+              <DropzoneContent className="gap-3">
+                <Upload className="size-12 text-[#545F71]" />
+                <p className="w-full truncate text-base text-[#545F71]">
+                  {coverImage?.[0]?.name ?? 'Drag & Drop Files Here'}
+                </p>
+                <p className="text-sm text-[#545F71]">Click to replace</p>
+              </DropzoneContent>
+            </Dropzone>
           </div>
 
           {/* Project Name */}
@@ -112,11 +110,7 @@ export default function CreateEditEvent() {
             <Label htmlFor="project-name" className="text-base text-[#545F71]">
               Project Name
             </Label>
-            <Input
-              id="project-name"
-              type="text"
-              className="h-12 w-[1254px] rounded-md border border-muted-foreground/30"
-            />
+            <Input id="project-name" type="text" className="h-12 w-[1254px]" />
           </div>
 
           {/* Project Description */}
@@ -129,7 +123,7 @@ export default function CreateEditEvent() {
             </Label>
             <Textarea
               id="project-description"
-              className="h-[114px] w-[1254px] resize-none rounded-md border border-muted-foreground/30"
+              className="h-[114px] w-[1254px] resize-none"
             />
           </div>
           {/* Start Date & End Date */}
@@ -245,14 +239,13 @@ export default function CreateEditEvent() {
             <Button
               variant="outline"
               className="h-[42px] w-[154px] rounded-md border border-muted-foreground/30 px-4 py-3 text-base"
+              onClick={() => navigate({ to: '/events/manage-events' })}
             >
               Cancel
             </Button>
             <Button
               className="h-[42px] w-[154px] rounded-md bg-[#545F71] px-4 py-3 text-base font-semibold"
-              onClick={() =>
-                navigate({ to: '/events/create-edit-event-success' })
-              }
+              onClick={() => navigate({ to: '/events/create-event-success' })}
             >
               Save & Publish
             </Button>
