@@ -86,7 +86,7 @@ const CalendarPage = () => {
   }
 
   const resetFilters = () => {
-    setActiveFilters(CALENDAR_FILTERS.map((filter) => filter.id))
+    setActiveFilters([])
   }
 
   const renderActiveView = () => {
