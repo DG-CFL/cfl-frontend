@@ -99,14 +99,15 @@ export const monthsForLocale = (
 
 export const daysForLocale = (
   locale: Intl.LocalesArgument,
-  startDay: number
+  startDay: number,
+  weekdayFormat: Intl.DateTimeFormatOptions['weekday'] = 'short'
 ) => {
-  const weekdays: string[] = [];
+  const weekdays: Array<string> = [];
   const baseDate = new Date(2024, 0, startDay);
 
   for (let i = 0; i < 7; i++) {
     weekdays.push(
-      new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(baseDate)
+      new Intl.DateTimeFormat(locale, { weekday: weekdayFormat }).format(baseDate)
     );
     baseDate.setDate(baseDate.getDate() + 1);
   }
@@ -189,9 +190,10 @@ const OutOfBoundsDay = ({ day }: OutOfBoundsDayProps) => (
 export type CalendarBodyProps = {
   features: Feature[];
   children: (props: { feature: Feature }) => ReactNode;
+  selectedDate?: Date;
 };
 
-export const CalendarBody = ({ features, children }: CalendarBodyProps) => {
+export const CalendarBody = ({ features, children, selectedDate }: CalendarBodyProps) => {
   const [month] = useCalendarMonth();
   const [year] = useCalendarYear();
   const { startDay } = useContext(CalendarContext);
@@ -260,14 +262,23 @@ export const CalendarBody = ({ features, children }: CalendarBodyProps) => {
 
   for (let day = 1; day <= daysInMonth; day++) {
     const featuresForDay = featuresByDay[day] || [];
+    const currentDayDate = new Date(year, month, day);
+    const isSelected = selectedDate && isSameDay(currentDayDate, selectedDate);
 
     days.push(
       <div
         className="relative flex h-full w-full flex-col gap-1 p-1 text-muted-foreground text-xs"
         key={day}
       >
-        {day}
-        <div>
+        <div
+          className={cn(
+            'flex h-6 w-6 items-center justify-center rounded-full font-medium',
+            isSelected && 'bg-[#BAE6FD] text-[#0E121B]'
+          )}
+        >
+          {day}
+        </div>
+        <div className="flex flex-col gap-0.5">
           {featuresForDay.slice(0, 3).map((feature) => children({ feature }))}
         </div>
         {featuresForDay.length > 3 && (
@@ -291,11 +302,11 @@ export const CalendarBody = ({ features, children }: CalendarBodyProps) => {
   }
 
   return (
-    <div className="grid flex-grow grid-cols-7">
+    <div className="grid flex-grow grid-cols-7 auto-rows-[1fr] border-b border-muted-foreground/20">
       {days.map((day, index) => (
         <div
           className={cn(
-            'relative aspect-square overflow-hidden border-t border-r',
+            'relative overflow-hidden border-t border-r border-muted-foreground/20',
             index % 7 === 6 && 'border-r-0'
           )}
           key={index}
@@ -442,13 +453,19 @@ export const CalendarHeader = ({ className }: CalendarHeaderProps) => {
 
   // Memoize days data to avoid recalculating date formatting
   const daysData = useMemo(() => {
-    return daysForLocale(locale, startDay);
+    return daysForLocale(locale, startDay, 'long');
   }, [locale, startDay]);
 
   return (
-    <div className={cn('grid flex-grow grid-cols-7', className)}>
-      {daysData.map((day) => (
-        <div className="p-3 text-right text-muted-foreground text-xs" key={day}>
+    <div className={cn('grid grid-cols-7', className)}>
+      {daysData.map((day, index) => (
+        <div
+          className={cn(
+            'flex items-center justify-center py-2 text-sm font-medium text-[#0E121B]',
+            index !== 6 && 'border-r border-muted-foreground/20'
+          )}
+          key={day}
+        >
           {day}
         </div>
       ))}

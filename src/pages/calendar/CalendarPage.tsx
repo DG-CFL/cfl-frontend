@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { format } from 'date-fns'
+import { Plus } from 'lucide-react'
 
 import {
   CALENDAR_FEATURES,
@@ -19,6 +20,7 @@ import type { CalendarState } from '@/components/ui/calendarpage'
 import type { CalendarDisplayMode, CalendarViewOption } from '@/components/ui_custom/CalendarBar'
 import { CalendarProvider, useCalendarMonth, useCalendarYear } from '@/components/ui/calendarpage'
 import CalendarBar, { CalendarBarHeader } from '@/components/ui_custom/CalendarBar'
+import { Button } from '@/components/ui/button'
 
 const CalendarPage = () => {
   const [view, setView] = useState<CalendarViewOption>('month')
@@ -94,7 +96,13 @@ const CalendarPage = () => {
 
     switch (view) {
       case 'month':
-        return <CalendarMonthView features={filteredFeatures} colors={STATUS_COLORS} />
+        return (
+          <CalendarMonthView
+            features={filteredFeatures}
+            colors={STATUS_COLORS}
+            selectedDate={selectedDate}
+          />
+        )
       case 'week':
         return <CalendarWeekView />
       case 'day':
@@ -102,12 +110,18 @@ const CalendarPage = () => {
       case 'year':
         return <CalendarYearView />
       default:
-        return <CalendarMonthView features={filteredFeatures} colors={STATUS_COLORS} />
+        return (
+          <CalendarMonthView
+            features={filteredFeatures}
+            colors={STATUS_COLORS}
+            selectedDate={selectedDate}
+          />
+        )
     }
   }
 
   return (
-    <div className="flex w-full">
+    <div className="flex h-screen w-full overflow-hidden bg-background">
       <CalendarBar
         sidebarTitle={sidebarTitle}
         selectedDate={selectedDate}
@@ -118,19 +132,29 @@ const CalendarPage = () => {
         resetFilters={resetFilters}
         statusColors={STATUS_COLORS}
       />
-      <div className="mx-auto w-full max-w-[1400px] px-6 py-10">
-        <CalendarProvider className="w-full gap-6">
-          <main className="flex-1">
-            <CalendarBarHeader
-              view={view}
-              onViewChange={setView}
-              mode={mode}
-              onModeChange={setMode}
-              onToday={handleToday}
-            />
-            {renderActiveView()}
-          </main>
-        </CalendarProvider>
+      <div className="relative flex-1 overflow-hidden">
+        <div className="h-full w-full">
+          <CalendarProvider className="h-full w-full gap-6">
+            <main className="flex h-full flex-col pb-16">
+              <div className="px-6 pb-6 pt-8">
+                <CalendarBarHeader
+                  view={view}
+                  onViewChange={setView}
+                  mode={mode}
+                  onModeChange={setMode}
+                  onToday={handleToday}
+                />
+              </div>
+              {renderActiveView()}
+            </main>
+          </CalendarProvider>
+        </div>
+        <Button
+          size="icon"
+          className="fixed bottom-8 right-8 h-14 w-14 rounded-full bg-[#334155] shadow-lg hover:bg-[#1e293b]"
+        >
+          <Plus className="h-6 w-6" />
+        </Button>
       </div>
     </div>
   )

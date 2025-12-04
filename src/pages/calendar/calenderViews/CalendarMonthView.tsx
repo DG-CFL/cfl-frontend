@@ -5,13 +5,14 @@ import { CalendarBody, CalendarHeader } from '@/components/ui/calendarpage'
 type CalendarMonthViewProps = {
   features: Array<Feature>
   colors: CalendarCategoryColors
+  selectedDate?: Date
 }
 
-const CalendarMonthView = ({ features, colors }: CalendarMonthViewProps) => {
+const CalendarMonthView = ({ features, colors, selectedDate }: CalendarMonthViewProps) => {
   return (
-    <div className="overflow-hidden rounded-xl border border-muted-foreground/20 bg-white shadow-md">
-      <CalendarHeader className="border-b border-muted-foreground/10 bg-muted/30" />
-      <CalendarBody features={features}>
+    <div className="flex flex-1 min-h-0 flex-col bg-white">
+      <CalendarHeader className="border-t border-muted-foreground/20 bg-white" />
+      <CalendarBody features={features} selectedDate={selectedDate}>
         {({ feature }) => {
           const category = feature.status.id as CalendarCategory
           const palette = colors[category]
@@ -19,7 +20,7 @@ const CalendarMonthView = ({ features, colors }: CalendarMonthViewProps) => {
           return (
             <span
               key={feature.id}
-              className="inline-flex items-center truncate rounded-full px-2 py-1 text-xs font-semibold"
+              className="flex items-center truncate rounded-md px-2 py-1 font-poppins text-xs font-medium leading-4"
               style={{ backgroundColor: palette.background, color: palette.text }}
             >
               {feature.name}

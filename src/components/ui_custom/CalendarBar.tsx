@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { addMonths, eachDayOfInterval, endOfMonth, format, getDay, isSameDay, isSameMonth, startOfMonth, subMonths } from 'date-fns'
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, List as ListIcon } from 'lucide-react'
+import { Calendar as CalendarIcon, ChevronDown, ChevronLeft, ChevronRight, Filter, List as ListIcon } from 'lucide-react'
 
 import type { CalendarCategory, CalendarCategoryColors } from '@/pages/calendar/SampleCalendarData'
 import { CalendarDatePagination, useCalendarMonth, useCalendarYear } from '@/components/ui/calendarpage'
@@ -57,23 +57,21 @@ export const CalendarBarHeader = ({ view, onViewChange, mode, onModeChange, onTo
   const currentLabel = useCurrentPeriodLabel(view)
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" className="rounded-full px-4" onClick={onToday}>
-            Today
-          </Button>
-          <h1 className="text-2xl font-semibold leading-none text-[#0E121B]">{currentLabel}</h1>
-        </div>
+    <div className="mb-6 flex items-center justify-between">
+      <div className="flex items-center gap-4">
+        <Button variant="outline" className="h-9 rounded-md px-4 font-medium" onClick={onToday}>
+          Today
+        </Button>
         <CalendarDatePagination />
+        <h1 className="ml-2 text-3xl font-bold text-[#0E121B]">{currentLabel}</h1>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex items-center gap-3">
         <Select value={view} onValueChange={(value) => onViewChange(value as CalendarViewOption)}>
-          <SelectTrigger size="sm" className="min-w-[160px] justify-between rounded-full bg-white px-4 text-sm font-semibold">
+          <SelectTrigger className="h-9 w-[120px] rounded-md border-input bg-background px-3 text-sm font-medium">
             <SelectValue placeholder="Select view" />
           </SelectTrigger>
-          <SelectContent className="w-[200px]">
+          <SelectContent align="end">
             {viewOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
@@ -83,17 +81,17 @@ export const CalendarBarHeader = ({ view, onViewChange, mode, onModeChange, onTo
         </Select>
 
         {onModeChange && (
-          <div className="flex items-center gap-2 rounded-full bg-white p-1 shadow-sm">
+          <div className="flex items-center rounded-md border bg-background p-1">
             {modeOptions.map(({ value, label, icon: Icon }) => (
               <Button
                 key={value}
                 variant="ghost"
                 size="icon"
                 className={cn(
-                  'size-9 rounded-full transition-colors',
+                  'h-7 w-7 rounded-sm',
                   mode === value
-                    ? 'bg-[#E2E8F0] text-[#0E121B] hover:bg-[#E2E8F0]'
-                    : 'text-muted-foreground hover:bg-transparent',
+                    ? 'bg-muted text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:bg-muted/50',
                 )}
                 onClick={() => {
                   if (value !== mode) {
@@ -154,89 +152,89 @@ const CalendarBar = ({
   const dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
 
   return (
-    <aside className="h-screen w-[366px] flex-shrink-0 bg-[#F8FAFC] p-6 pt-20"> 
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <h1>Calendar</h1>
-          <div className="pt-8 grid grid-cols-[1fr_auto] items-center gap-4">
-            <h3>{format(currentMonth, 'MMMM yyyy')}</h3>
-            <div className="flex gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="size-8"
-                onClick={handlePrevMonth}
-              >
-                <ChevronLeft className="size-4 font-bold" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="size-8"
-                onClick={handleNextMonth}
-              >
-                <ChevronRight className="size-4 font-bold" />
-              </Button>
+    <aside className="h-full w-[300px] flex-shrink-0 border-r bg-white p-6">
+      <div className="flex h-full flex-col gap-8">
+        <div>
+          <h1 className="mb-8 text-4xl font-bold tracking-tight text-[#0E121B]">Calendar</h1>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between px-1">
+              <h4 className="whitespace-nowrap font-semibold">{format(currentMonth, 'MMMM yyyy')}</h4>
+              <div className="flex gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 hover:bg-muted"
+                  onClick={handlePrevMonth}
+                >
+                  <ChevronLeft className="size-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 hover:bg-muted"
+                  onClick={handleNextMonth}
+                >
+                  <ChevronRight className="size-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="grid grid-cols-7 justify-items-center gap-1 text-center">
+                {dayNames.map((day) => (
+                  <div key={day} className="w-10 py-2 font-poppins text-xs font-medium text-muted-foreground">
+                    {day}
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-7 justify-items-center gap-1 text-center">
+                {paddingDays.map((_, idx) => (
+                  <div key={`padding-${idx}`} className="flex h-8 w-8 items-center justify-center" />
+                ))}
+                {allDays.map((day) => {
+                  const isSelected = isSameDay(day, selectedDate)
+                  return (
+                    <button
+                      key={day.toISOString()}
+                      onClick={() => onSelectDate(day)}
+                      className={cn(
+                        'flex h-8 w-8 items-center justify-center rounded-full font-poppins text-sm transition-colors hover:bg-muted',
+                        isSelected && 'bg-[#BAE6FD] font-semibold text-[#0E121B] hover:bg-[#BAE6FD]/80',
+                        !isSameMonth(day, currentMonth) && 'text-muted-foreground/30'
+                      )}
+                    >
+                      {format(day, 'd')}
+                    </button>
+                  )
+                })}
+                {Array(trailingPaddingCount)
+                  .fill(null)
+                  .map((_, idx) => (
+                    <div key={`trailing-${idx}`} className="flex h-8 w-8 items-center justify-center" />
+                  ))}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="space-y-2">
-          <div className="grid grid-cols-7 justify-items-center gap-1 text-center">
-            {dayNames.map((day) => (
-              <div key={day} className="w-10 py-2 font-poppins text-base font-normal leading-6">
-                {day}
-              </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-7 justify-items-center gap-1 text-center">
-            {paddingDays.map((_, idx) => (
-              <div key={`padding-${idx}`} className="flex h-10 w-10 items-center justify-center" />
-            ))}
-            {allDays.map((day) => {
-              const isSelected = isSameDay(day, selectedDate)
-              const isToday = isSameDay(day, new Date())
-              return (
-                <button
-                  key={day.toISOString()}
-                  onClick={() => onSelectDate(day)}
-                  className={cn(
-                    'flex h-10 w-10 items-center justify-center rounded-md font-poppins text-base font-normal leading-6 transition-colors hover:bg-accent',
-                    isSelected && 'bg-[#CBD5E1] font-semibold text-foreground',
-                    isToday && !isSelected && 'bg-accent font-medium',
-                    !isSameMonth(day, currentMonth) && 'text-muted-foreground/50'
-                  )}
-                >
-                  {format(day, 'd')}
-                </button>
-              )
-            })}
-            {Array(trailingPaddingCount)
-              .fill(null)
-              .map((_, idx) => (
-                <div key={`trailing-${idx}`} className="flex h-10 w-10 items-center justify-center" />
-              ))}
-          </div>
-        </div>
-
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <h3 className="text-base font-semibold text-[#0E121B]">Filter</h3>
-            <Button variant="ghost" size="sm" className="px-2 text-xs" onClick={resetFilters}>
-              Remove filters
-            </Button>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-bold text-[#0E121B]">Filter</h3>
+              <Filter className="size-4 text-muted-foreground" />
+            </div>
+            <ChevronDown className="size-4 text-muted-foreground" />
           </div>
+
           <ul className="space-y-3">
             {filters.map((filter) => (
-              <li key={filter.id} className="flex items-center gap-2">
-                <span
-                  className="size-2.5 rounded-full"
-                  style={{ backgroundColor: statusColors[filter.id].background }}
-                />
+              <li key={filter.id} className="flex items-center gap-3">
                 <Checkbox
                   id={`filter-${filter.id}`}
                   checked={activeFilters.includes(filter.id)}
                   onCheckedChange={() => toggleFilter(filter.id)}
+                  className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
                 />
                 <label htmlFor={`filter-${filter.id}`} className="text-sm font-medium text-[#0E121B]">
                   {filter.label}
@@ -244,6 +242,13 @@ const CalendarBar = ({
               </li>
             ))}
           </ul>
+
+          <button
+            onClick={resetFilters}
+            className="text-sm text-muted-foreground hover:text-foreground hover:underline"
+          >
+            x Remove filters
+          </button>
         </div>
       </div>
     </aside>
