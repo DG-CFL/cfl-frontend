@@ -10,7 +10,7 @@ type CalendarMonthViewProps = {
 
 const CalendarMonthView = ({ features, colors, selectedDate }: CalendarMonthViewProps) => {
   return (
-    <div className="flex flex-1 min-h-0 flex-col bg-white">
+    <div className="flex h-full flex-col bg-white">
       <CalendarHeader className="border-t border-muted-foreground/20 bg-white" />
       <CalendarBody features={features} selectedDate={selectedDate}>
         {({ feature }) => {

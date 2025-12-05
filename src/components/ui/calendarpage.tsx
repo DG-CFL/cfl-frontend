@@ -302,7 +302,7 @@ export const CalendarBody = ({ features, children, selectedDate }: CalendarBodyP
   }
 
   return (
-    <div className="grid flex-grow grid-cols-7 auto-rows-[1fr] border-b border-muted-foreground/20">
+    <div className="grid flex-1 grid-cols-7 auto-rows-[1fr] border-b border-muted-foreground/20">
       {days.map((day, index) => (
         <div
           className={cn(

@@ -142,7 +142,7 @@ const CalendarPage = () => {
         <div className="h-full w-full">
           <CalendarProvider className="h-full w-full gap-6">
             <main className="flex h-full flex-col">
-              <div className="px-6 pb-6 pt-8">
+              <div className="px-6 pt-8">
                 <CalendarBarHeader
                   view={view}
                   onViewChange={setView}
