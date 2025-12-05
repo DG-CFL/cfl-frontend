@@ -104,7 +104,13 @@ const CalendarPage = () => {
           />
         )
       case 'week':
-        return <CalendarWeekView />
+        return (
+          <CalendarWeekView
+            features={filteredFeatures}
+            colors={STATUS_COLORS}
+            selectedDate={selectedDate}
+          />
+        )
       case 'day':
         return <CalendarDayView />
       case 'year':
@@ -135,7 +141,7 @@ const CalendarPage = () => {
       <div className="relative flex-1 overflow-hidden">
         <div className="h-full w-full">
           <CalendarProvider className="h-full w-full gap-6">
-            <main className="flex h-full flex-col pb-16">
+            <main className="flex h-full flex-col">
               <div className="px-6 pb-6 pt-8">
                 <CalendarBarHeader
                   view={view}
@@ -145,7 +151,9 @@ const CalendarPage = () => {
                   onToday={handleToday}
                 />
               </div>
-              {renderActiveView()}
+              <div className="flex-1 min-h-0">
+                {renderActiveView()}
+              </div>
             </main>
           </CalendarProvider>
         </div>
