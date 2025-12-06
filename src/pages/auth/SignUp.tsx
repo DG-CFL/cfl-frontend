@@ -19,7 +19,7 @@ import { MaskableInput } from '@/components/ui_custom/MaskableInput'
 import type { SignUpData } from '@/types/auth'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import { useForm, type SubmitHandler } from 'react-hook-form'
+import { Controller, useForm, type SubmitHandler } from 'react-hook-form'
 
 type SignUpFormData = SignUpData & {
   acknowledgedTermsOfUse: boolean // Must be true for form to be submitted
@@ -29,6 +29,7 @@ export default function SignUp() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<SignUpFormData>()
 
@@ -106,18 +107,30 @@ export default function SignUp() {
           <FieldLabel htmlFor="date-of-birth">
             <h3>Date of Birth</h3>
           </FieldLabel>
-          <DatePicker id="date-of-birth" placeholder="MM / DD / YYYY" />
+
+          <Controller
+            name="dateOfBirth"
+            control={control}
+            render={({ field }) => (
+              <DatePicker
+                id="date-of-birth"
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="MM / DD / YYYY"
+              />
+            )}
+          />
         </Field>
         <Field>
           <FieldLabel htmlFor="contact-number">
             <h3>Contact Number</h3>
           </FieldLabel>
-          <Input id="contact-number" {...register("contactNumber")}/>
+          <Input id="contact-number" {...register('contactNumber')} />
         </Field>
       </FieldGroup>
       <div className="flex flex-col w-full gap-6">
         <div className="flex items-center gap-3">
-          <Checkbox id="email-opt-in" {...register("emailOptIn")}/>
+          <Checkbox id="email-opt-in" {...register('emailOptIn')} />
           <Label
             htmlFor="email-opt-in"
             className="text-lg text-muted-foreground"
@@ -126,7 +139,7 @@ export default function SignUp() {
           </Label>
         </div>
         <div className="flex items-center gap-3">
-          <Checkbox id="terms" {...register("acknowledgedTermsOfUse")}/>
+          <Checkbox id="terms" {...register('acknowledgedTermsOfUse')} />
           <Label htmlFor="terms" className="text-lg text-muted-foreground">
             I acknowledge that I agree to the Terms of Use and have read the
             Privacy Policy

@@ -5,7 +5,7 @@ export type SignUpData = {
   password: string
   name: string
   gender: string
-  dateOfBirth: string
+  dateOfBirth: Date
   contactNumber: string
   emailOptIn: boolean
 }
