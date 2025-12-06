@@ -1,8 +1,8 @@
 import type { Volunteer, VolunteerCertification, VolunteerEvent } from '@/types/vms'
 import { api } from './baseApi'
 
-// Returns the list of all volunteers
-// TODO: Allow filtering by passing in search filters as an object
+// Returns a list of volunteers
+// TODO: Accept params for filtering, sorting and pagination
 export async function getVolunteers(): Promise<Volunteer[]> {
   const res = await api.get('/volunteers')
   return res.data
@@ -21,7 +21,7 @@ export async function getVolunteerCertifications(volunteerId: number): Promise<V
 }
 
 // Returns the list of events attended by the specified volunteer
-export async function getVolunteerEvents(volunteerId: number): Promise<VolunteerEvent> {
+export async function getVolunteerHistory(volunteerId: number): Promise<VolunteerEvent> {
   const res = await api.get(`/volunteers/${volunteerId}/history`)
   return res.data
 }
