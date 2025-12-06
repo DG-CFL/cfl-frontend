@@ -46,3 +46,17 @@ export async function signIn(
   sessionStorage.setItem('user', JSON.stringify(user))
   return user
 }
+
+/**
+ * Send password reset email to the email address
+ */
+export async function sendPasswordResetEmail(email: string) {
+  // TODO:
+}
+
+/**
+ * Reset password to the new password
+ */
+export async function resetPassword(newPassword: string) {
+  // TODO:
+}
