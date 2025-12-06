@@ -2,6 +2,8 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  confirmPasswordReset,
 } from 'firebase/auth'
 import { app } from './firebase'
 import type { SignUpData } from '@/types/auth'
@@ -51,13 +53,20 @@ export async function signIn(
 /**
  * Send password reset email to the email address
  */
-export async function sendPasswordResetEmail(email: string) {
-  // TODO:
+export async function sendResetPasswordEmail(email: string) {
+  await sendPasswordResetEmail(auth, email, {
+    // Email will contain a link to the reset password page
+    url: `${import.meta.env.BASE_URL}/reset-password`,
+  })
 }
 
 /**
- * Reset password to the new password
+ * Reset password to the new password.
+ * Requires confirmation code which can be extracted from URL.
  */
-export async function resetPassword(newPassword: string) {
-  // TODO:
+export async function resetPassword(
+  newPassword: string,
+  confirmationCode: string,
+) {
+  await confirmPasswordReset(auth, confirmationCode, newPassword)
 }

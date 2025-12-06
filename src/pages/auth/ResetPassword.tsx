@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { ErrorAlert } from '@/components/ui_custom/ErrorAlert'
 import { MaskableInput } from '@/components/ui_custom/MaskableInput'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useParams, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 
@@ -24,10 +24,11 @@ export default function ResetPassword() {
   const [error, setError] = useState<string | null>(null)
 
   const navigate = useNavigate()
+  const searchParams = useSearch({from: '/auth/reset-password'})
 
   const onSubmit: SubmitHandler<ResetPasswordFormData> = async (data) => {
     try {
-      await resetPassword(data.password)
+      await resetPassword(data.password, searchParams.oobCode )
       navigate({
         to: '/reset-password-success',
       })

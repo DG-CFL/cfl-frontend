@@ -9,6 +9,7 @@ import {
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
+import * as z from 'zod'
 
 import './styles.css'
 
@@ -78,6 +79,9 @@ const resetPasswordRoute = createRoute({
   getParentRoute: () => authLayoutRoute,
   path: 'reset-password',
   component: ResetPassword,
+  validateSearch: z.object({
+    oobCode: z.string()
+  })
 })
 
 const resetPasswordSuccessRoute = createRoute({

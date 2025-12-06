@@ -1,4 +1,4 @@
-import { sendPasswordResetEmail } from '@/auth/operations'
+import { sendResetPasswordEmail } from '@/auth/operations'
 import { Button } from '@/components/ui/button'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -24,7 +24,7 @@ export default function ForgotPassword() {
 
   const onSubmit: SubmitHandler<ForgotPasswordFormData> = async (data) => {
     try {
-      await sendPasswordResetEmail(data.email)
+      await sendResetPasswordEmail(data.email)
       navigate({ to: '/reset-password-email' })
     } catch (err) {
       if (err instanceof Error) {
