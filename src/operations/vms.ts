@@ -54,7 +54,7 @@ export function useGetVolunteerHistory(volunteerId: number) {
 export function useDeleteVolunteers(volunteerIds: number[]) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: deleteVolunteers,
+    mutationFn: () => deleteVolunteers(volunteerIds),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ['volunteers'],
