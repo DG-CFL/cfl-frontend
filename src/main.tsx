@@ -1,5 +1,4 @@
-import { StrictMode } from 'react'
-import ReactDOM from 'react-dom/client'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
   Outlet,
   RouterProvider,
@@ -8,49 +7,55 @@ import {
   createRouter,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { StrictMode } from 'react'
+import ReactDOM from 'react-dom/client'
 
 import './styles.css'
 
 import App from './App.tsx'
+import { AuthProvider } from './auth/AuthProvider.tsx'
 import AuthLayout from './pages/auth/AuthLayout.tsx'
-import Login from './pages/auth/Login.tsx'
-import SignUp from './pages/auth/SignUp.tsx'
-import ResetPassword from './pages/auth/ResetPassword.tsx'
-import SignUpSuccess from './pages/auth/SignUpSuccess.tsx'
-import ResetPasswordSuccess from './pages/auth/ResetPasswordSuccess.tsx'
-import ResetPasswordEmail from './pages/auth/ResetPasswordEmail.tsx'
 import AuthSplitLayout from './pages/auth/AuthSplitLayout.tsx'
 import ForgotPassword from './pages/auth/ForgotPassword.tsx'
+import Login from './pages/auth/Login.tsx'
+import ResetPassword from './pages/auth/ResetPassword.tsx'
+import ResetPasswordEmail from './pages/auth/ResetPasswordEmail.tsx'
+import ResetPasswordSuccess from './pages/auth/ResetPasswordSuccess.tsx'
+import SignUp from './pages/auth/SignUp.tsx'
+import SignUpSuccess from './pages/auth/SignUpSuccess.tsx'
+import CreateEvent from './pages/events/CreateEvent.tsx'
+import CreateEventSuccess from './pages/events/CreateEventSuccess.tsx'
+import EditEvent from './pages/events/EditEvent.tsx'
+import EditEventSuccess from './pages/events/EditEventSuccess.tsx'
 import EventsLayout from './pages/events/EventsLayout.tsx'
 import ManageEvents from './pages/events/ManageEvents.tsx'
 import ViewEvent from './pages/events/ViewEvent.tsx'
-import CreateEvent from './pages/events/CreateEvent.tsx'
-import EditEvent from './pages/events/EditEvent.tsx'
-import CreateEventSuccess from './pages/events/CreateEventSuccess.tsx'
-import EditEventSuccess from './pages/events/EditEventSuccess.tsx'
 import VolunteerPage from './pages/vms/VolunteerPage.tsx'
-import Sidebar from './components/Sidebar.tsx'
-import { AuthProvider } from './auth/AuthProvider.tsx'
+import AppLayout from './pages/AppLayout.tsx'
 
 const rootRoute = createRootRoute({
   component: () => (
     <div className="flex">
-      <Sidebar />
-      <div className="flex-1">
-        <Outlet />
-        <TanStackRouterDevtools />
-      </div>
+      <Outlet />
+      <TanStackRouterDevtools />
     </div>
   ),
 })
 
-const indexRoute = createRoute({
+// Base layout for main app pages, i.e. non auth pages
+const appLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
+  id: 'app',
+  component: AppLayout,
+})
+
+const homeRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
   path: '/',
   component: App,
 })
 
+// Base layout for auth pages
 const authLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: 'auth',
@@ -106,7 +111,7 @@ const forgotPasswordRoute = createRoute({
 })
 
 const eventsLayoutRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => appLayoutRoute,
   path: 'events',
   component: EventsLayout,
 })
@@ -148,22 +153,24 @@ const editEventSuccessRoute = createRoute({
 })
 
 const volunteerPageRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => appLayoutRoute,
   path: 'volunteers',
   component: VolunteerPage,
 })
 
 export const routeTree = rootRoute.addChildren([
-  indexRoute,
-  eventsLayoutRoute.addChildren([
-    manageEventsRoute,
-    viewEventRoute,
-    createEventRoute,
-    editEventRoute,
-    createEventSuccessRoute,
-    editEventSuccessRoute,
+  appLayoutRoute.addChildren([
+    homeRoute,
+    eventsLayoutRoute.addChildren([
+      manageEventsRoute,
+      viewEventRoute,
+      createEventRoute,
+      editEventRoute,
+      createEventSuccessRoute,
+      editEventSuccessRoute,
+    ]),
+    volunteerPageRoute,
   ]),
-  volunteerPageRoute,
   authLayoutRoute.addChildren([
     signUpRoute,
     signUpSuccessRoute,
