@@ -398,31 +398,43 @@ export const CalendarYearPicker = ({
 
 export type CalendarDatePaginationProps = {
   className?: string;
+  onNext?: () => void;
+  onPrev?: () => void;
 };
 
 export const CalendarDatePagination = ({
   className,
+  onNext,
+  onPrev,
 }: CalendarDatePaginationProps) => {
   const [month, setMonth] = useCalendarMonth();
   const [year, setYear] = useCalendarYear();
 
   const handlePreviousMonth = useCallback(() => {
+    if (onPrev) {
+      onPrev();
+      return;
+    }
     if (month === 0) {
       setMonth(11);
       setYear(year - 1);
     } else {
       setMonth((month - 1) as CalendarState['month']);
     }
-  }, [month, year, setMonth, setYear]);
+  }, [month, year, setMonth, setYear, onPrev]);
 
   const handleNextMonth = useCallback(() => {
+    if (onNext) {
+      onNext();
+      return;
+    }
     if (month === 11) {
       setMonth(0);
       setYear(year + 1);
     } else {
       setMonth((month + 1) as CalendarState['month']);
     }
-  }, [month, year, setMonth, setYear]);
+  }, [month, year, setMonth, setYear, onNext]);
 
   return (
     <div className={cn('flex items-center gap-2', className)}>

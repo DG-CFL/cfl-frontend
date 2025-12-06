@@ -34,6 +34,8 @@ type CalendarToolbarProps = {
   mode: CalendarDisplayMode
   onModeChange?: (mode: CalendarDisplayMode) => void
   onToday: () => void
+  onNext?: () => void
+  onPrev?: () => void
 }
 
 const viewOptions: Array<{ value: CalendarViewOption; label: string }> = [
@@ -53,7 +55,7 @@ const modeOptions: Array<{
 ]
 
 // The header containing Today button, left and right button, month/year label, view selector, and mode selector
-export const CalendarBarHeader = ({ view, onViewChange, mode, onModeChange, onToday }: CalendarToolbarProps) => {
+export const CalendarBarHeader = ({ view, onViewChange, mode, onModeChange, onToday, onNext, onPrev }: CalendarToolbarProps) => {
   const currentLabel = useCurrentPeriodLabel(view)
 
   return (
@@ -68,7 +70,7 @@ export const CalendarBarHeader = ({ view, onViewChange, mode, onModeChange, onTo
             Today
           </h4>
         </Button>
-        <CalendarDatePagination />
+        <CalendarDatePagination onNext={onNext} onPrev={onPrev} />
         <h1 className="ml-2 text-3xl font-bold text-[#0E121B]">{currentLabel}</h1>
       </div>
 

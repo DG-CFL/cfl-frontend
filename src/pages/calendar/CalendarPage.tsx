@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { format } from 'date-fns'
+import { addDays, addWeeks, format, subDays, subWeeks } from 'date-fns'
 import { Plus } from 'lucide-react'
 
 import {
@@ -89,6 +89,22 @@ const CalendarPage = () => {
     setActiveFilters([])
   }
 
+  const handleNext = () => {
+    if (view === 'week') {
+      handleSelectDate(addWeeks(selectedDate, 1))
+    } else if (view === 'day') {
+      handleSelectDate(addDays(selectedDate, 1))
+    }
+  }
+
+  const handlePrev = () => {
+    if (view === 'week') {
+      handleSelectDate(subWeeks(selectedDate, 1))
+    } else if (view === 'day') {
+      handleSelectDate(subDays(selectedDate, 1))
+    }
+  }
+
   const renderActiveView = () => {
     if (mode === 'list') {
       return <CalendarListView />
@@ -149,6 +165,8 @@ const CalendarPage = () => {
                   mode={mode}
                   onModeChange={setMode}
                   onToday={handleToday}
+                  onNext={view === 'week' || view === 'day' ? handleNext : undefined}
+                  onPrev={view === 'week' || view === 'day' ? handlePrev : undefined}
                 />
               </div>
               <div className="flex-1 min-h-0">
