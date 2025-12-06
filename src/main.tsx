@@ -8,6 +8,7 @@ import {
   createRouter,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import './styles.css'
 
@@ -31,6 +32,7 @@ import EditEventSuccess from './pages/events/EditEventSuccess.tsx'
 import VolunteerPage from './pages/vms/VolunteerPage.tsx'
 import CalendarPage from './pages/calendar/CalendarPage.tsx'
 import Sidebar from './components/Sidebar.tsx'
+import { AuthProvider } from './auth/AuthProvider.tsx'
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -55,7 +57,6 @@ const authLayoutRoute = createRoute({
   id: 'auth',
   component: AuthLayout,
 })
-
 
 const signUpRoute = createRoute({
   getParentRoute: () => authLayoutRoute,
@@ -196,12 +197,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+const queryClient = new QueryClient()
+
 const rootElement = document.getElementById('app')
 if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <StrictMode>
-      <RouterProvider router={router} />
+      <AuthProvider>
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+        </QueryClientProvider>
+      </AuthProvider>
     </StrictMode>,
   )
 }

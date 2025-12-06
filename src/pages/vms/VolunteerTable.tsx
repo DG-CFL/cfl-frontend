@@ -38,82 +38,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-
-const data: Volunteer[] = [
-  {
-    id: "m5gr84i9",
-    name : "bob",
-    age : 20, 
-    gender : "Male", 
-    language : ["English"], 
-    activities : 5, 
-    trainings: 6, 
-    optin : true,
-    certifications : ['First Aid'],
-    volunteerHistory : 'hi',
-  },
-  {
-    id: "3u1reuv4",
-    name : "alice", 
-    age : 20, 
-    gender : "Female", 
-    language : ["English", "Chinese"], 
-    activities : 5, 
-    trainings: 7, 
-    optin : false,
-    certifications : ['-'],
-    volunteerHistory : 'hi',
-  },
-  {
-    id: "derv1ws0",
-    name : "bob2", 
-    age : 15, 
-    gender : "Female", 
-    language : ["English", "Chinese"], 
-    activities : 5, 
-    trainings: 6, 
-    optin : true,
-    certifications : ['-'],
-    volunteerHistory : 'hi',
-  },
-  {
-    id: "5kma53ae",
-    name : "bob3",
-    age : 21, 
-    gender : "Male", 
-    language : ["English","Malay"], 
-    activities : 5, 
-    trainings: 6, 
-    optin : true,
-    certifications : ['-'],
-    volunteerHistory : 'hi',
-  },
-  {
-    id: "bhqecj4p",
-    name : "bob4",
-    age : 15, 
-    gender : "Male", 
-    activities : 5, 
-    trainings: 6, 
-    optin : true,
-    language : ["English", "Chinese"], 
-    certifications : ['-'],
-    volunteerHistory : 'hi',
-  },
-]
-
-export type Volunteer = {
-  id: string
-  name : string
-  age : number
-  gender : "Male" | "Female"
-  language : string []
-  activities : number
-  trainings : number 
-  optin : boolean 
-  certifications : string[]
-  volunteerHistory : string
-}
+import type { Volunteer } from '@/types/vms'
+import { volunteerListData } from '@/data/vms'
 
 const columnFilter= <T,>(column :Column<T, any>, columnName : string, options : string[]) => {
   return (
@@ -351,7 +277,7 @@ export function VolunteerTable ({setClickedRow } : VolunteerTableProps) {
 
 
   const table = useReactTable({
-    data,
+    data: volunteerListData,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

@@ -1,25 +1,9 @@
-type People = {
-  name: string
-  role: string
-}
+import type { Event } from "@/types/events"
 
-export type EventData = {
-  id: string
-  eventName: string
-  status: string
-  location: string
-  coverImage: string
-  startDate: string
-  endDate: string
-  description: string
-  coordinators: Array<People>
-  volunteers: Array<People>
-}
-
-export const PLACEHOLDER_EVENTS: Array<EventData> = [
+export const eventListData: Array<Event> = [
   {
     id: 'event-1',
-    eventName: 'Community Charity Gala',
+    name: 'Community Charity Gala',
     status: 'Active',
     location: 'Harborview Conference Center, Seattle, WA, 98101',
     coverImage: 'gala_cover.jpg',
@@ -39,7 +23,7 @@ export const PLACEHOLDER_EVENTS: Array<EventData> = [
   },
   {
     id: 'event-2',
-    eventName: 'Youth Leadership Summit',
+    name: 'Youth Leadership Summit',
     status: 'Active',
     location: 'Northside Innovation Hub, Austin, TX, 78701',
     coverImage: 'summit_cover.jpg',
@@ -59,7 +43,7 @@ export const PLACEHOLDER_EVENTS: Array<EventData> = [
   },
   {
     id: 'event-3',
-    eventName: 'Spring Volunteer Drive',
+    name: 'Spring Volunteer Drive',
     status: 'Active',
     location: 'Civic Green Park, Denver, CO, 80202',
     coverImage: 'spring_drive.jpg',
@@ -79,7 +63,7 @@ export const PLACEHOLDER_EVENTS: Array<EventData> = [
   },
   {
     id: 'event-4',
-    eventName: 'Community Arts Festival',
+    name: 'Community Arts Festival',
     status: 'Active',
     location: 'Riverside Pavilion, Portland, OR, 97201',
     coverImage: 'arts_festival.jpg',
@@ -99,7 +83,7 @@ export const PLACEHOLDER_EVENTS: Array<EventData> = [
   },
   {
     id: 'event-5',
-    eventName: 'Neighborhood Cleanup Day',
+    name: 'Neighborhood Cleanup Day',
     status: 'Active',
     location: 'Central Plaza, Chicago, IL, 60601',
     coverImage: 'cleanup_day.jpg',
@@ -119,7 +103,7 @@ export const PLACEHOLDER_EVENTS: Array<EventData> = [
   },
   {
     id: 'event-6',
-    eventName: 'Annual Donor Reception',
+    name: 'Annual Donor Reception',
     status: 'Active',
     location: 'Skyline Terrace, New York, NY, 10001',
     coverImage: 'donor_reception.jpg',
@@ -139,6 +123,23 @@ export const PLACEHOLDER_EVENTS: Array<EventData> = [
   },
 ]
 
-export function getEventById(id: string): EventData | undefined {
-  return PLACEHOLDER_EVENTS.find((event) => event.id === id)
+export const eventData: Event = {
+  id: 'default',
+  name: 'Event Name',
+  status: 'Active',
+  location: 'Orchard Central, Somerset, 666666',
+  coverImage: 'image123456.jpg',
+  startDate: 'July 1, 2025',
+  endDate: 'December 31, 2025',
+  description:
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+  coordinators: [
+    { name: 'Name', role: 'Overall-in-Charge' },
+    { name: 'Name', role: 'Assistant-in-Charge' },
+  ],
+  volunteers: [
+    { name: 'Name', role: 'Volunteer' },
+    { name: 'Name', role: 'Volunteer' },
+    { name: 'Name', role: 'Volunteer' },
+  ],
 }

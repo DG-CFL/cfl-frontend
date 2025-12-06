@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Link } from "@tanstack/react-router";
+import { useState, useEffect, type CSSProperties } from "react"
+import { Link } from "@tanstack/react-router"
 import {
   Home,
   Calendar,
@@ -10,43 +10,46 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
-} from "lucide-react";
+} from "lucide-react"
 
-type Item = { label: string; to: string; icon: any };
+type Item = {
+  label: string
+  to: string
+  icon: React.ComponentType<{ size?: number }>
+}
 
 const TOP: Item[] = [
   { label: "Home", to: "/", icon: Home },
   { label: "Calendar", to: "/calendar", icon: Calendar },
   { label: "Volunteer Management System", to: "/volunteers", icon: Users },
   { label: "Events", to: "/events/manage-events", icon: BarChart2 },
-];
+]
 
 const BOTTOM: Item[] = [
   { label: "Profile", to: "/profile", icon: UserIcon },
   { label: "Settings", to: "/settings", icon: Settings },
   { label: "Sign Out", to: "/logout", icon: LogOut },
-];
+]
 
 export default function Sidebar() {
-  const [expanded, setExpanded] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
-  const collapsed = !expanded || isMobile;
+  const [expanded, setExpanded] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
+  const collapsed = !expanded || isMobile
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
 
   return (
     <aside
       style={{
-        width: isMobile ? 64 : (expanded ? 248 : 72),
+        width: isMobile ? 64 : expanded ? 248 : 72,
         height: "100vh",
         background: "#DADBDD",
         padding: isMobile ? 8 : 12,
@@ -82,11 +85,7 @@ export default function Sidebar() {
       )}
 
       <nav style={{ paddingTop: 4 }}>
-        {collapsed ? (
-          <CollapsedTop items={TOP} />
-        ) : (
-          <ExpandedTop items={TOP} />
-        )}
+        {collapsed ? <CollapsedTop items={TOP} /> : <ExpandedTop items={TOP} />}
       </nav>
 
       <div style={{ paddingTop: 10 }}>
@@ -104,7 +103,7 @@ export default function Sidebar() {
         )}
       </div>
     </aside>
-  );
+  )
 }
 
 function ExpandedTop({ items }: { items: Item[] }) {
@@ -114,13 +113,13 @@ function ExpandedTop({ items }: { items: Item[] }) {
         <ExpandedTopItem key={it.to} item={it} />
       ))}
     </div>
-  );
+  )
 }
 
 function ExpandedTopItem({ item }: { item: Item }) {
-  const Icon = item.icon;
+  const Icon = item.icon
 
-  const base = {
+  const base: CSSProperties = {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
@@ -130,23 +129,24 @@ function ExpandedTopItem({ item }: { item: Item }) {
     margin: "0 4px 10px",
     textDecoration: "none",
     fontSize: 14,
-    fontWeight: 700 as const,
-    transition: "background 120ms ease, color 120ms ease, box-shadow 120ms ease",
-  };
+    fontWeight: 700,
+    transition:
+      "background 120ms ease, color 120ms ease, box-shadow 120ms ease",
+  }
 
-  const inactive: React.CSSProperties = {
+  const inactive: CSSProperties = {
     ...base,
     background: "#F1F3F5",
     color: "#0E121B",
     boxShadow: "inset 0 0 0 1px #D5D8DD",
-  };
+  }
 
-  const active: React.CSSProperties = {
+  const active: CSSProperties = {
     ...base,
     background: "#0E121B",
     color: "#FFFFFF",
     boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-  };
+  }
 
   return (
     <Link
@@ -156,7 +156,14 @@ function ExpandedTopItem({ item }: { item: Item }) {
       activeOptions={{ exact: true }}
       preload="intent"
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          minWidth: 0,
+        }}
+      >
         <Icon size={18} />
         <span
           style={{
@@ -174,7 +181,7 @@ function ExpandedTopItem({ item }: { item: Item }) {
       </div>
       <span style={{ fontSize: 16, opacity: 0.85 }}>›</span>
     </Link>
-  );
+  )
 }
 
 function CollapsedTop({ items }: { items: Item[] }) {
@@ -184,35 +191,36 @@ function CollapsedTop({ items }: { items: Item[] }) {
         <CollapsedTopItem key={it.to} item={it} />
       ))}
     </div>
-  );
+  )
 }
 
 function CollapsedTopItem({ item }: { item: Item }) {
-  const Icon = item.icon;
+  const Icon = item.icon
 
-  const boxBase: React.CSSProperties = {
+  const boxBase: CSSProperties = {
     width: 44,
     height: 44,
     borderRadius: 10,
     display: "grid",
     placeItems: "center",
     textDecoration: "none",
-    transition: "background 120ms ease, color 120ms ease, box-shadow 120ms ease",
-  };
+    transition:
+      "background 120ms ease, color 120ms ease, box-shadow 120ms ease",
+  }
 
-  const inactive: React.CSSProperties = {
+  const inactive: CSSProperties = {
     ...boxBase,
     background: "#ECEFF2",
     color: "#0E121B",
     boxShadow: "inset 0 0 0 1px #D5D8DD",
-  };
+  }
 
-  const active: React.CSSProperties = {
+  const active: CSSProperties = {
     ...boxBase,
     background: "#3B4351",
     color: "#FFFFFF",
     boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-  };
+  }
 
   return (
     <Link
@@ -225,7 +233,7 @@ function CollapsedTopItem({ item }: { item: Item }) {
     >
       <Icon size={18} />
     </Link>
-  );
+  )
 }
 
 function ExpandedBottom({ items }: { items: Item[] }) {
@@ -235,13 +243,13 @@ function ExpandedBottom({ items }: { items: Item[] }) {
         <ExpandedBottomItem key={it.to} item={it} />
       ))}
     </div>
-  );
+  )
 }
 
 function ExpandedBottomItem({ item }: { item: Item }) {
-  const Icon = item.icon;
+  const Icon = item.icon
 
-  const base: React.CSSProperties = {
+  const base: CSSProperties = {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
@@ -255,12 +263,12 @@ function ExpandedBottomItem({ item }: { item: Item }) {
     transition: "background 120ms ease",
     fontSize: 13,
     fontWeight: 600,
-  };
+  }
 
-  const active: React.CSSProperties = {
+  const active: CSSProperties = {
     ...base,
     background: "#E6E8EB",
-  };
+  }
 
   return (
     <Link
@@ -276,23 +284,30 @@ function ExpandedBottomItem({ item }: { item: Item }) {
       </div>
       <span style={{ fontSize: 16, opacity: 0.6 }}>›</span>
     </Link>
-  );
+  )
 }
 
 function CollapsedBottom({ items }: { items: Item[] }) {
   return (
-    <div style={{ display: "grid", rowGap: 14, justifyItems: "center", paddingBottom: 6 }}>
+    <div
+      style={{
+        display: "grid",
+        rowGap: 14,
+        justifyItems: "center",
+        paddingBottom: 6,
+      }}
+    >
       {items.map((it) => (
         <CollapsedBottomItem key={it.to} item={it} />
       ))}
     </div>
-  );
+  )
 }
 
 function CollapsedBottomItem({ item }: { item: Item }) {
-  const Icon = item.icon;
+  const Icon = item.icon
 
-  const base: React.CSSProperties = {
+  const base: CSSProperties = {
     width: 24,
     height: 24,
     display: "grid",
@@ -300,13 +315,13 @@ function CollapsedBottomItem({ item }: { item: Item }) {
     textDecoration: "none",
     color: "#3B4351",
     opacity: 0.9,
-  };
+  }
 
-  const active: React.CSSProperties = {
+  const active: CSSProperties = {
     ...base,
     color: "#0E121B",
     opacity: 1,
-  };
+  }
 
   return (
     <Link
@@ -319,5 +334,5 @@ function CollapsedBottomItem({ item }: { item: Item }) {
     >
       <Icon size={18} />
     </Link>
-  );
+  )
 }
