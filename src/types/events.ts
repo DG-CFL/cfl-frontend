@@ -3,7 +3,7 @@ export type Person = {
   role: string
 }
 
-export type EventData = {
+export type Event = {
   id: string
   eventName: string
   status: string

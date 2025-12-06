@@ -1,6 +1,6 @@
-import type { EventData } from "@/types/events"
+import type { Event } from "@/types/events"
 
-export const eventListData: Array<EventData> = [
+export const eventListData: Array<Event> = [
   {
     id: 'event-1',
     eventName: 'Community Charity Gala',
@@ -123,7 +123,7 @@ export const eventListData: Array<EventData> = [
   },
 ]
 
-export const eventData: EventData = {
+export const eventData: Event = {
   id: 'default',
   eventName: 'Event Name',
   status: 'Active',
