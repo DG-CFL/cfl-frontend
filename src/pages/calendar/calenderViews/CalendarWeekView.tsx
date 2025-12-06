@@ -173,12 +173,12 @@ const CalendarWeekView = ({ features = [], colors = {} as CalendarCategoryColors
                       style={style}
                     >
                       <div className="font-semibold truncate">{event.name}</div>
-                      <div className="mt-0.5 flex items-center gap-1 opacity-80">
+                      <div className="mt-0.5 flex items-start gap-1 opacity-80">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 20 20"
                           fill="currentColor"
-                          className="h-3 w-3 flex-shrink-0"
+                          className="mt-0.5 h-3 w-3 flex-shrink-0"
                         >
                           <path
                             fillRule="evenodd"
@@ -186,7 +186,7 @@ const CalendarWeekView = ({ features = [], colors = {} as CalendarCategoryColors
                             clipRule="evenodd"
                           />
                         </svg>
-                        <span className="truncate">
+                        <span className="leading-tight break-words">
                           {format(event.startAt, 'HH:mm')} - {format(event.endAt, 'HH:mm')}
                         </span>
                       </div>
