@@ -7,6 +7,7 @@ import {
 } from 'firebase/auth'
 import { app } from './firebase'
 import type { SignUpData } from '@/types/auth'
+import { registerUser } from '@/api/auth'
 
 // Temp dummy credentials
 const ADMIN_CRENDENTIALS = { email: 'admin@cfl.com', password: '123' }
@@ -15,11 +16,7 @@ const VOLUNTEER_CREDENTIALS = { email: 'volunteer@cfl.com', password: '123' }
 export const auth = getAuth(app)
 
 export async function signUp(signUpData: SignUpData) {
-  try {
-    // const userCred = await createUserWithEmailAndPassword(auth, email, password)
-  } catch (err) {
-    console.log('Sign up failed: ', err)
-  }
+  return registerUser(signUpData)
 }
 
 export async function signIn(

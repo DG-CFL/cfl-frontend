@@ -9,3 +9,7 @@ export type SignUpData = {
   contactNumber: string
   emailOptIn: boolean
 }
+
+export type User = {
+  
+}
