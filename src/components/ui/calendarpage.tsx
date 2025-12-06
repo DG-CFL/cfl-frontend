@@ -15,6 +15,8 @@ import {
   useContext,
   useMemo,
   useState,
+  useRef,
+  useEffect,
   type ReactNode,
 } from 'react';
 import { Button } from '@/components/ui/button';
@@ -68,6 +70,9 @@ export type Feature = {
   startAt: Date;
   endAt: Date;
   status: Status;
+  location?: string;
+  currentAttendees?: number;
+  maxAttendees?: number;
 };
 
 type ComboboxProps = {
@@ -197,6 +202,8 @@ export const CalendarBody = ({ features, children, selectedDate }: CalendarBodyP
   const [month] = useCalendarMonth();
   const [year] = useCalendarYear();
   const { startDay } = useContext(CalendarContext);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [maxEvents, setMaxEvents] = useState(3);
 
   // Memoize expensive date calculations
   const currentMonthDate = useMemo(
@@ -211,6 +218,43 @@ export const CalendarBody = ({ features, children, selectedDate }: CalendarBodyP
     () => (getDay(currentMonthDate) - startDay + 7) % 7,
     [currentMonthDate, startDay]
   );
+
+  // Calculate max events based on container height
+  useEffect(() => {
+    const updateMaxEvents = () => {
+      if (!containerRef.current) return;
+      
+      const containerHeight = containerRef.current.clientHeight;
+      const totalDays = firstDay + daysInMonth;
+      const remainingDays = 7 - (totalDays % 7);
+      const totalCells = totalDays + (remainingDays < 7 ? remainingDays : 0);
+      const weeks = Math.ceil(totalCells / 7);
+      
+      const rowHeight = containerHeight / weeks;
+      const headerHeight = 32; // Approx height for date number + padding
+      const eventHeight = 26; // Approx height for event item + gap
+      
+      const availableHeight = rowHeight - headerHeight;
+      const calculatedMax = Math.floor(availableHeight / eventHeight);
+      
+      // Ensure we show at least 1 event if possible, but reserve space for "+X more" if needed
+      // If calculatedMax is 5, we can show 5 events.
+      // If we have 6 events, we show 4 events + "2 more".
+      // So the limit for "show all" is calculatedMax.
+      // The limit for "truncated" is calculatedMax - 1.
+      
+      setMaxEvents(Math.max(1, calculatedMax));
+    };
+
+    updateMaxEvents();
+    
+    const observer = new ResizeObserver(updateMaxEvents);
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [firstDay, daysInMonth]);
 
   // Memoize previous month calculations
   const prevMonthData = useMemo(() => {
@@ -279,11 +323,11 @@ export const CalendarBody = ({ features, children, selectedDate }: CalendarBodyP
           {day}
         </div>
         <div className="flex flex-col gap-0.5">
-          {featuresForDay.slice(0, 3).map((feature) => children({ feature }))}
+          {featuresForDay.slice(0, featuresForDay.length > maxEvents ? maxEvents - 1 : maxEvents).map((feature) => children({ feature }))}
         </div>
-        {featuresForDay.length > 3 && (
+        {featuresForDay.length > maxEvents && (
           <span className="block text-muted-foreground text-xs">
-            +{featuresForDay.length - 3} more
+            +{featuresForDay.length - (maxEvents - 1)} more
           </span>
         )}
       </div>
@@ -302,7 +346,7 @@ export const CalendarBody = ({ features, children, selectedDate }: CalendarBodyP
   }
 
   return (
-    <div className="grid flex-1 grid-cols-7 auto-rows-[1fr] border-b border-muted-foreground/20">
+    <div ref={containerRef} className="grid flex-1 grid-cols-7 auto-rows-[1fr] border-b border-muted-foreground/20">
       {days.map((day, index) => (
         <div
           className={cn(

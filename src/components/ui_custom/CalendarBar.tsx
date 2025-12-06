@@ -42,7 +42,6 @@ const viewOptions: Array<{ value: CalendarViewOption; label: string }> = [
   { value: 'day', label: 'Day' },
   { value: 'week', label: 'Week' },
   { value: 'month', label: 'Month' },
-  { value: 'year', label: 'Year' },
 ]
 
 const modeOptions: Array<{

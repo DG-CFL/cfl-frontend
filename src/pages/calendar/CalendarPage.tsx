@@ -14,7 +14,7 @@ import CalendarMonthView from './calenderViews/CalendarMonthView'
 import CalendarWeekView from './calenderViews/CalendarWeekView'
 import CalendarDayView from './calenderViews/CalendarDayView'
 import CalendarYearView from './calenderViews/CalendarYearView'
-import CalendarListView from './CalendarListView'
+import CalendarEventListView from './calenderViews/CalendarListView'
 import type { CalendarCategory } from './SampleCalendarData'
 import type { CalendarState } from '@/components/ui/calendarpage'
 import type { CalendarDisplayMode, CalendarViewOption } from '@/components/ui_custom/CalendarBar'
@@ -94,6 +94,9 @@ const CalendarPage = () => {
       handleSelectDate(addWeeks(selectedDate, 1))
     } else if (view === 'day') {
       handleSelectDate(addDays(selectedDate, 1))
+    } else if (view === 'month') {
+      const nextMonth = new Date(year, month + 1, 1)
+      handleSelectDate(nextMonth)
     }
   }
 
@@ -102,12 +105,21 @@ const CalendarPage = () => {
       handleSelectDate(subWeeks(selectedDate, 1))
     } else if (view === 'day') {
       handleSelectDate(subDays(selectedDate, 1))
+    } else if (view === 'month') {
+      const prevMonth = new Date(year, month - 1, 1)
+      handleSelectDate(prevMonth)
     }
   }
 
   const renderActiveView = () => {
     if (mode === 'list') {
-      return <CalendarListView />
+      return (
+        <CalendarEventListView 
+          features={filteredFeatures} 
+          colors={STATUS_COLORS} 
+          selectedDate={selectedDate}
+        />
+      )
     }
 
     switch (view) {
