@@ -149,7 +149,7 @@ const CalendarWeekView = ({ features = [], colors = {} as CalendarCategoryColors
                 <div key={hour} className="relative h-16 border-r border-[#94A3B8]">
                   {hour !== 0 && (
                     <span className="absolute -top-2 right-2 text-[11px] font-medium text-gray-900">
-                      {hour === 12 ? '12 PM' : hour > 12 ? `${hour - 12} PM` : `${hour} AM`}
+                      {hour + ":00"}
                     </span>
                   )}
                 </div>

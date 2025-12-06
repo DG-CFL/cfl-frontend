@@ -128,7 +128,13 @@ const CalendarPage = () => {
           />
         )
       case 'day':
-        return <CalendarDayView />
+        return (
+          <CalendarDayView
+            features={filteredFeatures}
+            colors={STATUS_COLORS}
+            selectedDate={selectedDate}
+          />
+        )
       case 'year':
         return <CalendarYearView />
       default:
