@@ -17,9 +17,10 @@ import CalendarYearView from './calenderViews/CalendarYearView'
 import CalendarEventListView from './calenderViews/CalendarListView'
 import type { CalendarCategory } from './SampleCalendarData'
 import type { CalendarState } from '@/components/ui/calendarpage'
-import type { CalendarDisplayMode, CalendarViewOption } from '@/components/ui_custom/CalendarBar'
+import type { CalendarDisplayMode, CalendarViewOption } from '@/pages/calendar/CalendarHeader'
 import { CalendarProvider, useCalendarMonth, useCalendarYear } from '@/components/ui/calendarpage'
-import CalendarBar, { CalendarBarHeader } from '@/components/ui_custom/CalendarBar'
+import { CalendarBarHeader } from '@/pages/calendar/CalendarHeader'
+import CalendarBar from '@/pages/calendar/CalendarSideBar'
 import { Button } from '@/components/ui/button'
 
 const CalendarPage = () => {
@@ -160,18 +161,22 @@ const CalendarPage = () => {
     }
   }
 
+  const showSidebar = mode === 'grid' && (view === 'month' || view === 'year')
+
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background">
-      <CalendarBar
-        sidebarTitle={sidebarTitle}
-        selectedDate={selectedDate}
-        onSelectDate={handleMiniCalendarSelect}
-        filters={CALENDAR_FILTERS}
-        activeFilters={activeFilters}
-        toggleFilter={toggleFilter}
-        resetFilters={resetFilters}
-        statusColors={STATUS_COLORS}
-      />
+      {showSidebar && (
+        <CalendarBar
+          sidebarTitle={sidebarTitle}
+          selectedDate={selectedDate}
+          onSelectDate={handleMiniCalendarSelect}
+          filters={CALENDAR_FILTERS}
+          activeFilters={activeFilters}
+          toggleFilter={toggleFilter}
+          resetFilters={resetFilters}
+          statusColors={STATUS_COLORS}
+        />
+      )}
       <div className="relative flex-1 overflow-hidden">
         <div className="h-full w-full">
           <CalendarProvider className="h-full w-full gap-6">
@@ -187,7 +192,7 @@ const CalendarPage = () => {
                   onPrev={view === 'week' || view === 'day' ? handlePrev : undefined}
                 />
               </div>
-              <div className="flex-1 min-h-0">
+              <div className="flex-1 min-h-0 px-6 pb-6">
                 {renderActiveView()}
               </div>
             </main>
