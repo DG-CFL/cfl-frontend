@@ -3,9 +3,9 @@ export type Person = {
   role: string
 }
 
-export type EventData = {
+export type Event = {
   id: string
-  eventName: string
+  name: string
   status: string
   location: string
   coverImage: string
@@ -15,3 +15,15 @@ export type EventData = {
   coordinators: Array<Person>
   volunteers: Array<Person>
 }
+
+export type EventPostData = {
+  name: string
+  description: string
+  startDate: string
+  endDate: string
+  venue: string
+  postalCode: string
+  coverImage: string
+}
+
+export type EventPutData = EventPostData 
