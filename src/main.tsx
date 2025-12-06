@@ -12,7 +12,7 @@ import ReactDOM from 'react-dom/client'
 
 import './styles.css'
 
-import App from './App.tsx'
+import Home from './pages/Home.tsx'
 import { AuthProvider } from './auth/AuthProvider.tsx'
 import AuthLayout from './pages/auth/AuthLayout.tsx'
 import AuthSplitLayout from './pages/auth/AuthSplitLayout.tsx'
@@ -52,7 +52,7 @@ const appLayoutRoute = createRoute({
 const homeRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
   path: '/',
-  component: App,
+  component: Home,
 })
 
 // Base layout for auth pages
