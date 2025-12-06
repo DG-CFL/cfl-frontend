@@ -3,7 +3,7 @@ import type { Event } from "@/types/events"
 export const eventListData: Array<Event> = [
   {
     id: 'event-1',
-    eventName: 'Community Charity Gala',
+    name: 'Community Charity Gala',
     status: 'Active',
     location: 'Harborview Conference Center, Seattle, WA, 98101',
     coverImage: 'gala_cover.jpg',
@@ -23,7 +23,7 @@ export const eventListData: Array<Event> = [
   },
   {
     id: 'event-2',
-    eventName: 'Youth Leadership Summit',
+    name: 'Youth Leadership Summit',
     status: 'Active',
     location: 'Northside Innovation Hub, Austin, TX, 78701',
     coverImage: 'summit_cover.jpg',
@@ -43,7 +43,7 @@ export const eventListData: Array<Event> = [
   },
   {
     id: 'event-3',
-    eventName: 'Spring Volunteer Drive',
+    name: 'Spring Volunteer Drive',
     status: 'Active',
     location: 'Civic Green Park, Denver, CO, 80202',
     coverImage: 'spring_drive.jpg',
@@ -63,7 +63,7 @@ export const eventListData: Array<Event> = [
   },
   {
     id: 'event-4',
-    eventName: 'Community Arts Festival',
+    name: 'Community Arts Festival',
     status: 'Active',
     location: 'Riverside Pavilion, Portland, OR, 97201',
     coverImage: 'arts_festival.jpg',
@@ -83,7 +83,7 @@ export const eventListData: Array<Event> = [
   },
   {
     id: 'event-5',
-    eventName: 'Neighborhood Cleanup Day',
+    name: 'Neighborhood Cleanup Day',
     status: 'Active',
     location: 'Central Plaza, Chicago, IL, 60601',
     coverImage: 'cleanup_day.jpg',
@@ -103,7 +103,7 @@ export const eventListData: Array<Event> = [
   },
   {
     id: 'event-6',
-    eventName: 'Annual Donor Reception',
+    name: 'Annual Donor Reception',
     status: 'Active',
     location: 'Skyline Terrace, New York, NY, 10001',
     coverImage: 'donor_reception.jpg',
@@ -125,7 +125,7 @@ export const eventListData: Array<Event> = [
 
 export const eventData: Event = {
   id: 'default',
-  eventName: 'Event Name',
+  name: 'Event Name',
   status: 'Active',
   location: 'Orchard Central, Somerset, 666666',
   coverImage: 'image123456.jpg',
