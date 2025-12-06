@@ -24,7 +24,7 @@ export default function EditEvent() {
   const [coverImage, setCoverImage] = useState<Array<File> | undefined>(
     undefined,
   )
-  const [projectName, setProjectName] = useState(data.eventName)
+  const [projectName, setProjectName] = useState(data.name)
   const [projectDescription, setProjectDescription] = useState(data.description)
   const [venue, setVenue] = useState(data.location.split(',')[0] || '')
   const [postalCode, setPostalCode] = useState(

@@ -16,7 +16,7 @@ export default function ViewEvent() {
   return (
     <div className="mx-auto flex w-full max-w-[1662px] flex-col gap-9 px-10 py-14">
       <div className="flex items-center gap-6">
-        <h1>{data.eventName}</h1>
+        <h1>{data.name}</h1>
         <Button
           className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold"
           onClick={() => {

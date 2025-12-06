@@ -28,7 +28,7 @@ export default function ManageEvents() {
           <EventCard
             key={event.id}
             id={event.id}
-            name={event.eventName}
+            name={event.name}
             location={event.location}
             dateRange={`${event.startDate} – ${event.endDate}`}
           />
