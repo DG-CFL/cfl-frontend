@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react'
-import { addDays, format, startOfWeek } from 'date-fns'
+import { addDays, differenceInMinutes, format, startOfWeek } from 'date-fns'
 import { cn } from '@/lib/utils'
 import type { Feature } from '@/components/ui/calendarpage'
 import type { CalendarCategoryColors } from '@/pages/calendar/SampleCalendarData'
@@ -84,32 +84,53 @@ const CalendarWeekView = ({ features = [], colors = {} as CalendarCategoryColors
               <div className="absolute inset-0 flex">
                 {weekDays.map((day, i) => (
                   <div key={i} className="relative flex-1">
-                    {getDayEventsLayout(day, features, colors).map(({ event, style }) => (
-                      <div
-                        key={event.id}
-                        className="absolute flex flex-col overflow-hidden rounded-md p-1 text-xs shadow-sm ring-1 ring-black/5 transition-all hover:z-10 hover:shadow-md"
-                        style={style}
-                      >
-                        <div className="font-semibold truncate">{event.name}</div>
-                        <div className="mt-0.5 flex items-start gap-1 opacity-80">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                            className="mt-0.5 h-3 w-3 flex-shrink-0"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          <span className="leading-tight break-words">
-                            {format(event.startAt, 'HH:mm')} - {format(event.endAt, 'HH:mm')}
-                          </span>
+                    {getDayEventsLayout(day, features, colors).map(({ event, style }) => {
+                      const durationInMinutes = differenceInMinutes(event.endAt, event.startAt)
+                      const isShortEvent = durationInMinutes < 45
+                      const isVeryShortEvent = durationInMinutes < 20
+
+                      return (
+                        <div
+                          key={event.id}
+                          className={cn(
+                            'absolute flex overflow-hidden rounded-md shadow-sm ring-1 ring-black/5 transition-all hover:z-10 hover:shadow-md',
+                            isShortEvent ? 'flex-row items-center px-1' : 'flex-col p-1',
+                            isVeryShortEvent ? 'text-[10px] leading-none' : 'text-xs',
+                          )}
+                          style={style}
+                        >
+                          {isShortEvent ? (
+                            <div className="flex items-center gap-1 truncate">
+                              <span className="font-semibold">{event.name}</span>
+                              <span className="opacity-80">
+                                {format(event.startAt, 'HH:mm')}
+                              </span>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="font-semibold truncate">{event.name}</div>
+                              <div className="mt-0.5 flex items-start gap-1 opacity-80">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                  className="mt-0.5 h-3 w-3 flex-shrink-0"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                                <span className="leading-tight break-words">
+                                  {format(event.startAt, 'HH:mm')} - {format(event.endAt, 'HH:mm')}
+                                </span>
+                              </div>
+                            </>
+                          )}
                         </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 ))}
               </div>
