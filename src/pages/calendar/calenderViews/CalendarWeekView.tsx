@@ -26,39 +26,92 @@ const CalendarWeekView = ({ features = [], colors = {} as CalendarCategoryColors
     }
   }, [])
 
-  const getEventStyle = (event: Feature) => {
-    const startHour = getHours(event.startAt)
-    const startMinute = getMinutes(event.startAt)
-    const endHour = getHours(event.endAt)
-    const endMinute = getMinutes(event.endAt)
+  // Calculate each event's block size and position based on event duration and filter for overlaps
+  const getDayEventsLayout = (day: Date) => {
+    const dayEvents = features.filter((event) => isSameDay(event.startAt, day))
 
-    // Calculate duration in minutes
-    const startTotalMinutes = startHour * 60 + startMinute
-    const endTotalMinutes = endHour * 60 + endMinute
-    const durationMinutes = endTotalMinutes - startTotalMinutes
+    // 1. Prepare and Sort
+    const eventsWithTime = dayEvents.map((event) => {
+      const startHour = getHours(event.startAt)
+      const startMinute = getMinutes(event.startAt)
+      const endHour = getHours(event.endAt)
+      const endMinute = getMinutes(event.endAt)
 
-    // Calculate top offset relative to 00:00 (0 minutes)
-    const startOffsetMinutes = startTotalMinutes
+      const startMinutes = startHour * 60 + startMinute
+      const endMinutes = endHour * 60 + endMinute
+      
+      return {
+        original: event,
+        start: startMinutes,
+        end: endMinutes,
+        duration: endMinutes - startMinutes,
+        id: event.id,
+      }
+    }).sort((a, b) => {
+      if (a.start !== b.start) return a.start - b.start
+      return b.duration - a.duration
+    })
 
-    // 1 hour = 64px (approx height of a cell)
-    // 1 minute = 64 / 60 px
-    const pixelsPerMinute = 64 / 60
+    // 2. Pack into columns
+    const processed: any[] = []
+    eventsWithTime.forEach((ev) => {
+      let colIndex = 0
+      while (true) {
+        const collision = processed.find((p) => 
+          p.colIndex === colIndex && 
+          p.end > ev.start
+        )
+        if (!collision) break
+        colIndex++
+      }
+      processed.push({ ...ev, colIndex })
+    })
 
-    const top = startOffsetMinutes * pixelsPerMinute
-    const height = durationMinutes * pixelsPerMinute
+    // 3. Group into clusters to determine width
+    const clusters: any[][] = []
+    processed.forEach((ev) => {
+      const lastCluster = clusters[clusters.length - 1]
+      if (lastCluster) {
+        const clusterEnd = Math.max(...lastCluster.map((e) => e.end))
+        if (ev.start < clusterEnd) {
+          lastCluster.push(ev)
+          return
+        }
+      }
+      clusters.push([ev])
+    })
 
-    const color = colors[event.status.id as CalendarCategory]
-
-    return {
-      top: `${top}px`,
-      height: `${height}px`,
-      backgroundColor: color?.background || '#e2e8f0',
-      color: color?.text || '#1e293b',
-    }
-  }
-
-  const getEventsForDay = (day: Date) => {
-    return features.filter((event) => isSameDay(event.startAt, day))
+    // 4. Calculate styles
+    const results: any[] = []
+    clusters.forEach((cluster) => {
+      const maxCol = Math.max(...cluster.map((e) => e.colIndex))
+      const numCols = maxCol + 1
+      
+      cluster.forEach((ev) => {
+        const pixelsPerMinute = 64 / 60
+        const top = ev.start * pixelsPerMinute
+        const height = ev.duration * pixelsPerMinute
+        const widthPercent = 100 / numCols
+        const leftPercent = ev.colIndex * widthPercent
+        
+        const color = colors[ev.original.status.id as CalendarCategory]
+        
+        results.push({
+          event: ev.original,
+          style: {
+            top: `${top}px`,
+            height: `${height}px`,
+            left: `${leftPercent}%`,
+            width: `${widthPercent}%`,
+            backgroundColor: color?.background || '#e2e8f0',
+            color: color?.text || '#1e293b',
+            position: 'absolute' as const,
+          },
+        })
+      })
+    })
+    
+    return results
   }
 
   return (
@@ -113,19 +166,19 @@ const CalendarWeekView = ({ features = [], colors = {} as CalendarCategoryColors
                   ))}
 
                   {/* Events */}
-                  {getEventsForDay(day).map((event) => (
+                  {getDayEventsLayout(day).map(({ event, style }) => (
                     <div
                       key={event.id}
-                      className="absolute left-1 right-1 rounded-md p-2 text-xs shadow-sm ring-1 ring-black/5 transition-all hover:z-10 hover:shadow-md"
-                      style={getEventStyle(event)}
+                      className="absolute flex flex-col overflow-hidden rounded-md p-1 text-xs shadow-sm ring-1 ring-black/5 transition-all hover:z-10 hover:shadow-md"
+                      style={style}
                     >
-                      <div className="font-semibold">{event.name}</div>
+                      <div className="font-semibold truncate">{event.name}</div>
                       <div className="mt-0.5 flex items-center gap-1 opacity-80">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 20 20"
                           fill="currentColor"
-                          className="h-3 w-3"
+                          className="h-3 w-3 flex-shrink-0"
                         >
                           <path
                             fillRule="evenodd"
@@ -133,7 +186,7 @@ const CalendarWeekView = ({ features = [], colors = {} as CalendarCategoryColors
                             clipRule="evenodd"
                           />
                         </svg>
-                        <span>
+                        <span className="truncate">
                           {format(event.startAt, 'HH:mm')} - {format(event.endAt, 'HH:mm')}
                         </span>
                       </div>
