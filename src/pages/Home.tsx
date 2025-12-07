@@ -1,10 +1,10 @@
 import { useState } from "react";
 
-export default function Dashboard() {
+export default function Home() {
   const [role, setRole] = useState<"user" | "admin">("user");
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-[#F7F7F7]">
+    <div className="w-screen flex flex-col md:flex-row h-screen bg-[#F7F7F7]">
       
       {/* MAIN CONTENT */}
       <main className="flex-1 p-6 overflow-auto">

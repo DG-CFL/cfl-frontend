@@ -2,8 +2,12 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  confirmPasswordReset,
 } from 'firebase/auth'
 import { app } from './firebase'
+import type { SignUpData } from '@/types/auth'
+import { registerUser } from '@/api/auth'
 
 // Temp dummy credentials
 const ADMIN_CRENDENTIALS = { email: 'admin@cfl.com', password: '123' }
@@ -11,12 +15,8 @@ const VOLUNTEER_CREDENTIALS = { email: 'volunteer@cfl.com', password: '123' }
 
 export const auth = getAuth(app)
 
-export async function signUp(email: string, password: string) {
-  try {
-    const userCred = await createUserWithEmailAndPassword(auth, email, password)
-  } catch (err) {
-    console.log('Sign up failed: ', err)
-  }
+export async function signUp(signUpData: SignUpData) {
+  return registerUser(signUpData)
 }
 
 export async function signIn(
@@ -45,4 +45,25 @@ export async function signIn(
 
   sessionStorage.setItem('user', JSON.stringify(user))
   return user
+}
+
+/**
+ * Send password reset email to the email address
+ */
+export async function sendResetPasswordEmail(email: string) {
+  await sendPasswordResetEmail(auth, email, {
+    // Email will contain a link to the reset password page
+    url: `${import.meta.env.BASE_URL}/reset-password`,
+  })
+}
+
+/**
+ * Reset password to the new password.
+ * Requires confirmation code which can be extracted from URL.
+ */
+export async function resetPassword(
+  newPassword: string,
+  confirmationCode: string,
+) {
+  await confirmPasswordReset(auth, confirmationCode, newPassword)
 }

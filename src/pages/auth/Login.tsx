@@ -1,5 +1,4 @@
 import { signIn } from '@/auth/operations'
-import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldLabel } from '@/components/ui/field'
@@ -11,7 +10,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 
-type LoginFields = {
+type LoginFormData = {
   email: string
   password: string
   rememberMe: boolean
@@ -22,13 +21,13 @@ export default function Login() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFields>()
+  } = useForm<LoginFormData>()
 
   const [error, setError] = useState<string | null>(null)
 
   const navigate = useNavigate()
 
-  const onSubmit: SubmitHandler<LoginFields> = async (data) => {
+  const onSubmit: SubmitHandler<LoginFormData> = async (data) => {
     try {
       await signIn(data.email, data.password, data.rememberMe)
       navigate({ to: '/' })
