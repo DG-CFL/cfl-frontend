@@ -22,6 +22,7 @@ import {
   loginRoute,
   forgotPasswordRoute,
 } from './auth'
+import { calendarPageRoute } from './calendar'
 
 export const rootRoute = createRootRoute({
   component: () => (
@@ -43,6 +44,7 @@ const routeTree = rootRoute.addChildren([
       createEventSuccessRoute,
       editEventSuccessRoute,
     ]),
+    calendarPageRoute,
     volunteerPageRoute,
   ]),
   authLayoutRoute.addChildren([
