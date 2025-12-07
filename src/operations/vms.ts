@@ -1,3 +1,4 @@
+import type { QueryParams } from '@/api/queryUtils'
 import {
   deleteVolunteers,
   getVolunteer,
@@ -11,10 +12,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
  * Returns a list of volunteers
  * TODO: Accept params for filtering, sorting and pagination
  */
-export function useGetVolunteers() {
+export function useGetVolunteers(params: QueryParams) {
   return useQuery({
-    queryKey: ['volunteers'],
-    queryFn: getVolunteers,
+    queryKey: ['volunteers', params], // Refetch whenever any of the query params changes
+    queryFn: () => getVolunteers(params),
   })
 }
 
