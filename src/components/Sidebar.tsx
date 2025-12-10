@@ -5,6 +5,7 @@ import {
   Calendar,
   Users,
   BarChart2,
+  TrendingUp,
   User as UserIcon,
   Settings,
   LogOut,
@@ -23,6 +24,7 @@ const TOP: Item[] = [
   { label: "Calendar", to: "/calendar", icon: Calendar },
   { label: "Volunteer Management System", to: "/volunteers", icon: Users },
   { label: "Events", to: "/events/manage-events", icon: BarChart2 },
+  { label: "Analytics", to: "/analytics", icon: TrendingUp },
 ]
 
 const BOTTOM: Item[] = [
@@ -47,18 +49,17 @@ export default function Sidebar() {
   }, [])
 
   return (
-    <aside
+    <div
       style={{
+        position: "sticky",
+        top: 0,
+        alignSelf: "flex-start",
         width: isMobile ? 64 : expanded ? 248 : 72,
+        flexShrink: 0,
         height: "100vh",
-        background: "#DADBDD",
-        padding: isMobile ? 8 : 12,
-        boxSizing: "border-box",
-        position: "relative",
-        transition: "width 160ms ease",
+        maxHeight: "100vh",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
       }}
     >
       {!isMobile && (
@@ -67,42 +68,59 @@ export default function Sidebar() {
           style={{
             position: "absolute",
             top: "50%",
-            right: -10,
+            right: -11,
             transform: "translateY(-50%)",
             width: 22,
             height: 22,
             borderRadius: 6,
-            background: "#ECEDEF",
+            background: "#FFFFFF",
             border: "1px solid #BFC2C7",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             cursor: "pointer",
+            zIndex: 10,
+            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
           }}
         >
           {expanded ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
         </button>
       )}
+      <aside
+        style={{
+          width: "100%",
+          height: "100%",
+          background: "#DADBDD",
+          padding: isMobile ? 8 : 12,
+          boxSizing: "border-box",
+          position: "relative",
+          transition: "width 160ms ease",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+          maxHeight: "100vh",
+        }}
+      >
+        <nav style={{ paddingTop: 4, flex: "1 1 0", overflowY: "auto", minHeight: 0 }}>
+          {collapsed ? <CollapsedTop items={TOP} /> : <ExpandedTop items={TOP} />}
+        </nav>
 
-      <nav style={{ paddingTop: 4 }}>
-        {collapsed ? <CollapsedTop items={TOP} /> : <ExpandedTop items={TOP} />}
-      </nav>
-
-      <div style={{ paddingTop: 10 }}>
-        <div
-          style={{
-            height: 1,
-            background: "#C9CCD1",
-            margin: collapsed ? "8px 8px 10px" : "12px 8px 14px",
-          }}
-        />
-        {collapsed ? (
-          <CollapsedBottom items={BOTTOM} />
-        ) : (
-          <ExpandedBottom items={BOTTOM} />
-        )}
-      </div>
-    </aside>
+        <div style={{ paddingTop: 10, flexShrink: 0, marginTop: "auto" }}>
+          <div
+            style={{
+              height: 1,
+              background: "#C9CCD1",
+              margin: collapsed ? "8px 8px 10px" : "12px 8px 14px",
+            }}
+          />
+          {collapsed ? (
+            <CollapsedBottom items={BOTTOM} />
+          ) : (
+            <ExpandedBottom items={BOTTOM} />
+          )}
+        </div>
+      </aside>
+    </div>
   )
 }
 
