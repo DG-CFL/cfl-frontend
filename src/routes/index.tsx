@@ -23,6 +23,7 @@ import {
   forgotPasswordRoute,
 } from './auth'
 import { calendarPageRoute } from './calendar'
+import { analyticsPageRoute } from './analytics'
 
 export const rootRoute = createRootRoute({
   component: () => (
@@ -46,6 +47,7 @@ const routeTree = rootRoute.addChildren([
     ]),
     calendarPageRoute,
     volunteerPageRoute,
+    analyticsPageRoute,
   ]),
   authLayoutRoute.addChildren([
     signUpRoute,
