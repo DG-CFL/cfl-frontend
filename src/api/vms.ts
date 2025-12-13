@@ -5,17 +5,23 @@ import type {
 } from '@/types/vms'
 import { api } from './baseApi'
 
-import { serializeParams, type QueryParams } from './queryUtils'
+import { serializeParams} from './utils'
+import type { ApiCollection, QueryParams } from '@/types/api_utils'
+import { volunteerListData } from '@/data/vms'
 
 // Returns a list of volunteers
 export async function getVolunteers(
   params: QueryParams = {},
-): Promise<Volunteer[]> {
-  const res = await api.get('/volunteers', {
-    params,
-    paramsSerializer: serializeParams,
-  })
-  return res.data
+): Promise<ApiCollection<Volunteer>> {
+  // const res = await api.get('/volunteers', {
+  //   params,
+  //   paramsSerializer: serializeParams,
+  // })
+  // return res.data
+  return {
+    items: volunteerListData,
+    totalCount: 5
+  }
 }
 
 // Returns a volunteer specified by the volunteerId

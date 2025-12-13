@@ -1,4 +1,3 @@
-import type { QueryParams } from '@/api/queryUtils'
 import {
   deleteVolunteers,
   getVolunteer,
@@ -6,6 +5,7 @@ import {
   getVolunteerHistory,
   getVolunteers,
 } from '@/api/vms'
+import type { QueryParams } from '@/types/api_utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 /**
