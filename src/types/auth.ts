@@ -1,15 +1,17 @@
-export type Role = "admin" | "volunteer" | "public"
+export type Role = "cfl" | "admin" | "volunteer" | "public"
 
 export type SignUpData = {
   email: string
   password: string
-  name: string
+
+  fullName: string
   gender: string
   dateOfBirth: Date
   contactNumber: string
-  emailOptIn: boolean
+  marketingEmailPref: boolean
 }
 
-export type User = {
-  
+export type UserAccount = {
+  userId: string
+  role: Role
 }

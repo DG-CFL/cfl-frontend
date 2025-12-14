@@ -1,6 +1,5 @@
-import { onAuthStateChanged, type User } from 'firebase/auth'
+import { getAuth, onAuthStateChanged, type User } from 'firebase/auth'
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { auth } from './operations'
 import type { Role } from '@/types/auth'
 
 type AuthContextValue = {
@@ -13,6 +12,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null)
 
   useEffect(() => {
+    const auth = getAuth()
     return onAuthStateChanged(auth, (user) => {
       setCurrentUser(user)
     })
@@ -31,17 +31,17 @@ export const useAuth = () => {
 
 export const useCurrentUser = () => {
   // Temp logic
-  const value = sessionStorage.getItem("user")
+  const value = sessionStorage.getItem('user')
   if (!value) return null
   return JSON.parse(value)
-  
+
   // TODO: return useAuth().currentUser
 }
 
 export function getUserRole(user: User): Role {
   // Temp logic
-  const value = sessionStorage.getItem("user")
-  if (!value) return "public"
+  const value = sessionStorage.getItem('user')
+  if (!value) return 'public'
   return JSON.parse(value).role as Role
 
   // TODO: Actual logic here:

@@ -1,10 +1,10 @@
-import type { SignUpData, User } from '@/types/auth'
+import type { SignUpData, UserAccount } from '@/types/auth'
 import { api } from './baseApi'
 
 /**
- * Registers a new user
+ * Signs up a new user
  */
-export async function registerUser(signUpData: SignUpData): Promise<User> {
-  const res = await api.post('/auth/sign-up', signUpData)
+export async function signUpUser(signUpData: SignUpData): Promise<UserAccount> {
+  const res = await api.post('/auth/signup', signUpData)
   return res.data
 }

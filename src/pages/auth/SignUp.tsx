@@ -83,9 +83,9 @@ export default function SignUp() {
           </FieldLabel>
           <Input
             id="full-name"
-            {...register('name', { required: 'Full name is required' })}
+            {...register('fullName', { required: 'Full name is required' })}
           />
-          {errors.name && <ErrorAlert message={errors.name.message} />}
+          {errors.fullName && <ErrorAlert message={errors.fullName.message} />}
         </Field>
         <Field>
           <FieldLabel htmlFor="gender">
@@ -130,7 +130,7 @@ export default function SignUp() {
       </FieldGroup>
       <div className="flex flex-col w-full gap-6">
         <div className="flex items-center gap-3">
-          <Checkbox id="email-opt-in" {...register('emailOptIn')} />
+          <Checkbox id="email-opt-in" {...register('marketingEmailPref')} />
           <Label
             htmlFor="email-opt-in"
             className="text-lg text-muted-foreground"
