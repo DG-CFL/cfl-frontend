@@ -1,5 +1,6 @@
 import type { Event, EventPostData, EventPutData } from "@/types/events";
 import { api } from "./baseApi";
+import { eventData } from "@/data/events";
 
 /**
  * Returns the list of all events
@@ -13,8 +14,9 @@ export async function getEvents(): Promise<Event[]> {
  * Returns an event
  */
 export async function getEvent(eventId: number): Promise<Event> {
-  const res = await api.get(`/events/${eventId}`)
-  return res.data
+  // const res = await api.get(`/events/${eventId}`)
+  // return res.data
+  return eventData
 }
 
 /**

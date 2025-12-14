@@ -1,29 +1,31 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { eventData } from '@/data/events'
+import { ErrorAlert } from '@/components/ui_custom/ErrorAlert'
+import { useGetEvent } from '@/operations/events'
 import type { Person } from '@/types/events'
-import { Link, useNavigate, useParams } from '@tanstack/react-router'
+import { Link, useParams } from '@tanstack/react-router'
 import { CalendarDays, ImageIcon, MapPin, SquarePen } from 'lucide-react'
+import LoadingSkeleton from '../LoadingSkeleton'
 
 export default function ViewEvent() {
   const { eventId } = useParams({ strict: false })
-  const navigate = useNavigate()
 
-  const data = eventData
+  const { data, isLoading, isError } = useGetEvent(Number(eventId!))
+
+  if (isLoading) {
+    return <LoadingSkeleton />
+  }
+
+  if (isError || !data) {
+    return <ErrorAlert />
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-[1662px] flex-col gap-9 px-10 py-14">
       <div className="flex items-center gap-6">
         <h1>{data.name}</h1>
         <Link to="/events/$eventId/edit" params={{ eventId: eventId! }}>
-          <Button
-            className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold"
-            onClick={() => {
-              if (data.id) {
-                navigate({ to: `/events/${data.id}/edit` })
-              }
-            }}
-          >
+          <Button className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold">
             <SquarePen className="size-5" aria-hidden="true" />
             Edit Event Details
           </Button>
