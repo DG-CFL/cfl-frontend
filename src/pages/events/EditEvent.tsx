@@ -5,11 +5,9 @@ import {
   DropzoneContent,
   DropzoneEmptyState,
 } from '@/components/ui/dropzone'
-import { FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { DateInput } from '@/components/ui_custom/DateInput'
 import { DatePicker } from '@/components/ui_custom/DatePicker'
 import { ErrorAlert } from '@/components/ui_custom/ErrorAlert'
 import { useEditEvent, useGetEvent } from '@/operations/events'
@@ -41,6 +39,7 @@ export default function EditEvent() {
   const navigate = useNavigate()
 
   const { data } = useGetEvent(Number(eventId!))
+  const editEvent = useEditEvent(Number(eventId!))
 
   const [coverImage, setCoverImage] = useState<Array<File> | undefined>(
     undefined,
@@ -55,14 +54,15 @@ export default function EditEvent() {
     defaultValues: data && initializeEventEditFormData(data),
   })
 
-  const editEvent = useEditEvent(Number(eventId!))
+  const [error, setError] = useState<string | null>(null)
 
   const onSubmit: SubmitHandler<EventEditFormData> = async (data) => {
     try {
       await editEvent.mutateAsync(data)
       navigate({ to: '/events/edit-success' })
     } catch (err) {
-      console.log('Error editing event: ', err)
+      console.log(error)
+      setError(error)
     }
   }
 
@@ -239,6 +239,9 @@ export default function EditEvent() {
                 )}
               </div>
             </div>
+
+            {/* Server errors (if any) */}
+            {error && <ErrorAlert message={error} />}
 
             {/* Action Buttons */}
             <div className="flex w-[1254px] justify-end gap-[10px] pt-2">

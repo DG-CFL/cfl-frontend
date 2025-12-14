@@ -4,7 +4,7 @@ export type Person = {
 }
 
 export type Event = {
-  id: string
+  id: number
   name: string
   status: string
   location: string
