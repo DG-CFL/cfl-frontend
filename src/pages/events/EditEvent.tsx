@@ -1,56 +1,62 @@
-import { useState } from 'react'
-import { ChevronLeft, Upload } from 'lucide-react'
-import { useNavigate, useParams } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import {
   Dropzone,
   DropzoneContent,
   DropzoneEmptyState,
 } from '@/components/ui/dropzone'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { DateInput } from '@/components/ui_custom/DateInput'
-import { eventData } from '@/data/events'
+import { useGetEvent } from '@/operations/events'
+import { Link, useNavigate, useParams } from '@tanstack/react-router'
+import { ChevronLeft, Upload } from 'lucide-react'
+import { useState } from 'react'
 
 export default function EditEvent() {
   const { eventId } = useParams({ strict: false })
   const navigate = useNavigate()
 
-  // Get event data - this happens once during component initialization
-  const data = eventData
+  const { data } = useGetEvent(Number(eventId!))
 
   const [coverImage, setCoverImage] = useState<Array<File> | undefined>(
     undefined,
   )
-  const [projectName, setProjectName] = useState(data.name)
-  const [projectDescription, setProjectDescription] = useState(data.description)
-  const [venue, setVenue] = useState(data.location.split(',')[0] || '')
+  const [projectName, setProjectName] = useState(data?.name)
+  const [projectDescription, setProjectDescription] = useState(
+    data?.description,
+  )
+  const [venue, setVenue] = useState(data?.location.split(',')[0] || '')
   const [postalCode, setPostalCode] = useState(
-    data.location.split(',').pop()?.trim() || '',
+    data?.location.split(',').pop()?.trim() || '',
   )
   const [startDate, setStartDate] = useState<Date | undefined>(
-    data.startDate ? new Date(data.startDate) : undefined,
+    data?.startDate ? new Date(data?.startDate) : undefined,
   )
   const [endDate, setEndDate] = useState<Date | undefined>(
-    data.endDate ? new Date(data.endDate) : undefined,
+    data?.endDate ? new Date(data?.endDate) : undefined,
   )
 
   return (
     <div className="mx-auto flex w-full max-w-[1662px] flex-col gap-6 px-10 py-14">
       {/* Header with Back Button */}
       <div className="flex items-start gap-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-10"
-          onClick={() =>
-            navigate({ to: '/events/$eventId', params: { eventId: eventId! } })
-          }
-        >
-          <ChevronLeft className="size-8" />
-        </Button>
+        <Link to="/events/$eventId" params={{ eventId: eventId! }}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-10"
+            onClick={() =>
+              navigate({
+                to: '/events/$eventId',
+                params: { eventId: eventId! },
+              })
+            }
+          >
+            <ChevronLeft className="size-8" />
+          </Button>
+        </Link>
         <div className="flex flex-col gap-1">
           <h1>Edit Event</h1>
           <p className="text-xl leading-7 text-muted-foreground">
