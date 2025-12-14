@@ -5,17 +5,19 @@ import {
   DropzoneContent,
   DropzoneEmptyState,
 } from '@/components/ui/dropzone'
+import { FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { DateInput } from '@/components/ui_custom/DateInput'
+import { DatePicker } from '@/components/ui_custom/DatePicker'
 import { ErrorAlert } from '@/components/ui_custom/ErrorAlert'
 import { useEditEvent, useGetEvent } from '@/operations/events'
 import type { Event, EventPutData } from '@/types/events'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { ChevronLeft, Upload } from 'lucide-react'
 import { useState } from 'react'
-import { useForm, type SubmitHandler } from 'react-hook-form'
+import { Controller, useForm, type SubmitHandler } from 'react-hook-form'
 
 type EventEditFormData = EventPutData
 
@@ -26,8 +28,8 @@ const initializeEventEditFormData = (eventData: Event): EventEditFormData => {
   return {
     name: eventData.name,
     description: eventData.description,
-    startDate: eventData.startDate,
-    endDate: eventData.endDate,
+    startDate: new Date(eventData.startDate),
+    endDate: new Date(eventData.endDate),
     venue: eventData.location.split(',')[0] || '',
     postalCode: eventData.location.split(',').pop()?.trim() || '',
     coverImage: undefined,
@@ -48,7 +50,10 @@ export default function EditEvent() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<EventEditFormData>()
+    control,
+  } = useForm<EventEditFormData>({
+    defaultValues: data && initializeEventEditFormData(data),
+  })
 
   const editEvent = useEditEvent(Number(eventId!))
 
@@ -159,25 +164,46 @@ export default function EditEvent() {
                 <ErrorAlert message={errors.description.message} />
               )}
             </div>
+
             {/* Start Date & End Date */}
             <div className="flex w-[1254px] gap-3">
-              <DateInput
-                id="start-date"
-                label="Start Date"
-                {...register('startDate', {
-                  required: 'Start date is required',
-                })}
-                className="flex-1 space-y-2"
-              />
+              <div className="space-y-2">
+                <Label htmlFor="start-date">Start Date</Label>
+                <Controller
+                  {...register('startDate', {
+                    required: 'Start date is required',
+                  })}
+                  control={control}
+                  render={({ field }) => (
+                    <DatePicker
+                      id="start-date"
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  )}
+                />
+                {errors.startDate && (
+                  <ErrorAlert message={errors.startDate.message} />
+                )}
+              </div>
 
-              <DateInput
-                id="end-date"
-                label="End Date"
-                {...register('endDate', {
-                  required: 'End date is required',
-                })}
-                className="flex-1 space-y-2"
-              />
+              <div className="space-y-2">
+                <Label htmlFor="end-date">End Date</Label>
+                <Controller
+                  {...register('endDate', { required: 'End date is required' })}
+                  control={control}
+                  render={({ field }) => (
+                    <DatePicker
+                      id="end-date"
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  )}
+                />
+                {errors.endDate && (
+                  <ErrorAlert message={errors.endDate.message} />
+                )}
+              </div>
             </div>
 
             {/* Venue & Postal Code */}

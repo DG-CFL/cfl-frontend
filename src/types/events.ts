@@ -19,8 +19,8 @@ export type Event = {
 export type EventPostData = {
   name: string
   description: string
-  startDate: string
-  endDate: string
+  startDate: Date
+  endDate: Date
   venue: string
   postalCode: string
   coverImage?: string
