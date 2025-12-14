@@ -1,3 +1,4 @@
+import { serializeDateWithoutTime } from '@/api/utils/utils'
 import logo from '@/assets/cfl-logo.png'
 import { signUp } from '@/auth/operations'
 import { Button } from '@/components/ui/button'
@@ -16,14 +17,10 @@ import {
 import { DatePicker } from '@/components/ui_custom/DatePicker'
 import { ErrorAlert } from '@/components/ui_custom/ErrorAlert'
 import { MaskableInput } from '@/components/ui_custom/MaskableInput'
-import type { SignUpData } from '@/types/auth'
+import type { SignUpFormData } from '@/types/auth'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Controller, useForm, type SubmitHandler } from 'react-hook-form'
-
-type SignUpFormData = SignUpData & {
-  acknowledgedTermsOfUse: boolean // Must be true for form to be submitted
-}
 
 export default function SignUp() {
   const {
@@ -38,6 +35,7 @@ export default function SignUp() {
   const navigate = useNavigate()
 
   const onSubmit: SubmitHandler<SignUpFormData> = async (data) => {
+    
     try {
       await signUp(data)
       navigate({ to: '/sign-up-success' })
@@ -83,9 +81,9 @@ export default function SignUp() {
           </FieldLabel>
           <Input
             id="full-name"
-            {...register('name', { required: 'Full name is required' })}
+            {...register('fullName', { required: 'Full name is required' })}
           />
-          {errors.name && <ErrorAlert message={errors.name.message} />}
+          {errors.fullName && <ErrorAlert message={errors.fullName.message} />}
         </Field>
         <Field>
           <FieldLabel htmlFor="gender">
@@ -109,7 +107,7 @@ export default function SignUp() {
           </FieldLabel>
 
           <Controller
-            name="dateOfBirth"
+            {...register('dateOfBirth')}
             control={control}
             render={({ field }) => (
               <DatePicker
@@ -130,7 +128,7 @@ export default function SignUp() {
       </FieldGroup>
       <div className="flex flex-col w-full gap-6">
         <div className="flex items-center gap-3">
-          <Checkbox id="email-opt-in" {...register('emailOptIn')} />
+          <Checkbox id="email-opt-in" {...register('marketingEmailPref')} />
           <Label
             htmlFor="email-opt-in"
             className="text-lg text-muted-foreground"
