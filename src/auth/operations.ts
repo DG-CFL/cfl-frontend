@@ -6,8 +6,9 @@ import {
   confirmPasswordReset,
 } from 'firebase/auth'
 import { app } from './firebase'
-import type { SignUpData } from '@/types/auth'
+import type { SignUpFormData } from '@/types/auth'
 import { signUpUser } from '@/api/auth'
+import { serializeDateWithoutTime } from '@/api/utils/utils'
 
 // Temp dummy credentials
 const ADMIN_CRENDENTIALS = { email: 'admin@cfl.com', password: '123' }
@@ -15,11 +16,18 @@ const VOLUNTEER_CREDENTIALS = { email: 'volunteer@cfl.com', password: '123' }
 
 export const auth = getAuth(app)
 
-export async function signUp(signUpData: SignUpData) {
+export async function signUp(signUpData: SignUpFormData) {
   // Create firebase user account
-  await createUserWithEmailAndPassword(auth, signUpData.email, signUpData.password)
+  await createUserWithEmailAndPassword(
+    auth,
+    signUpData.email,
+    signUpData.password,
+  )
   // Backend endpoint for additional user data not handled by firebase
-  return signUpUser(signUpData)
+  return signUpUser({
+    ...signUpData,
+    dateOfBirth: serializeDateWithoutTime(signUpData.dateOfBirth),
+  })
 }
 
 export async function signIn(
