@@ -44,7 +44,7 @@ export default function CreateEvent() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[1662px] flex-col gap-6 px-10 py-14">
+    <div className="mx-auto flex w-screen max-w-[1662px] flex-col gap-6 px-10 py-14">
       {/* Header with Back Button */}
       <div className="flex items-start gap-4">
         <Link to="/events">
@@ -61,9 +61,9 @@ export default function CreateEvent() {
       </div>
 
       {/* Form Card */}
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Card className=" w-[1568px] gap-0 rounded-[10px] border border-muted-foreground/30">
-          <CardContent className="flex flex-col items-center space-y-4 px-8 py-8">
+      <form onSubmit={handleSubmit(onSubmit)} >
+        <Card className=" gap-0 rounded-[10px] border border-muted-foreground/30">
+          <CardContent className="w-full flex flex-col space-y-4 px-8 py-8">
             {/* Upload Cover Image */}
             <div className="space-y-2">
               <Label className="text-base text-[#545F71]">
@@ -78,7 +78,7 @@ export default function CreateEvent() {
                     acceptedFiles.length ? acceptedFiles : undefined,
                   )
                 }
-                className="h-[222px] w-[1254px] gap-3 rounded-lg border border-input bg-[#99999a] shadow-md transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 hover:border-ring/50"
+                className="h-[222px] gap-3 rounded-lg border border-input bg-[#99999a] shadow-md transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 hover:border-ring/50"
               >
                 <DropzoneEmptyState className="gap-3">
                   <Upload className="size-12 text-[#545F71]" />
@@ -88,7 +88,7 @@ export default function CreateEvent() {
                 </DropzoneEmptyState>
                 <DropzoneContent className="gap-3">
                   <Upload className="size-12 text-[#545F71]" />
-                  <p className="w-full truncate text-base text-[#545F71]">
+                  <p className="truncate text-base text-[#545F71]">
                     {coverImage?.[0]?.name ?? 'Drag & Drop Files Here'}
                   </p>
                   <p className="text-sm text-[#545F71]">Click to replace</p>
@@ -107,7 +107,7 @@ export default function CreateEvent() {
               <Input
                 id="project-name"
                 {...register('name', { required: 'Project name is required' })}
-                className="h-12 w-[1254px]"
+                className="h-12"
               />
               {errors.name && <ErrorAlert message={errors.name.message} />}
             </div>
@@ -125,7 +125,7 @@ export default function CreateEvent() {
                 {...register('description', {
                   required: 'Description is required',
                 })}
-                className="h-[114px] w-[1254px] resize-none"
+                className="h-[114px] resize-none"
               />
               {errors.description && (
                 <ErrorAlert message={errors.description.message} />
@@ -133,8 +133,8 @@ export default function CreateEvent() {
             </div>
 
             {/* Start Date & End Date */}
-            <div className="flex w-[1254px] gap-3">
-              <div className="space-y-2">
+            <div className="flex gap-3">
+              <div className=" flex-1 space-y-2">
                 <Label htmlFor="start-date">Start Date</Label>
                 <Controller
                   {...register('startDate', {
@@ -154,7 +154,7 @@ export default function CreateEvent() {
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div className="flex-1 space-y-2">
                 <Label htmlFor="end-date">End Date</Label>
                 <Controller
                   {...register('endDate', { required: 'End date is required' })}
@@ -174,7 +174,7 @@ export default function CreateEvent() {
             </div>
 
             {/* Venue & Postal Code */}
-            <div className="flex w-[1254px] gap-3">
+            <div className="flex gap-3">
               <div className="flex-1 space-y-2">
                 <Label htmlFor="venue" className="text-base text-[#545F71]">
                   Venue
@@ -211,7 +211,7 @@ export default function CreateEvent() {
             {error && <ErrorAlert message={error} />}
 
             {/* Action Buttons */}
-            <div className="flex w-[1254px] justify-end gap-[10px] pt-2">
+            <div className="flex justify-end gap-[10px] pt-2">
               <Button
                 variant="outline"
                 className="h-[42px] w-[154px] rounded-md border border-muted-foreground/30 px-4 py-3 text-base"
