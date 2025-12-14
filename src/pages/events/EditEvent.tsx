@@ -70,18 +70,8 @@ export default function EditEvent() {
     <div className="mx-auto flex w-full max-w-[1662px] flex-col gap-6 px-10 py-14">
       {/* Header with Back Button */}
       <div className="flex items-start gap-4">
-        <Link to="/events/$eventId" params={{ eventId: eventId! }}>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-10"
-            onClick={() =>
-              navigate({
-                to: '/events/$eventId',
-                params: { eventId: eventId! },
-              })
-            }
-          >
+        <Link to="/events/$eventId/view" params={{ eventId: eventId! }}>
+          <Button variant="ghost" size="icon" className="size-10">
             <ChevronLeft className="size-8" />
           </Button>
         </Link>
@@ -250,7 +240,7 @@ export default function EditEvent() {
                 variant="outline"
                 onClick={() =>
                   navigate({
-                    to: '/events/$eventId',
+                    to: '/events/$eventId/view',
                     params: { eventId: eventId! },
                   })
                 }

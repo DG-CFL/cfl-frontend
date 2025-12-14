@@ -9,7 +9,7 @@ import { createRoute } from '@tanstack/react-router'
 import { appLayoutRoute } from './app'
 
 /**
- * BAse layout for events pages
+ * Base layout for events pages
  */
 export const eventsLayoutRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
@@ -25,7 +25,7 @@ export const manageEventsRoute = createRoute({
 
 export const viewEventRoute = createRoute({
   getParentRoute: () => eventsLayoutRoute,
-  path: '$eventId',
+  path: '$eventId/view',
   component: ViewEvent,
 })
 

@@ -1,11 +1,11 @@
 import { Calendar, MapPin } from 'lucide-react'
-import { useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 
 export type EventCardProps = {
-  id: string
+  id: number
   name: string
   location: string
   dateRange: string
@@ -19,7 +19,7 @@ export function EventCard({
   dateRange,
   imageUrl,
 }: EventCardProps) {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   return (
     <Card className="flex h-[425px] w-full max-w-[403px] flex-col overflow-hidden rounded-2xl border border-muted-foreground/20 p-0 shadow-sm transition-shadow hover:shadow-lg">
@@ -76,17 +76,14 @@ export function EventCard({
         </div>
 
         <div className="pt-4">
-          <Button
-            variant="outline"
-            className="h-11 w-full rounded-lg border border-muted-foreground/30 px-4 text-sm font-medium hover:bg-muted/50"
-            onClick={() => 
-              navigate({
-                to: `/events/${id}`,
-              })
-            }
-          >
-            View/Edit Details
-          </Button>
+          <Link to="/events/$eventId/view" params={{ eventId: id.toString() }}>
+            <Button
+              variant="outline"
+              className="h-11 w-full rounded-lg border border-muted-foreground/30 px-4 text-sm font-medium hover:bg-muted/50"
+            >
+              View/Edit Details
+            </Button>
+          </Link>
         </div>
       </div>
     </Card>

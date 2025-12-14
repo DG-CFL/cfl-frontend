@@ -60,7 +60,7 @@ export default function CreateEvent() {
           variant="ghost"
           size="icon"
           className="size-10"
-          onClick={() => navigate({ to: '/events/manage-events' })}
+          onClick={() => navigate({ to: '/events' })}
         >
           <ChevronLeft className="size-8" />
         </Button>
@@ -239,13 +239,13 @@ export default function CreateEvent() {
             <Button
               variant="outline"
               className="h-[42px] w-[154px] rounded-md border border-muted-foreground/30 px-4 py-3 text-base"
-              onClick={() => navigate({ to: '/events/manage-events' })}
+              onClick={() => navigate({ to: '/events' })}
             >
               Cancel
             </Button>
             <Button
               className="h-[42px] w-[154px] rounded-md bg-[#545F71] px-4 py-3 text-base font-semibold"
-              onClick={() => navigate({ to: '/events/create-event-success' })}
+              onClick={() => navigate({ to: '/events/create-success' })}
             >
               Save & Publish
             </Button>
