@@ -25,10 +25,10 @@ export function useGetEvent(eventId: number) {
 /**
  * Creates a new event
  */
-export function useCreateEvent(eventData: EventPostData) {
+export function useCreateEvent() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: () => createEvent(eventData),
+    mutationFn: (eventData: EventPostData) => createEvent(eventData),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ['events'],

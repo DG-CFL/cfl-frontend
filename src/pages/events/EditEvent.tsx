@@ -17,12 +17,10 @@ import { ChevronLeft, Upload } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, useForm, type SubmitHandler } from 'react-hook-form'
 
-type EventEditFormData = EventPutData
-
 /**
  * Initializes form data default values to the current values of the event
  */
-const initializeEventEditFormData = (eventData: Event): EventEditFormData => {
+const initializeEventEditFormData = (eventData: Event): EventPutData => {
   return {
     name: eventData.name,
     description: eventData.description,
@@ -50,13 +48,13 @@ export default function EditEvent() {
     handleSubmit,
     formState: { errors },
     control,
-  } = useForm<EventEditFormData>({
+  } = useForm<EventPutData>({
     defaultValues: data && initializeEventEditFormData(data),
   })
 
   const [error, setError] = useState<string | null>(null)
 
-  const onSubmit: SubmitHandler<EventEditFormData> = async (data) => {
+  const onSubmit: SubmitHandler<EventPutData> = async (data) => {
     try {
       await editEvent.mutateAsync(data)
       navigate({ to: '/events/edit-success' })
