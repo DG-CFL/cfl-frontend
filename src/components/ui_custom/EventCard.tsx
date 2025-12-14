@@ -81,7 +81,7 @@ export function EventCard({
             className="h-11 w-full rounded-lg border border-muted-foreground/30 px-4 text-sm font-medium hover:bg-muted/50"
             onClick={() => 
               navigate({
-                to: `/events/view-event/${id}`,
+                to: `/events/${id}`,
               })
             }
           >

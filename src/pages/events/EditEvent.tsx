@@ -45,7 +45,9 @@ export default function EditEvent() {
           variant="ghost"
           size="icon"
           className="size-10"
-          onClick={() => navigate({ to: '/events/manage-events' })}
+          onClick={() =>
+            navigate({ to: '/events/$eventId', params: { eventId: eventId! } })
+          }
         >
           <ChevronLeft className="size-8" />
         </Button>
@@ -172,13 +174,13 @@ export default function EditEvent() {
             <Button
               variant="outline"
               className="h-[42px] w-[154px] rounded-md border border-muted-foreground/30 px-4 py-3 text-base"
-              onClick={() => navigate({ to: '/events/manage-events' })}
+              onClick={() => navigate({ to: '/events' })}
             >
               Cancel
             </Button>
             <Button
               className="h-[42px] w-[154px] rounded-md bg-[#545F71] px-4 py-3 text-base font-semibold"
-              onClick={() => navigate({ to: '/events/edit-event-success' })}
+              onClick={() => navigate({ to: '/events/edit-success' })}
             >
               Save & Publish
             </Button>

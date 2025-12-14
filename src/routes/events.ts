@@ -19,36 +19,36 @@ export const eventsLayoutRoute = createRoute({
 
 export const manageEventsRoute = createRoute({
   getParentRoute: () => eventsLayoutRoute,
-  path: 'manage-events',
+  path: '/',
   component: ManageEvents,
 })
 
 export const viewEventRoute = createRoute({
   getParentRoute: () => eventsLayoutRoute,
-  path: 'view-event/$eventId',
+  path: '$eventId',
   component: ViewEvent,
 })
 
 export const createEventRoute = createRoute({
   getParentRoute: () => eventsLayoutRoute,
-  path: 'create-event',
+  path: 'create',
   component: CreateEvent,
 })
 
 export const editEventRoute = createRoute({
   getParentRoute: () => eventsLayoutRoute,
-  path: 'edit-event/$eventId',
+  path: '$eventId/edit',
   component: EditEvent,
 })
 
 export const createEventSuccessRoute = createRoute({
   getParentRoute: () => eventsLayoutRoute,
-  path: 'create-event-success',
+  path: 'create-success',
   component: CreateEventSuccess,
 })
 
 export const editEventSuccessRoute = createRoute({
   getParentRoute: () => eventsLayoutRoute,
-  path: 'edit-event-success',
+  path: 'edit-success',
   component: EditEventSuccess,
 })
