@@ -9,10 +9,30 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { DateInput } from '@/components/ui_custom/DateInput'
-import { useGetEvent } from '@/operations/events'
+import { ErrorAlert } from '@/components/ui_custom/ErrorAlert'
+import { useEditEvent, useGetEvent } from '@/operations/events'
+import type { Event, EventPutData } from '@/types/events'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { ChevronLeft, Upload } from 'lucide-react'
 import { useState } from 'react'
+import { useForm, type SubmitHandler } from 'react-hook-form'
+
+type EventEditFormData = EventPutData
+
+/**
+ * Initializes form data default values to the current values of the event
+ */
+const initializeEventEditFormData = (eventData: Event): EventEditFormData => {
+  return {
+    name: eventData.name,
+    description: eventData.description,
+    startDate: eventData.startDate,
+    endDate: eventData.endDate,
+    venue: eventData.location.split(',')[0] || '',
+    postalCode: eventData.location.split(',').pop()?.trim() || '',
+    coverImage: undefined,
+  }
+}
 
 export default function EditEvent() {
   const { eventId } = useParams({ strict: false })
@@ -23,20 +43,23 @@ export default function EditEvent() {
   const [coverImage, setCoverImage] = useState<Array<File> | undefined>(
     undefined,
   )
-  const [projectName, setProjectName] = useState(data?.name)
-  const [projectDescription, setProjectDescription] = useState(
-    data?.description,
-  )
-  const [venue, setVenue] = useState(data?.location.split(',')[0] || '')
-  const [postalCode, setPostalCode] = useState(
-    data?.location.split(',').pop()?.trim() || '',
-  )
-  const [startDate, setStartDate] = useState<Date | undefined>(
-    data?.startDate ? new Date(data?.startDate) : undefined,
-  )
-  const [endDate, setEndDate] = useState<Date | undefined>(
-    data?.endDate ? new Date(data?.endDate) : undefined,
-  )
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<EventEditFormData>()
+
+  const editEvent = useEditEvent(Number(eventId!))
+
+  const onSubmit: SubmitHandler<EventEditFormData> = async (data) => {
+    try {
+      await editEvent.mutateAsync(data)
+      navigate({ to: '/events/edit-success' })
+    } catch (err) {
+      console.log('Error editing event: ', err)
+    }
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-[1662px] flex-col gap-6 px-10 py-14">
@@ -66,133 +89,153 @@ export default function EditEvent() {
       </div>
 
       {/* Form Card */}
-      <Card className="h-[854px] w-[1568px] gap-0 rounded-[10px] border border-muted-foreground/30">
-        <CardContent className="flex flex-col items-center space-y-4 px-8 py-8">
-          {/* Upload Cover Image */}
-          <div className="space-y-2">
-            <Label className="text-base text-[#545F71]">
-              Upload Cover Image
-            </Label>
-            <Dropzone
-              accept={{ 'image/*': [] }}
-              maxFiles={1}
-              src={coverImage}
-              onDrop={(acceptedFiles) =>
-                setCoverImage(acceptedFiles.length ? acceptedFiles : undefined)
-              }
-              className="h-[222px] w-[1254px] gap-3 rounded-lg border border-input bg-[#99999a] shadow-md transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 hover:border-ring/50"
-            >
-              <DropzoneEmptyState className="gap-3">
-                <Upload className="size-12 text-[#545F71]" />
-                <p className="text-base text-[#545F71]">
-                  Drag & Drop Files Here
-                </p>
-              </DropzoneEmptyState>
-              <DropzoneContent className="gap-3">
-                <Upload className="size-12 text-[#545F71]" />
-                <p className="w-full truncate text-base text-[#545F71]">
-                  {coverImage?.[0]?.name ?? 'Drag & Drop Files Here'}
-                </p>
-                <p className="text-sm text-[#545F71]">Click to replace</p>
-              </DropzoneContent>
-            </Dropzone>
-          </div>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Card className=" w-[1568px] gap-0 rounded-[10px] border border-muted-foreground/30">
+          <CardContent className="flex flex-col items-center space-y-4 px-8 py-8">
+            {/* Upload Cover Image */}
+            <div className="space-y-2">
+              <Label className="text-base text-[#545F71]">
+                Upload Cover Image
+              </Label>
+              <Dropzone
+                accept={{ 'image/*': [] }}
+                maxFiles={1}
+                src={coverImage}
+                onDrop={(acceptedFiles) =>
+                  setCoverImage(
+                    acceptedFiles.length ? acceptedFiles : undefined,
+                  )
+                }
+                className="h-[222px] w-[1254px] gap-3 rounded-lg border border-input bg-[#99999a] shadow-md transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 hover:border-ring/50"
+              >
+                <DropzoneEmptyState className="gap-3">
+                  <Upload className="size-12 text-[#545F71]" />
+                  <p className="text-base text-[#545F71]">
+                    Drag & Drop Files Here
+                  </p>
+                </DropzoneEmptyState>
+                <DropzoneContent className="gap-3">
+                  <Upload className="size-12 text-[#545F71]" />
+                  <p className="w-full truncate text-base text-[#545F71]">
+                    {coverImage?.[0]?.name ?? 'Drag & Drop Files Here'}
+                  </p>
+                  <p className="text-sm text-[#545F71]">Click to replace</p>
+                </DropzoneContent>
+              </Dropzone>
+            </div>
 
-          {/* Project Name */}
-          <div className="space-y-2">
-            <Label htmlFor="project-name" className="text-base text-[#545F71]">
-              Project Name
-            </Label>
-            <Input
-              id="project-name"
-              type="text"
-              value={projectName}
-              onChange={(e) => setProjectName(e.target.value)}
-              className="h-12 w-[1254px]"
-            />
-          </div>
-
-          {/* Project Description */}
-          <div className="space-y-2">
-            <Label
-              htmlFor="project-description"
-              className="text-base text-[#545F71]"
-            >
-              Project Description
-            </Label>
-            <Textarea
-              id="project-description"
-              value={projectDescription}
-              onChange={(e) => setProjectDescription(e.target.value)}
-              className="h-[114px] w-[1254px] resize-none"
-            />
-          </div>
-          {/* Start Date & End Date */}
-          <div className="flex w-[1254px] gap-3">
-            <DateInput
-              id="start-date"
-              label="Start Date"
-              value={startDate}
-              onChange={setStartDate}
-              className="flex-1 space-y-2"
-            />
-
-            <DateInput
-              id="end-date"
-              label="End Date"
-              value={endDate}
-              onChange={setEndDate}
-              className="flex-1 space-y-2"
-            />
-          </div>
-
-          {/* Venue & Postal Code */}
-          <div className="flex w-[1254px] gap-3">
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="venue" className="text-base text-[#545F71]">
-                Venue
+            {/* Project Name */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="project-name"
+                className="text-base text-[#545F71]"
+              >
+                Project Name
               </Label>
               <Input
-                id="venue"
-                type="text"
-                value={venue}
-                onChange={(e) => setVenue(e.target.value)}
-                className="h-12 rounded-md border border-muted-foreground/30 p-3"
+                id="project-name"
+                {...register('name', { required: 'Project name is required' })}
+                className="h-12 w-[1254px]"
+              />
+              {errors.name && <ErrorAlert message={errors.name.message} />}
+            </div>
+
+            {/* Project Description */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="project-description"
+                className="text-base text-[#545F71]"
+              >
+                Project Description
+              </Label>
+              <Textarea
+                id="project-description"
+                {...register('description', {
+                  required: 'Description is required',
+                })}
+                className="h-[114px] w-[1254px] resize-none"
+              />
+              {errors.description && (
+                <ErrorAlert message={errors.description.message} />
+              )}
+            </div>
+            {/* Start Date & End Date */}
+            <div className="flex w-[1254px] gap-3">
+              <DateInput
+                id="start-date"
+                label="Start Date"
+                {...register('startDate', {
+                  required: 'Start date is required',
+                })}
+                className="flex-1 space-y-2"
+              />
+
+              <DateInput
+                id="end-date"
+                label="End Date"
+                {...register('endDate', {
+                  required: 'End date is required',
+                })}
+                className="flex-1 space-y-2"
               />
             </div>
 
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="postal-code" className="text-base text-[#545F71]">
-                Postal Code
-              </Label>
-              <Input
-                id="postal-code"
-                type="text"
-                value={postalCode}
-                onChange={(e) => setPostalCode(e.target.value)}
-                className="h-12 rounded-md border border-muted-foreground/30 p-3"
-              />
-            </div>
-          </div>
+            {/* Venue & Postal Code */}
+            <div className="flex w-[1254px] gap-3">
+              <div className="flex-1 space-y-2">
+                <Label htmlFor="venue" className="text-base text-[#545F71]">
+                  Venue
+                </Label>
+                <Input
+                  id="venue"
+                  {...register('venue', { required: 'Venue is required' })}
+                  className="h-12 rounded-md border border-muted-foreground/30 p-3"
+                />
+                {errors.venue && <ErrorAlert message={errors.venue.message} />}
+              </div>
 
-          {/* Action Buttons */}
-          <div className="flex w-[1254px] justify-end gap-[10px] pt-2">
-            <Button
-              variant="outline"
-              className="h-[42px] w-[154px] rounded-md border border-muted-foreground/30 px-4 py-3 text-base"
-              onClick={() => navigate({ to: '/events' })}
-            >
-              Cancel
-            </Button>
-            <Button
-              className="h-[42px] w-[154px] rounded-md bg-[#545F71] px-4 py-3 text-base font-semibold"
-              onClick={() => navigate({ to: '/events/edit-success' })}
-            >
-              Save & Publish
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+              <div className="flex-1 space-y-2">
+                <Label
+                  htmlFor="postal-code"
+                  className="text-base text-[#545F71]"
+                >
+                  Postal Code
+                </Label>
+                <Input
+                  id="postal-code"
+                  {...register('postalCode', {
+                    required: 'Postal code is required',
+                  })}
+                  className="h-12 rounded-md border border-muted-foreground/30 p-3"
+                />
+                {errors.postalCode && (
+                  <ErrorAlert message={errors.postalCode.message} />
+                )}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex w-[1254px] justify-end gap-[10px] pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  navigate({
+                    to: '/events/$eventId',
+                    params: { eventId: eventId! },
+                  })
+                }
+                className="h-[42px] w-[154px] rounded-md border border-muted-foreground/30 px-4 py-3 text-base"
+              >
+                Cancel
+              </Button>
+              <Button className="h-[42px] w-[154px] rounded-md bg-[#545F71] px-4 py-3 text-base font-semibold">
+                Save & Publish
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </form>
     </div>
   )
 }

@@ -40,10 +40,10 @@ export function useCreateEvent(eventData: EventPostData) {
 /**
  * Edits an event by replacing with the new eventData
  */
-export function useEditEvent(eventId: number, eventData: EventPutData) {
+export function useEditEvent(eventId: number) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: () => editEvent(eventId, eventData),
+    mutationFn: (eventData: EventPutData) => editEvent(eventId, eventData),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ['events', eventId],

@@ -8,7 +8,7 @@ export type Event = {
   name: string
   status: string
   location: string
-  coverImage: string
+  coverImage?: string
   startDate: string
   endDate: string
   description: string
@@ -23,7 +23,7 @@ export type EventPostData = {
   endDate: string
   venue: string
   postalCode: string
-  coverImage: string
+  coverImage?: string
 }
 
 export type EventPutData = EventPostData 
