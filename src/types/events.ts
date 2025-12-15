@@ -4,11 +4,11 @@ export type Person = {
 }
 
 export type Event = {
-  id: string
+  id: number
   name: string
   status: string
   location: string
-  coverImage: string
+  coverImage?: string
   startDate: string
   endDate: string
   description: string
@@ -19,11 +19,11 @@ export type Event = {
 export type EventPostData = {
   name: string
   description: string
-  startDate: string
-  endDate: string
+  startDate: Date
+  endDate: Date
   venue: string
   postalCode: string
-  coverImage: string
+  coverImage?: string
 }
 
 export type EventPutData = EventPostData 
