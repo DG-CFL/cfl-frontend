@@ -1,69 +1,57 @@
-import { useState } from 'react'
-import { format, isValid, parse } from 'date-fns'
-import { CalendarDays, ChevronLeft, Upload } from 'lucide-react'
-import { useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
 import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
-import { Textarea } from '@/components/ui/textarea'
 import {
   Dropzone,
   DropzoneContent,
   DropzoneEmptyState,
 } from '@/components/ui/dropzone'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { DatePicker } from '@/components/ui_custom/DatePicker'
+import { ErrorAlert } from '@/components/ui_custom/ErrorAlert'
+import { useCreateEvent } from '@/operations/events'
+import type { EventPostData } from '@/types/events'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { ChevronLeft, Upload } from 'lucide-react'
+import { useState } from 'react'
+import { Controller, useForm, type SubmitHandler } from 'react-hook-form'
 
 export default function CreateEvent() {
+  const navigate = useNavigate()
+  const createEvent = useCreateEvent()
+
   const [coverImage, setCoverImage] = useState<Array<File> | undefined>(
     undefined,
   )
-  const [startDate, setStartDate] = useState<Date>()
-  const [endDate, setEndDate] = useState<Date>()
-  const [startDateInput, setStartDateInput] = useState('')
-  const [endDateInput, setEndDateInput] = useState('')
 
-  const navigate = useNavigate()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    control,
+  } = useForm<EventPostData>()
 
-  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setStartDateInput(value)
+  const [error, setError] = useState<string | null>(null)
 
-    // Try to parse the date as MM/dd/yyyy or MM / dd / yyyy
-    const parsed = parse(value.replace(/\s/g, ''), 'MM/dd/yyyy', new Date())
-    if (isValid(parsed)) {
-      setStartDate(parsed)
-    }
-  }
-
-  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setEndDateInput(value)
-
-    // Try to parse the date as MM/dd/yyyy or MM / dd / yyyy
-    const parsed = parse(value.replace(/\s/g, ''), 'MM/dd/yyyy', new Date())
-    if (isValid(parsed)) {
-      setEndDate(parsed)
+  const onSubmit: SubmitHandler<EventPostData> = async (data) => {
+    try {
+      await createEvent.mutateAsync(data)
+      navigate({ to: '/events/create-success' })
+    } catch (err) {
+      setError("Error creating event: " + error)
     }
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[1662px] flex-col gap-6 px-10 py-14">
+    <div className="mx-auto flex w-screen max-w-[1662px] flex-col gap-6 px-10 py-14">
       {/* Header with Back Button */}
       <div className="flex items-start gap-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-10"
-          onClick={() => navigate({ to: '/events/manage-events' })}
-        >
-          <ChevronLeft className="size-8" />
-        </Button>
+        <Link to="/events">
+          <Button variant="ghost" size="icon" className="size-10">
+            <ChevronLeft className="size-8" />
+          </Button>
+        </Link>
         <div className="flex flex-col gap-1">
           <h1>Create New Event</h1>
           <p className="text-xl leading-7 text-muted-foreground">
@@ -73,185 +61,171 @@ export default function CreateEvent() {
       </div>
 
       {/* Form Card */}
-      <Card className="h-[854px] w-[1568px] gap-0 rounded-[10px] border border-muted-foreground/30">
-        <CardContent className="flex flex-col items-center space-y-4 px-8 py-8">
-          {/* Upload Cover Image */}
-          <div className="space-y-2">
-            <Label className="text-base text-[#545F71]">
-              Upload Cover Image
-            </Label>
-            <Dropzone
-              accept={{ 'image/*': [] }}
-              maxFiles={1}
-              src={coverImage}
-              onDrop={(acceptedFiles) =>
-                setCoverImage(acceptedFiles.length ? acceptedFiles : undefined)
-              }
-              className="h-[222px] w-[1254px] gap-3 rounded-lg border border-input bg-[#99999a] shadow-md transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 hover:border-ring/50"
-            >
-              <DropzoneEmptyState className="gap-3">
-                <Upload className="size-12 text-[#545F71]" />
-                <p className="text-base text-[#545F71]">
-                  Drag & Drop Files Here
-                </p>
-              </DropzoneEmptyState>
-              <DropzoneContent className="gap-3">
-                <Upload className="size-12 text-[#545F71]" />
-                <p className="w-full truncate text-base text-[#545F71]">
-                  {coverImage?.[0]?.name ?? 'Drag & Drop Files Here'}
-                </p>
-                <p className="text-sm text-[#545F71]">Click to replace</p>
-              </DropzoneContent>
-            </Dropzone>
-          </div>
-
-          {/* Project Name */}
-          <div className="space-y-2">
-            <Label htmlFor="project-name" className="text-base text-[#545F71]">
-              Project Name
-            </Label>
-            <Input id="project-name" type="text" className="h-12 w-[1254px]" />
-          </div>
-
-          {/* Project Description */}
-          <div className="space-y-2">
-            <Label
-              htmlFor="project-description"
-              className="text-base text-[#545F71]"
-            >
-              Project Description
-            </Label>
-            <Textarea
-              id="project-description"
-              className="h-[114px] w-[1254px] resize-none"
-            />
-          </div>
-          {/* Start Date & End Date */}
-          <div className="flex w-[1254px] gap-3">
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="start-date" className="text-base text-[#545F71]">
-                Start Date
+      <form onSubmit={handleSubmit(onSubmit)} >
+        <Card className=" gap-0 rounded-[10px] border border-muted-foreground/30">
+          <CardContent className="w-full flex flex-col space-y-4 px-8 py-8">
+            {/* Upload Cover Image */}
+            <div className="space-y-2">
+              <Label className="text-base text-[#545F71]">
+                Upload Cover Image
               </Label>
-              <div className="relative">
-                <Input
-                  id="start-date"
-                  type="text"
-                  value={
-                    startDate
-                      ? format(startDate, 'MM / dd / yyyy')
-                      : startDateInput
-                  }
-                  onChange={handleStartDateChange}
-                  placeholder="MM / DD / YYYY"
-                  className="h-12 rounded-md border border-muted-foreground/30 p-3 pr-10"
-                />
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-1 top-1/2 size-8 -translate-y-1/2 hover:bg-transparent"
-                    >
-                      <CalendarDays className="size-5 text-muted-foreground" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={startDate}
-                      onSelect={(date) => {
-                        setStartDate(date)
-                        setStartDateInput('')
-                      }}
+              <Dropzone
+                accept={{ 'image/*': [] }}
+                maxFiles={1}
+                src={coverImage}
+                onDrop={(acceptedFiles) =>
+                  setCoverImage(
+                    acceptedFiles.length ? acceptedFiles : undefined,
+                  )
+                }
+                className="h-[222px] gap-3 rounded-lg border border-input bg-[#99999a] shadow-md transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 hover:border-ring/50"
+              >
+                <DropzoneEmptyState className="gap-3">
+                  <Upload className="size-12 text-[#545F71]" />
+                  <p className="text-base text-[#545F71]">
+                    Drag & Drop Files Here
+                  </p>
+                </DropzoneEmptyState>
+                <DropzoneContent className="gap-3">
+                  <Upload className="size-12 text-[#545F71]" />
+                  <p className="truncate text-base text-[#545F71]">
+                    {coverImage?.[0]?.name ?? 'Drag & Drop Files Here'}
+                  </p>
+                  <p className="text-sm text-[#545F71]">Click to replace</p>
+                </DropzoneContent>
+              </Dropzone>
+            </div>
+
+            {/* Project Name */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="project-name"
+                className="text-base text-[#545F71]"
+              >
+                Project Name
+              </Label>
+              <Input
+                id="project-name"
+                {...register('name', { required: 'Project name is required' })}
+                className="h-12"
+              />
+              {errors.name && <ErrorAlert message={errors.name.message} />}
+            </div>
+
+            {/* Project Description */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="project-description"
+                className="text-base text-[#545F71]"
+              >
+                Project Description
+              </Label>
+              <Textarea
+                id="project-description"
+                {...register('description', {
+                  required: 'Description is required',
+                })}
+                className="h-[114px] resize-none"
+              />
+              {errors.description && (
+                <ErrorAlert message={errors.description.message} />
+              )}
+            </div>
+
+            {/* Start Date & End Date */}
+            <div className="flex gap-3">
+              <div className=" flex-1 space-y-2">
+                <Label htmlFor="start-date">Start Date</Label>
+                <Controller
+                  {...register('startDate', {
+                    required: 'Start date is required',
+                  })}
+                  control={control}
+                  render={({ field }) => (
+                    <DatePicker
+                      id="start-date"
+                      value={field.value}
+                      onChange={field.onChange}
                     />
-                  </PopoverContent>
-                </Popover>
+                  )}
+                />
+                {errors.startDate && (
+                  <ErrorAlert message={errors.startDate.message} />
+                )}
+              </div>
+
+              <div className="flex-1 space-y-2">
+                <Label htmlFor="end-date">End Date</Label>
+                <Controller
+                  {...register('endDate', { required: 'End date is required' })}
+                  control={control}
+                  render={({ field }) => (
+                    <DatePicker
+                      id="end-date"
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  )}
+                />
+                {errors.endDate && (
+                  <ErrorAlert message={errors.endDate.message} />
+                )}
               </div>
             </div>
 
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="end-date" className="text-base text-[#545F71]">
-                End Date
-              </Label>
-              <div className="relative">
+            {/* Venue & Postal Code */}
+            <div className="flex gap-3">
+              <div className="flex-1 space-y-2">
+                <Label htmlFor="venue" className="text-base text-[#545F71]">
+                  Venue
+                </Label>
                 <Input
-                  id="end-date"
-                  type="text"
-                  value={
-                    endDate ? format(endDate, 'MM / dd / yyyy') : endDateInput
-                  }
-                  onChange={handleEndDateChange}
-                  placeholder="MM / DD / YYYY"
-                  className="h-12 rounded-md border border-muted-foreground/30 p-3 pr-10"
+                  id="venue"
+                  {...register('venue', { required: 'Venue is required' })}
+                  className="h-12 rounded-md border border-muted-foreground/30 p-3"
                 />
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-1 top-1/2 size-8 -translate-y-1/2 hover:bg-transparent"
-                    >
-                      <CalendarDays className="size-5 text-muted-foreground" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={endDate}
-                      onSelect={(date) => {
-                        setEndDate(date)
-                        setEndDateInput('')
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover>
+                {errors.venue && <ErrorAlert message={errors.venue.message} />}
+              </div>
+
+              <div className="flex-1 space-y-2">
+                <Label
+                  htmlFor="postal-code"
+                  className="text-base text-[#545F71]"
+                >
+                  Postal Code
+                </Label>
+                <Input
+                  id="postal-code"
+                  {...register('postalCode', {
+                    required: 'Postal code is required',
+                  })}
+                  className="h-12 rounded-md border border-muted-foreground/30 p-3"
+                />
+                {errors.postalCode && (
+                  <ErrorAlert message={errors.postalCode.message} />
+                )}
               </div>
             </div>
-          </div>
 
-          {/* Venue & Postal Code */}
-          <div className="flex w-[1254px] gap-3">
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="venue" className="text-base text-[#545F71]">
-                Venue
-              </Label>
-              <Input
-                id="venue"
-                type="text"
-                className="h-12 rounded-md border border-muted-foreground/30 p-3"
-              />
+            {/* Server errors (if any) */}
+            {error && <ErrorAlert message={error} />}
+
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-[10px] pt-2">
+              <Button
+                variant="outline"
+                className="h-[42px] w-[154px] rounded-md border border-muted-foreground/30 px-4 py-3 text-base"
+                onClick={() => navigate({ to: '/events' })}
+              >
+                Cancel
+              </Button>
+              <Button className="h-[42px] w-[154px] rounded-md bg-[#545F71] px-4 py-3 text-base font-semibold">
+                Save & Publish
+              </Button>
             </div>
-
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="postal-code" className="text-base text-[#545F71]">
-                Postal Code
-              </Label>
-              <Input
-                id="postal-code"
-                type="text"
-                className="h-12 rounded-md border border-muted-foreground/30 p-3"
-              />
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex w-[1254px] justify-end gap-[10px] pt-2">
-            <Button
-              variant="outline"
-              className="h-[42px] w-[154px] rounded-md border border-muted-foreground/30 px-4 py-3 text-base"
-              onClick={() => navigate({ to: '/events/manage-events' })}
-            >
-              Cancel
-            </Button>
-            <Button
-              className="h-[42px] w-[154px] rounded-md bg-[#545F71] px-4 py-3 text-base font-semibold"
-              onClick={() => navigate({ to: '/events/create-event-success' })}
-            >
-              Save & Publish
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </form>
     </div>
   )
 }

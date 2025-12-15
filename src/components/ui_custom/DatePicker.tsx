@@ -25,7 +25,7 @@ export function DatePicker({
   id,
   value,
   onChange,
-  placeholder = 'Select date',
+  placeholder = 'MM/DD/YYYY',
 }: DatePickerProps) {
   const [open, setOpen] = useState(false)
   const [date, setDate] = useState<Date | undefined>(value)
