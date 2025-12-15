@@ -52,3 +52,8 @@ export const editEventSuccessRoute = createRoute({
   path: 'edit-success',
   component: EditEventSuccess,
 })
+
+export const registerEventRoute = createRoute({
+  getParentRoute: () => eventsLayoutRoute,
+  path: '$eventId/register'
+})
