@@ -6,11 +6,15 @@ import type { Person } from '@/types/events'
 import { Link, useParams } from '@tanstack/react-router'
 import { CalendarDays, ImageIcon, MapPin, SquarePen } from 'lucide-react'
 import LoadingSkeleton from '../LoadingSkeleton'
+import { useCurrentUser } from '@/auth/AuthProvider'
 
 export default function ViewEvent() {
   const { eventId } = useParams({ strict: false })
 
   const { data, isLoading, isError } = useGetEvent(Number(eventId!))
+
+  const currentUser = useCurrentUser()
+  console.log(currentUser?.role)
 
   if (isLoading) {
     return <LoadingSkeleton />
