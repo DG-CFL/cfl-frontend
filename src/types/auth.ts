@@ -24,4 +24,5 @@ export type SignUpPostData = {
 export type UserAccount = {
   userId: string
   role: UserRole
+  name: string
 }
