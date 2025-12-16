@@ -1,21 +1,30 @@
 import { getAuth, onAuthStateChanged, type User } from 'firebase/auth'
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import type { Role } from '@/types/auth'
+import type { UserAccount, UserRole } from '@/types/auth'
 
 type AuthContextValue = {
-  currentUser: User | null
+  currentUser: UserAccount | null
 }
 
 const AuthContext = createContext<AuthContextValue>({ currentUser: null })
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null)
-
+  const [currentUser, setCurrentUser] = useState<UserAccount | null>(null)
+  
   useEffect(() => {
     const auth = getAuth()
-    return onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user)
-    })
+    return onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const token = await user.getIdTokenResult()
+        const role = (token.claims.role ?? 'public') as UserRole // If no role assigned, default to public
+        setCurrentUser({
+          userId: user.uid,
+          role,
+        })
+      } else {
+        setCurrentUser(null)
+      }
+    }) 
   }, [])
 
   const authValue: AuthContextValue = { currentUser }
@@ -30,22 +39,5 @@ export const useAuth = () => {
 }
 
 export const useCurrentUser = () => {
-  // Temp logic
-  const value = sessionStorage.getItem('user')
-  if (!value) return null
-  return JSON.parse(value)
-
-  // TODO: return useAuth().currentUser
-}
-
-export function getUserRole(user: User): Role {
-  // Temp logic
-  const value = sessionStorage.getItem('user')
-  if (!value) return 'public'
-  return JSON.parse(value).role as Role
-
-  // TODO: Actual logic here:
-  // const jwt = await user.getIdTokenResult()
-  // const role = jwt.claims.role as Role
-  // return role === 'admin'
+  return useAuth().currentUser
 }

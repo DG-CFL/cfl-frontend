@@ -1,4 +1,4 @@
-export type Role = 'cfl' | 'admin' | 'volunteer' | 'public'
+export type UserRole = 'CFL' | 'admin' | 'trainer' | 'public'
 
 export type SignUpFormData = {
   email: string
@@ -23,5 +23,5 @@ export type SignUpPostData = {
 
 export type UserAccount = {
   userId: string
-  role: Role
+  role: UserRole
 }

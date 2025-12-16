@@ -8,6 +8,7 @@ import {
   editEventSuccessRoute,
   eventsLayoutRoute,
   manageEventsRoute,
+  registerEventRoute,
   viewEventRoute,
 } from './events'
 import { volunteerPageRoute } from './vms'
@@ -44,6 +45,7 @@ const routeTree = rootRoute.addChildren([
       editEventRoute,
       createEventSuccessRoute,
       editEventSuccessRoute,
+      registerEventRoute,
     ]),
     calendarPageRoute,
     volunteerPageRoute,

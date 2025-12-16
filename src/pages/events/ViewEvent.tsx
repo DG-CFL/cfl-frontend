@@ -6,11 +6,14 @@ import type { Person } from '@/types/events'
 import { Link, useParams } from '@tanstack/react-router'
 import { CalendarDays, ImageIcon, MapPin, SquarePen } from 'lucide-react'
 import LoadingSkeleton from '../LoadingSkeleton'
+import { useCurrentUser } from '@/auth/AuthProvider'
 
 export default function ViewEvent() {
   const { eventId } = useParams({ strict: false })
 
   const { data, isLoading, isError } = useGetEvent(Number(eventId!))
+
+  const currentUser = useCurrentUser()
 
   if (isLoading) {
     return <LoadingSkeleton />
@@ -24,12 +27,21 @@ export default function ViewEvent() {
     <div className="mx-auto flex w-full max-w-[1662px] flex-col gap-9 px-10 py-14">
       <div className="flex items-center gap-6">
         <h1>{data.name}</h1>
-        <Link to="/events/$eventId/edit" params={{ eventId: eventId! }}>
-          <Button className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold">
-            <SquarePen className="size-5" aria-hidden="true" />
-            Edit Event Details
-          </Button>
-        </Link>
+        {currentUser?.role === 'admin' && (
+          <Link to="/events/$eventId/edit" params={{ eventId: eventId! }}>
+            <Button className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold">
+              <SquarePen className="size-5" aria-hidden="true" />
+              Edit Event Details
+            </Button>
+          </Link>
+        )}
+        {currentUser?.role === 'public' && (
+          <Link to='/events/$eventId/register' params={{ eventId: eventId!}}>
+            <Button className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold">
+              Sign Up Now!
+            </Button>
+          </Link>
+        )}
       </div>
 
       <Card className="h-[455px] gap-0 rounded-[10px] border-muted-foreground/30 py-0">
