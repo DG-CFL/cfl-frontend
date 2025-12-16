@@ -38,7 +38,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import type { Volunteer } from '@/types/vms'
+import type { Volunteer } from '@/types/volunteers'
 import { volunteerListData } from '@/data/vms'
 
 const columnFilter= <T,>(column :Column<T, any>, columnName : string, options : string[]) => {

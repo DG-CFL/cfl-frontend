@@ -4,7 +4,7 @@ import {
   getVolunteerCertifications,
   getVolunteerHistory,
   getVolunteers,
-} from '@/api/vms'
+} from '@/api/volunteers'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 /**

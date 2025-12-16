@@ -1,5 +1,15 @@
-import { createEvent, editEvent, getEvent, getEvents } from '@/api/events'
-import type { EventPostData, EventPutData } from '@/types/events'
+import {
+  createEvent,
+  editEvent,
+  getEvent,
+  getEvents,
+  registerEventParticipant,
+} from '@/api/events'
+import type {
+  EventPostData,
+  EventPutData,
+  EventRegistrationPostData,
+} from '@/types/events'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 /**
@@ -44,6 +54,22 @@ export function useEditEvent(eventId: number) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (eventData: EventPutData) => editEvent(eventId, eventData),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['events', eventId],
+      })
+    },
+  })
+}
+
+/**
+ * Registers a volunteer as a participant of an event
+ */
+export function useRegisterEventParticipant(eventId: number) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (registrationData: EventRegistrationPostData) =>
+      registerEventParticipant(eventId, registrationData),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ['events', eventId],
