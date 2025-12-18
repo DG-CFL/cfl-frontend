@@ -1,10 +1,9 @@
-import VolunteerPage from "@/pages/vms/VolunteerPage";
 import LandingPage from "@/pages/vms/LandingPage";
 import { createRoute } from "@tanstack/react-router";
 import { appLayoutRoute } from "./app";
 
-export const volunteerPageRoute = createRoute({
+export const landingPageRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
-  path: 'volunteers',
-  component: VolunteerPage,
+  path: 'landing',
+  component: LandingPage,
 })
