@@ -5,7 +5,7 @@ export default function AppLayout() {
   return (
     <div className="flex min-h-screen overflow-x-visible">
       <Sidebar />
-      <div className="flex-1">
+      <div className="w-max flex-1">
         <Outlet />
       </div>
     </div>

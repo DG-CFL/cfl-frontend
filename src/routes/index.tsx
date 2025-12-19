@@ -25,6 +25,7 @@ import {
 } from './auth'
 import { calendarPageRoute } from './calendar'
 import { analyticsPageRoute } from './analytics'
+import { landingPageRoute } from './landing'
 
 export const rootRoute = createRootRoute({
   component: () => (
@@ -48,6 +49,7 @@ const routeTree = rootRoute.addChildren([
       registerEventRoute,
     ]),
     calendarPageRoute,
+    landingPageRoute,
     volunteerPageRoute,
     analyticsPageRoute,
   ]),
