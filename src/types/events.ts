@@ -33,5 +33,6 @@ export type EventPutData = EventPostData
 
 export type EventRegistrationPostData = {
   volunteerId: number
-  // TODO: role: string ?
+  eventId: number
+  numberOfAttendees: number
 }

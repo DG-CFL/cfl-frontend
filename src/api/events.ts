@@ -3,7 +3,7 @@ import { api } from './baseApi'
 import { eventData, eventListData } from '@/data/events'
 
 /**
- * Returns the list of all events
+ * Returns the list of all eventsw
  */
 export async function getEvents(): Promise<Event[]> {
   // const res = await api.get("/events")
