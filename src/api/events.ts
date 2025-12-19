@@ -1,13 +1,14 @@
 import type { Event, EventPostData, EventPutData, EventRegistrationPostData } from '@/types/events'
 import { api } from './baseApi'
-import { eventData } from '@/data/events'
+import { eventData, eventListData } from '@/data/events'
 
 /**
  * Returns the list of all events
  */
 export async function getEvents(): Promise<Event[]> {
-  const res = await api.get('/events')
-  return res.data
+  // const res = await api.get("/events")
+  // return res.data
+  return eventListData
 }
 
 /**

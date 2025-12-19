@@ -1,24 +1,24 @@
 import { format, isSameMonth } from 'date-fns'
 import { Clock, MapPin, User } from 'lucide-react'
-import type { Feature } from '@/components/ui/calendarpage'
 import type { CalendarCategory, CalendarCategoryColors } from '@/pages/calendar/SampleCalendarData'
+import type { Event } from '@/types/events'
 
 type CalendarEventListViewProps = {
-  features: Feature[]
+  events: Event[]
   colors: CalendarCategoryColors
   selectedDate: Date
 }
 
-const CalendarEventListView = ({ features, colors, selectedDate }: CalendarEventListViewProps) => {
+const CalendarListView = ({ events, colors, selectedDate }: CalendarEventListViewProps) => {
   // Filter events by selected month and sort by date
-  const sortedFeatures = features
-    .filter(feature => isSameMonth(feature.startAt, selectedDate))
-    .sort((a, b) => a.startAt.getTime() - b.startAt.getTime())
+  const sortedFeatures = events
+    .filter(feature => isSameMonth(feature.startDate, selectedDate))
+    .sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
 
   // Group by date
-  const groupedFeatures: { [key: string]: Feature[] } = {}
+  const groupedFeatures: { [key: string]: Event[] } = {}
   sortedFeatures.forEach(feature => {
-    const dateKey = format(feature.startAt, 'yyyy-MM-dd')
+    const dateKey = format(feature.startDate, 'yyyy-MM-dd')
     if (!groupedFeatures[dateKey]) {
       groupedFeatures[dateKey] = []
     }
@@ -46,7 +46,7 @@ const CalendarEventListView = ({ features, colors, selectedDate }: CalendarEvent
                 {/* Events Column */}
                 <div className="flex-1 space-y-3">
                   {events.map((event) => {
-                    const color = colors[event.status.id as CalendarCategory]
+                    const color = colors[event.status as CalendarCategory]
                     
                     return (
                       <div
@@ -69,7 +69,7 @@ const CalendarEventListView = ({ features, colors, selectedDate }: CalendarEvent
                             <div className="flex items-center gap-1.5">
                               <Clock className="h-4 w-4" />
                               <span>
-                                {format(event.startAt, 'h:mm a')}
+                                {format(event.startDate, 'h:mm a')}
                               </span>
                             </div>
 
@@ -80,14 +80,14 @@ const CalendarEventListView = ({ features, colors, selectedDate }: CalendarEvent
                               </div>
                             )}
 
-                            {(event.currentAttendees !== undefined || event.maxAttendees !== undefined) && (
+                            {/* {(event.currentAttendees !== undefined || event.maxAttendees !== undefined) && (
                               <div className="flex items-center gap-1.5">
                                 <User className="h-4 w-4" />
                                 <span>
                                   {event.currentAttendees ?? 0} /{event.maxAttendees ?? 0}
                                 </span>
                               </div>
-                            )}
+                            )} */}
                           </div>
                         </div>
                       </div>
@@ -110,4 +110,4 @@ const CalendarEventListView = ({ features, colors, selectedDate }: CalendarEvent
   )
 }
 
-export default CalendarEventListView
+export default CalendarListView

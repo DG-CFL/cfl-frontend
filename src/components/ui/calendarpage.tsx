@@ -34,6 +34,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import type { Event } from '@/types/events';
 
 export type CalendarState = {
   month: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
@@ -62,17 +63,6 @@ export type Status = {
   id: string;
   name: string;
   color: string;
-};
-
-export type Feature = {
-  id: string;
-  name: string;
-  startAt: Date;
-  endAt: Date;
-  status: Status;
-  location?: string;
-  currentAttendees?: number;
-  maxAttendees?: number;
 };
 
 type ComboboxProps = {
@@ -193,12 +183,12 @@ const OutOfBoundsDay = ({ day }: OutOfBoundsDayProps) => (
 );
 
 export type CalendarBodyProps = {
-  features: Feature[];
-  children: (props: { feature: Feature }) => ReactNode;
+  events: Event[];
+  children: (props: { event: Event }) => ReactNode;
   selectedDate?: Date;
 };
 
-export const CalendarBody = ({ features, children, selectedDate }: CalendarBodyProps) => {
+export const CalendarBody = ({ events, children, selectedDate }: CalendarBodyProps) => {
   const [month] = useCalendarMonth();
   const [year] = useCalendarYear();
   const { startDay } = useContext(CalendarContext);
@@ -282,14 +272,14 @@ export const CalendarBody = ({ features, children, selectedDate }: CalendarBodyP
 
   // Memoize features filtering by day to avoid recalculating on every render
   const featuresByDay = useMemo(() => {
-    const result: { [day: number]: Feature[] } = {};
+    const result: { [day: number]: Event[] } = {};
     for (let day = 1; day <= daysInMonth; day++) {
-      result[day] = features.filter((feature) => {
-        return isSameDay(new Date(feature.endAt), new Date(year, month, day));
+      result[day] = events.filter((feature) => {
+        return isSameDay(new Date(feature.endDate), new Date(year, month, day));
       });
     }
     return result;
-  }, [features, daysInMonth, year, month]);
+  }, [events, daysInMonth, year, month]);
 
   const days: ReactNode[] = [];
 
@@ -323,7 +313,7 @@ export const CalendarBody = ({ features, children, selectedDate }: CalendarBodyP
           {day}
         </div>
         <div className="flex flex-col gap-0.5">
-          {featuresForDay.slice(0, featuresForDay.length > maxEvents ? maxEvents - 1 : maxEvents).map((feature) => children({ feature }))}
+          {featuresForDay.slice(0, featuresForDay.length > maxEvents ? maxEvents - 1 : maxEvents).map((event) => children({ event }))}
         </div>
         {featuresForDay.length > maxEvents && (
           <span className="block text-muted-foreground text-xs">
@@ -530,7 +520,7 @@ export const CalendarHeader = ({ className }: CalendarHeaderProps) => {
 };
 
 export type CalendarItemProps = {
-  feature: Feature;
+  feature: Event;
   className?: string;
 };
 
@@ -539,9 +529,6 @@ export const CalendarItem = memo(
     <div className={cn('flex items-center gap-2', className)}>
       <div
         className="h-2 w-2 shrink-0 rounded-full"
-        style={{
-          backgroundColor: feature.status.color,
-        }}
       />
       <span className="truncate">{feature.name}</span>
     </div>

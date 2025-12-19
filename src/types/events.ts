@@ -3,14 +3,17 @@ export type Person = {
   role: string
 }
 
+export type EventCategory = 'event' | 'training'
+
 export type Event = {
   id: number
   name: string
   status: string
+  category: EventCategory
   location: string
   coverImage?: string
-  startDate: string
-  endDate: string
+  startDate: Date
+  endDate: Date
   description: string
   coordinators: Array<Person>
   volunteers: Array<Person>

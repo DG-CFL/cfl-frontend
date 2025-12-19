@@ -1,46 +1,48 @@
 import { getHours, getMinutes, isSameDay } from 'date-fns'
-import type { Feature } from '@/components/ui/calendarpage'
-import type { CalendarCategory, CalendarCategoryColors } from '@/pages/calendar/SampleCalendarData'
-
-
+import type {
+  CalendarCategory,
+  CalendarCategoryColors,
+} from '@/pages/calendar/SampleCalendarData'
+import type { Event } from '@/types/events'
 
 export const getDayEventsLayout = (
   day: Date,
-  features: Feature[],
-  colors: CalendarCategoryColors
+  events: Event[],
+  colors: CalendarCategoryColors,
 ) => {
-  const dayEvents = features.filter((event) => isSameDay(event.startAt, day))
+  const dayEvents = events.filter((event) => isSameDay(event.startDate, day))
 
   // 1. Prepare and Sort
-  const eventsWithTime = dayEvents.map((event) => {
-    const startHour = getHours(event.startAt)
-    const startMinute = getMinutes(event.startAt)
-    const endHour = getHours(event.endAt)
-    const endMinute = getMinutes(event.endAt)
+  const eventsWithTime = dayEvents
+    .map((event) => {
+      const startHour = getHours(event.startDate)
+      const startMinute = getMinutes(event.startDate)
+      const endHour = getHours(event.endDate)
+      const endMinute = getMinutes(event.endDate)
 
-    const startMinutes = startHour * 60 + startMinute
-    const endMinutes = endHour * 60 + endMinute
-    
-    return {
-      original: event,
-      start: startMinutes,
-      end: endMinutes,
-      duration: endMinutes - startMinutes,
-      id: event.id,
-    }
-  }).sort((a, b) => {
-    if (a.start !== b.start) return a.start - b.start
-    return b.duration - a.duration
-  })
+      const startMinutes = startHour * 60 + startMinute
+      const endMinutes = endHour * 60 + endMinute
+
+      return {
+        original: event,
+        start: startMinutes,
+        end: endMinutes,
+        duration: endMinutes - startMinutes,
+        id: event.id,
+      }
+    })
+    .sort((a, b) => {
+      if (a.start !== b.start) return a.start - b.start
+      return b.duration - a.duration
+    })
 
   // 2. Pack into columns
   const processed: any[] = []
   eventsWithTime.forEach((ev) => {
     let colIndex = 0
     while (true) {
-      const collision = processed.find((p) => 
-        p.colIndex === colIndex && 
-        p.end > ev.start
+      const collision = processed.find(
+        (p) => p.colIndex === colIndex && p.end > ev.start,
       )
       if (!collision) break
       colIndex++
@@ -67,16 +69,16 @@ export const getDayEventsLayout = (
   clusters.forEach((cluster) => {
     const maxCol = Math.max(...cluster.map((e) => e.colIndex))
     const numCols = maxCol + 1
-    
+
     cluster.forEach((ev) => {
       const pixelsPerMinute = 64 / 60
       const top = ev.start * pixelsPerMinute
       const height = ev.duration * pixelsPerMinute
       const widthPercent = 100 / numCols
       const leftPercent = ev.colIndex * widthPercent
-      
+
       const color = colors[ev.original.status.id as CalendarCategory]
-      
+
       results.push({
         event: ev.original,
         style: {
@@ -91,6 +93,6 @@ export const getDayEventsLayout = (
       })
     })
   })
-  
+
   return results
 }
