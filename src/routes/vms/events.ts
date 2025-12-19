@@ -1,12 +1,12 @@
-import CreateEvent from '@/pages/events/CreateEvent'
-import CreateEventSuccess from '@/pages/events/CreateEventSuccess'
-import EditEvent from '@/pages/events/EditEvent'
-import EditEventSuccess from '@/pages/events/EditEventSuccess'
-import EventsLayout from '@/pages/events/EventsLayout'
-import ManageEvents from '@/pages/events/ManageEvents'
-import ViewEvent from '@/pages/events/ViewEvent'
+import CreateEvent from '@/pages/vms/events/CreateEvent'
+import CreateEventSuccess from '@/pages/vms/events/CreateEventSuccess'
+import EditEvent from '@/pages/vms/events/EditEvent'
+import EditEventSuccess from '@/pages/vms/events/EditEventSuccess'
+import EventsLayout from '@/pages/vms/events/EventsLayout'
+import ManageEvents from '@/pages/vms/events/ManageEvents'
+import ViewEvent from '@/pages/vms/events/ViewEvent'
 import { createRoute } from '@tanstack/react-router'
-import { appLayoutRoute } from './app'
+import { appLayoutRoute } from '../app'
 
 /**
  * Base layout for events pages

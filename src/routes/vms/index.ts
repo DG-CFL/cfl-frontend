@@ -1,9 +1,10 @@
-import LandingPage from "@/pages/vms/LandingPage";
+import VmsLandingPage from "@/pages/vms/VmsLandingPage";
 import { createRoute } from "@tanstack/react-router";
-import { appLayoutRoute } from "./app";
+import { appLayoutRoute } from "../app";
+
 
 export const landingPageRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
-  path: 'landing',
-  component: LandingPage,
+  path: 'vms',
+  component: VmsLandingPage,
 })

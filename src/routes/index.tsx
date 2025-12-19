@@ -10,8 +10,8 @@ import {
   manageEventsRoute,
   registerEventRoute,
   viewEventRoute,
-} from './events'
-import { volunteerPageRoute } from './vms'
+} from './vms/events'
+import { volunteerPageRoute } from './vms/volunteers'
 import {
   authLayoutRoute,
   signUpRoute,
@@ -25,7 +25,7 @@ import {
 } from './auth'
 import { calendarPageRoute } from './calendar'
 import { analyticsPageRoute } from './analytics'
-import { landingPageRoute } from './landing'
+import { landingPageRoute } from './vms'
 
 export const rootRoute = createRootRoute({
   component: () => (
