@@ -5,6 +5,6 @@ import { appLayoutRoute } from "../app";
 
 export const landingPageRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
-  path: 'landing',
+  path: 'vms',
   component: VmsLandingPage,
 })
