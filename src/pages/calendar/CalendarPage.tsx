@@ -140,7 +140,7 @@ const CalendarPage = () => {
       case 'week':
         return (
           <CalendarWeekView
-            features={filteredEvents}
+            events={filteredEvents}
             colors={STATUS_COLORS}
             selectedDate={selectedDate}
           />

@@ -7,8 +7,8 @@ export const eventListData: Array<Event> = [
     status: 'Active',
     location: 'Harborview Conference Center, Seattle, WA, 98101',
     coverImage: 'gala_cover.jpg',
-    startDate: new Date('December 12, 2025'),
-    endDate: new Date('December 14, 2025'),
+    startDate: new Date('2025-12-12T18:00:00'),
+    endDate: new Date('2025-12-14T22:00:00'),
     description:
       'Join us for an elegant evening of fundraising and community celebration. This annual gala brings together local businesses, philanthropists, and community members to support vital social programs. Enjoy fine dining, live entertainment, and the opportunity to make a real difference in our community.',
     coordinators: [
@@ -20,7 +20,7 @@ export const eventListData: Array<Event> = [
       { name: 'James Wilson', role: 'Volunteer' },
       { name: 'Amanda Lee', role: 'Volunteer' },
     ],
-    category: 'training'
+    category: 'training',
   },
   {
     id: 2,
@@ -28,8 +28,8 @@ export const eventListData: Array<Event> = [
     status: 'Active',
     location: 'Northside Innovation Hub, Austin, TX, 78701',
     coverImage: 'summit_cover.jpg',
-    startDate: new Date('December 8, 2025'),
-    endDate: new Date('December 9, 2025'),
+    startDate: new Date('2025-12-08T09:00:00'),
+    endDate: new Date('2025-12-09T17:00:00'),
     description:
       'Empowering the next generation of leaders through interactive workshops, mentorship sessions, and networking opportunities. This two-day summit features keynote speakers, skill-building activities, and collaborative projects designed to inspire and equip young leaders.',
     coordinators: [
@@ -41,7 +41,7 @@ export const eventListData: Array<Event> = [
       { name: 'Jessica Brown', role: 'Volunteer' },
       { name: 'Ryan Garcia', role: 'Volunteer' },
     ],
-    category: 'event'
+    category: 'event',
   },
   {
     id: 3,
@@ -49,8 +49,8 @@ export const eventListData: Array<Event> = [
     status: 'Active',
     location: 'Civic Green Park, Denver, CO, 80202',
     coverImage: 'spring_drive.jpg',
-    startDate: new Date('December 20, 2025'),
-    endDate: new Date('December 20, 2025'),
+    startDate: new Date('2025-12-20T08:00:00'),
+    endDate: new Date('2025-12-20T13:00:00'),
     description:
       'Help beautify our community! Join fellow volunteers for a day of park cleanup, tree planting, and community gardening. All ages and skill levels welcome. Tools and refreshments provided.',
     coordinators: [
@@ -62,7 +62,7 @@ export const eventListData: Array<Event> = [
       { name: 'Daniel Kim', role: 'Volunteer' },
       { name: 'Maria Santos', role: 'Volunteer' },
     ],
-    category: 'training'
+    category: 'training',
   },
   {
     id: 4,
@@ -70,8 +70,8 @@ export const eventListData: Array<Event> = [
     status: 'Active',
     location: 'Riverside Pavilion, Portland, OR, 97201',
     coverImage: 'arts_festival.jpg',
-    startDate: new Date('December 2, 2025'),
-    endDate: new Date('December 4, 2025'),
+    startDate: new Date('2025-12-02T10:00:00'),
+    endDate: new Date('2025-12-04T21:00:00'),
     description:
       'Celebrate local artists and creativity! This three-day festival showcases paintings, sculptures, live performances, and interactive art installations. Support local talent while enjoying food trucks, music, and family-friendly activities.',
     coordinators: [
@@ -83,7 +83,7 @@ export const eventListData: Array<Event> = [
       { name: 'Emma Wilson', role: 'Volunteer' },
       { name: 'Jordan Lee', role: 'Volunteer' },
     ],
-    category: 'event'
+    category: 'event',
   },
   {
     id: 5,
@@ -91,8 +91,8 @@ export const eventListData: Array<Event> = [
     status: 'Active',
     location: 'Central Plaza, Chicago, IL, 60601',
     coverImage: 'cleanup_day.jpg',
-    startDate: new Date('December 27, 2025'),
-    endDate: new Date('December 27, 2025'),
+    startDate: new Date('2025-12-27T07:30:00'),
+    endDate: new Date('2025-12-27T12:00:00'),
     description:
       'Make our neighborhood shine! Volunteers will help clean streets, remove litter, and spruce up public spaces. A great opportunity to meet neighbors and take pride in our community.',
     coordinators: [
@@ -104,7 +104,7 @@ export const eventListData: Array<Event> = [
       { name: 'Olivia Clark', role: 'Volunteer' },
       { name: 'Nathan Taylor', role: 'Volunteer' },
     ],
-    category: 'training'
+    category: 'training',
   },
   {
     id: 6,
@@ -112,8 +112,8 @@ export const eventListData: Array<Event> = [
     status: 'Active',
     location: 'Skyline Terrace, New York, NY, 10001',
     coverImage: 'donor_reception.jpg',
-    startDate: new Date('December 22, 2025'),
-    endDate: new Date('December 22, 2025'),
+    startDate: new Date('2025-12-22T19:00:00'),
+    endDate: new Date('2025-12-22T22:30:00'),
     description:
       'An exclusive evening to honor our generous donors and supporters. Enjoy breathtaking city views, gourmet cuisine, and heartfelt recognition of those who make our mission possible.',
     coordinators: [
@@ -125,7 +125,7 @@ export const eventListData: Array<Event> = [
       { name: 'Andrew Jackson', role: 'Volunteer' },
       { name: 'Isabella Martinez', role: 'Volunteer' },
     ],
-    category: 'event'
+    category: 'event',
   },
 ]
 
@@ -135,8 +135,8 @@ export const eventData: Event = {
   status: 'Active',
   location: 'Orchard Central, Somerset, 666666',
   coverImage: 'image123456.jpg',
-  startDate: new Date('December 1, 2025'),
-  endDate: new Date('December 31, 2025'),
+  startDate: new Date('2025-12-01T09:00:00'),
+  endDate: new Date('2025-12-31T18:00:00'),
   description:
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
   coordinators: [
@@ -148,5 +148,6 @@ export const eventData: Event = {
     { name: 'Name', role: 'Volunteer' },
     { name: 'Name', role: 'Volunteer' },
   ],
-  category: 'event'
+  category: 'event',
 }
+
