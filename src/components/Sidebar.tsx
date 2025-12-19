@@ -22,7 +22,7 @@ type Item = {
 const TOP: Item[] = [
   { label: "Home", to: "/", icon: Home },
   { label: "Calendar", to: "/calendar", icon: Calendar },
-  { label: "Volunteer Management System", to: "/volunteers", icon: Users },
+  { label: "Volunteer Management System", to: "/landing", icon: Users },
   { label: "Events", to: "/events", icon: BarChart2 },
   { label: "Analytics", to: "/analytics", icon: TrendingUp },
 ]

@@ -14,12 +14,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const auth = getAuth()
     return onAuthStateChanged(auth, async (user) => {
+      console.log(user)
       if (user) {
         const token = await user.getIdTokenResult()
         const role = (token.claims.role ?? 'public') as UserRole // If no role assigned, default to public
         setCurrentUser({
           userId: user.uid,
           role,
+          name: user.displayName ?? ''
         })
       } else {
         setCurrentUser(null)
