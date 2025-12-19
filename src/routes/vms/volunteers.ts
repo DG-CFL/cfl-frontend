@@ -1,7 +1,6 @@
-import VolunteerPage from "@/pages/vms/VolunteerPage";
-import LandingPage from "@/pages/vms/LandingPage";
+import VolunteerPage from "@/pages/vms/volunteers/VolunteerPage";
 import { createRoute } from "@tanstack/react-router";
-import { appLayoutRoute } from "./app";
+import { appLayoutRoute } from "../app";
 
 export const volunteerPageRoute = createRoute({
   getParentRoute: () => appLayoutRoute,

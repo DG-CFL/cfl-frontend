@@ -1,11 +1,7 @@
-import { Button } from '@/components/ui/button'
 import { Sheet } from '@/components/ui/sheet'
-import { EventCard } from '@/components/ui_custom/EventCard'
-import { eventListData } from '@/data/events'
 import { Link } from '@tanstack/react-router'
-import { PlusCircle } from 'lucide-react'
 
-export default function LandingPage() {
+export default function VmsLandingPage() {
   const volunteerIconUrl = null; 
   return (
     <div className="mx-auto w-full space-y-12 px-10 py-14">

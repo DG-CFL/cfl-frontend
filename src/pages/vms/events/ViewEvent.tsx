@@ -5,7 +5,7 @@ import { useGetEvent } from '@/operations/events'
 import type { Person } from '@/types/events'
 import { Link, useParams } from '@tanstack/react-router'
 import { CalendarDays, ImageIcon, MapPin, SquarePen } from 'lucide-react'
-import LoadingSkeleton from '../LoadingSkeleton'
+import LoadingSkeleton from '@/pages/LoadingSkeleton'
 import { useCurrentUser } from '@/auth/AuthProvider'
 
 export default function ViewEvent() {
