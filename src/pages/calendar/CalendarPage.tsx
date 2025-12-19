@@ -1,32 +1,38 @@
-import { useEffect, useMemo, useState } from 'react'
 import { addDays, addWeeks, format, subDays, subWeeks } from 'date-fns'
 import { Plus } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 
-import {
-  CALENDAR_FEATURES,
-  CALENDAR_FILTERS,
-  INITIAL_DATE,
-  INITIAL_MONTH,
-  INITIAL_YEAR,
-  STATUS_COLORS,
-} from './SampleCalendarData'
-import CalendarMonthView from './calenderViews/CalendarMonthView'
-import CalendarWeekView from './calenderViews/CalendarWeekView'
-import CalendarDayView from './calenderViews/CalendarDayView'
-import CalendarYearView from './calenderViews/CalendarYearView'
-import CalendarEventListView from './calenderViews/CalendarListView'
-import type { CalendarCategory } from './SampleCalendarData'
+import { Button } from '@/components/ui/button'
 import type { CalendarState } from '@/components/ui/calendarpage'
-import type { CalendarDisplayMode, CalendarViewOption } from '@/pages/calendar/CalendarHeader'
-import { CalendarProvider, useCalendarMonth, useCalendarYear } from '@/components/ui/calendarpage'
+import {
+  CalendarProvider,
+  useCalendarMonth,
+  useCalendarYear,
+} from '@/components/ui/calendarpage'
+import { ErrorAlert } from '@/components/ui_custom/ErrorAlert'
+import { useGetEvents } from '@/operations/events'
+import type {
+  CalendarDisplayMode,
+  CalendarViewOption,
+} from '@/pages/calendar/CalendarHeader'
 import { CalendarBarHeader } from '@/pages/calendar/CalendarHeader'
 import CalendarBar from '@/pages/calendar/CalendarSideBar'
-import { Button } from '@/components/ui/button'
+import LoadingSkeleton from '../LoadingSkeleton'
+import CalendarDayView from './calenderViews/CalendarDayView'
+import CalendarListView from './calenderViews/CalendarListView'
+import CalendarMonthView from './calenderViews/CalendarMonthView'
+import CalendarWeekView from './calenderViews/CalendarWeekView'
+import CalendarYearView from './calenderViews/CalendarYearView'
+import type { CalendarCategory } from './SampleCalendarData'
+import {
+  CALENDAR_FILTERS,
+  STATUS_COLORS
+} from './SampleCalendarData'
 
 const CalendarPage = () => {
   const [view, setView] = useState<CalendarViewOption>('month')
   const [mode, setMode] = useState<CalendarDisplayMode>('grid')
-  const [selectedDate, setSelectedDate] = useState<Date>(INITIAL_DATE)
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [activeFilters, setActiveFilters] = useState<Array<CalendarCategory>>(
     CALENDAR_FILTERS.map((filter) => filter.id),
   )
@@ -35,12 +41,15 @@ const CalendarPage = () => {
   const [year, setYear] = useCalendarYear()
 
   useEffect(() => {
-    setMonth(INITIAL_MONTH)
-    setYear(INITIAL_YEAR)
+    setMonth(new Date().getMonth() as CalendarState['month'])
+    setYear(new Date().getFullYear())
   }, [setMonth, setYear])
 
   useEffect(() => {
-    if (selectedDate.getFullYear() === year && selectedDate.getMonth() === month) {
+    if (
+      selectedDate.getFullYear() === year &&
+      selectedDate.getMonth() === month
+    ) {
       return
     }
 
@@ -54,13 +63,9 @@ const CalendarPage = () => {
     [month, year],
   )
 
-  const filteredFeatures = useMemo(
-    () =>
-      CALENDAR_FEATURES.filter((feature) =>
-        activeFilters.includes(feature.status.id as CalendarCategory),
-      ),
-    [activeFilters],
-  )
+  const { data: events, isLoading, isError } = useGetEvents()
+
+  const filteredEvents = events?.filter((event) => activeFilters.includes(event.category)) ?? []
 
   const handleSelectDate = (date: Date) => {
     setSelectedDate(date)
@@ -115,9 +120,9 @@ const CalendarPage = () => {
   const renderActiveView = () => {
     if (mode === 'list') {
       return (
-        <CalendarEventListView 
-          features={filteredFeatures} 
-          colors={STATUS_COLORS} 
+        <CalendarListView
+          events={filteredEvents}
+          colors={STATUS_COLORS}
           selectedDate={selectedDate}
         />
       )
@@ -127,7 +132,7 @@ const CalendarPage = () => {
       case 'month':
         return (
           <CalendarMonthView
-            features={filteredFeatures}
+            events={filteredEvents}
             colors={STATUS_COLORS}
             selectedDate={selectedDate}
           />
@@ -135,7 +140,7 @@ const CalendarPage = () => {
       case 'week':
         return (
           <CalendarWeekView
-            features={filteredFeatures}
+            features={filteredEvents}
             colors={STATUS_COLORS}
             selectedDate={selectedDate}
           />
@@ -143,7 +148,7 @@ const CalendarPage = () => {
       case 'day':
         return (
           <CalendarDayView
-            features={filteredFeatures}
+            events={filteredEvents}
             colors={STATUS_COLORS}
             selectedDate={selectedDate}
           />
@@ -153,7 +158,7 @@ const CalendarPage = () => {
       default:
         return (
           <CalendarMonthView
-            features={filteredFeatures}
+            events={filteredEvents}
             colors={STATUS_COLORS}
             selectedDate={selectedDate}
           />
@@ -162,6 +167,14 @@ const CalendarPage = () => {
   }
 
   const showSidebar = mode === 'grid' && (view === 'month' || view === 'year')
+
+  if (isLoading) {
+    return <LoadingSkeleton />
+  }
+
+  if (isError) {
+    return <ErrorAlert />
+  }
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background">
@@ -188,8 +201,12 @@ const CalendarPage = () => {
                   mode={mode}
                   onModeChange={setMode}
                   onToday={handleToday}
-                  onNext={view === 'week' || view === 'day' ? handleNext : undefined}
-                  onPrev={view === 'week' || view === 'day' ? handlePrev : undefined}
+                  onNext={
+                    view === 'week' || view === 'day' ? handleNext : undefined
+                  }
+                  onPrev={
+                    view === 'week' || view === 'day' ? handlePrev : undefined
+                  }
                 />
               </div>
               <div className="flex-1 min-h-0 px-6 pb-6">

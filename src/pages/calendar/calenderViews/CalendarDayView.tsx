@@ -1,19 +1,20 @@
 import { useEffect, useRef } from 'react'
 import { differenceInMinutes, format } from 'date-fns'
 import { cn } from '@/lib/utils'
-import type { Feature } from '@/components/ui/calendarpage'
+
 import type { CalendarCategoryColors } from '@/pages/calendar/SampleCalendarData'
 import { getDayEventsLayout } from '../calendarUtils'
+import type { Event } from '@/types/events'
 
 type CalendarDayViewProps = {
-  features?: Feature[]
+  events?: Event[]
   colors?: CalendarCategoryColors
   selectedDate?: Date
 }
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i) // 00:00 to 23:00
 
-const CalendarDayView = ({ features = [], colors = {} as CalendarCategoryColors, selectedDate = new Date() }: CalendarDayViewProps) => {
+const CalendarDayView = ({ events = [], colors = {} as CalendarCategoryColors, selectedDate = new Date() }: CalendarDayViewProps) => {
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -58,7 +59,7 @@ const CalendarDayView = ({ features = [], colors = {} as CalendarCategoryColors,
               ))}
 
               {/* Events */}
-              {getDayEventsLayout(selectedDate, features, colors).map(({ event, style }) => {
+              {getDayEventsLayout(selectedDate, events, colors).map(({ event, style }) => {
                 const durationInMinutes = differenceInMinutes(event.endAt, event.startAt)
                 const isShortEvent = durationInMinutes < 45
                 const isVeryShortEvent = durationInMinutes < 20
