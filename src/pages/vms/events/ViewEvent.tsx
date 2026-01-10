@@ -100,7 +100,7 @@ export default function ViewEvent() {
                     className="size-5 text-muted-foreground"
                     aria-hidden="true"
                   />
-                  <h4>{data.startDate.toDateString()}</h4>
+                  <h4>{data.startDate.toLocaleString()}</h4>
                 </div>
               </div>
 
@@ -113,7 +113,7 @@ export default function ViewEvent() {
                     className="size-5 text-muted-foreground"
                     aria-hidden="true"
                   />
-                  <h4>{data.endDate.toDateString()}</h4>
+                  <h4>{data.endDate.toLocaleString()}</h4>
                 </div>
               </div>
             </div>

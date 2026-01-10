@@ -1,4 +1,4 @@
-import type { Volunteer, VolunteerCertification, VolunteerEvent } from '@/types/vms'
+import type { Volunteer, VolunteerCertification, VolunteerEvent } from '@/types/volunteers'
 import { api } from './baseApi'
 
 // Returns a list of volunteers

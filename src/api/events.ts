@@ -1,9 +1,9 @@
-import type { Event, EventPostData, EventPutData } from "@/types/events";
-import { api } from "./baseApi";
-import { eventData, eventListData } from "@/data/events";
+import type { Event, EventPostData, EventPutData, EventRegistrationPostData } from '@/types/events'
+import { api } from './baseApi'
+import { eventData, eventListData } from '@/data/events'
 
 /**
- * Returns the list of all events
+ * Returns the list of all eventsw
  */
 export async function getEvents(): Promise<Event[]> {
   // const res = await api.get("/events")
@@ -15,6 +15,7 @@ export async function getEvents(): Promise<Event[]> {
  * Returns an event
  */
 export async function getEvent(eventId: number): Promise<Event> {
+  // TODO: Replace with actual API call when backend is ready
   // const res = await api.get(`/events/${eventId}`)
   // return res.data
   return eventData
@@ -31,8 +32,21 @@ export async function createEvent(eventData: EventPostData): Promise<Event> {
 /**
  * Edits an event by replacing with the new eventData
  */
-export async function editEvent(eventId: number, eventData: EventPutData): Promise<Event> {
+export async function editEvent(
+  eventId: number,
+  eventData: EventPutData,
+): Promise<Event> {
   const res = await api.put(`/events/${eventId}`, eventData)
   return res.data
 }
 
+/**
+ * Registers a volunteer as a participant of an event
+ */
+export async function registerEventParticipant(
+  eventId: number,
+  registrationData: EventRegistrationPostData,
+): Promise<void> {
+  const res = await api.post(`/events/${eventId}/register`, registrationData)
+  return res.data
+}
