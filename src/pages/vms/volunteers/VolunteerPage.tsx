@@ -4,7 +4,7 @@ import { VolunteerInformationPage } from './VolunteerInformationPage.tsx'
 import { useState } from 'react'
 
 import { ChevronLeft } from 'lucide-react'
-import type { Volunteer } from '@/types/vms.tsx'
+import type { Volunteer } from '@/types/volunteers.ts'
 
 export default function VolunteerPage() {
   const [clickedRow, setClickedRow] = useState<Volunteer | null>(null)

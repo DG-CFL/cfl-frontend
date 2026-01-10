@@ -1,4 +1,4 @@
-import type { Volunteer, VolunteerEvent } from "@/types/vms";
+import type { Volunteer, VolunteerEvent } from "@/types/volunteers";
 
 export const volunteerListData: Volunteer[] = [
   {

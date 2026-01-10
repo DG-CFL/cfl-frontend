@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
-import { type Volunteer, type VolunteerEvent } from '@/types/vms'
+import { type Volunteer, type VolunteerEvent } from '@/types/volunteers'
 
 import { Card, CardHeader } from '@/components/ui/card'
 import type {
