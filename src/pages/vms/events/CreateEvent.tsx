@@ -1,6 +1,14 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
   Dropzone,
   DropzoneContent,
   DropzoneEmptyState,
@@ -37,11 +45,25 @@ export default function CreateEvent() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { isDirty },
     control,
   } = useForm<EventPostData>()
 
   const [error, setError] = useState<string | null>(null)
+  const [showExitDialog, setShowExitDialog] = useState(false)
+
+  const handleCancelClick = () => {
+    if (isDirty) {
+      setShowExitDialog(true)
+    } else {
+      navigate({ to: '/events' })
+    }
+  }
+
+  const handleConfirmExit = () => {
+    setShowExitDialog(false)
+    navigate({ to: '/events' })
+  }
 
   const onSubmit: SubmitHandler<EventPostData> = async (data) => {
     try {
@@ -61,7 +83,7 @@ export default function CreateEvent() {
       {/* Header row */}
       <div className="flex items-start justify-between gap-8">
         <div className="flex items-start gap-4">
-            <Button variant="ghost" size="icon" className="size-10" onClick={() => navigate({ to:'/events'})}>
+            <Button variant="ghost" size="icon" className="size-10" onClick={handleCancelClick}>
               <ChevronLeft className="size-8" />
             </Button>
 
@@ -80,7 +102,7 @@ export default function CreateEvent() {
             type="button"
             variant="outline"
             className="h-[42px] w-[136px] rounded-[6px] !border-[#545f71] text-[16px] font-semibold text-[#475569]"
-            onClick={() => navigate({ to: '/events' })}
+            onClick={handleCancelClick}
           >
             Cancel
           </Button>
@@ -305,6 +327,32 @@ export default function CreateEvent() {
           </CardContent>
         </Card>
       </form>
+
+      <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+        <DialogContent className="bg-[#BDD797] border-[#545f71]">
+          <DialogHeader className="text-center sm:text-center">
+            <h2>Are you sure?</h2>
+            <p>
+              You have unsaved changes. Are you sure you want to leave?
+            </p>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-center gap-[10px]">
+            <Button
+              className="h-[42px] w-[136px] rounded-[6px] bg-[#5f733c] text-[16px] font-semibold text-white hover:bg-[#4d5e30]"
+              onClick={() => setShowExitDialog(false)}
+            >
+              Stay
+            </Button>
+            <Button
+              variant="outline"
+              className="h-[42px] w-[136px] rounded-[6px] border border-[#5f733c] bg-transparent text-[16px] font-semibold text-[#5f733c] hover:bg-[#5f733c]/10"
+              onClick={handleConfirmExit}
+            >
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
