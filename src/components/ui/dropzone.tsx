@@ -37,6 +37,7 @@ const DropzoneContext = createContext<DropzoneContextType | undefined>(
 export type DropzoneProps = Omit<DropzoneOptions, 'onDrop'> & {
   src?: Array<File>;
   className?: string;
+  style?: React.CSSProperties;
   onDrop?: (
     acceptedFiles: Array<File>,
     fileRejections: Array<FileRejection>,
@@ -55,6 +56,7 @@ export const Dropzone = ({
   disabled,
   src,
   className,
+  style,
   children,
   ...props
 }: DropzoneProps) => {
@@ -88,6 +90,7 @@ export const Dropzone = ({
           isDragActive && 'outline-none ring-1 ring-ring',
           className
         )}
+        style={style}
         disabled={disabled}
         type="button"
         variant="outline"
