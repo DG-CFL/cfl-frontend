@@ -47,35 +47,32 @@ export default function CreateEvent() {
     handleSubmit,
     formState: { isDirty },
     control,
-  } = useForm<EventPostData>()
+  } = useForm<EventPostData>({
+    defaultValues: {
+      eventName: '',
+      eventStatus: '',
+      location: '',
+      startDate: new Date(),
+      endDate: new Date(),
+      projectDescription: '',
+    },
+  })
 
-  const [error, setError] = useState<string | null>(null)
   const [showExitDialog, setShowExitDialog] = useState(false)
 
-  const handleCancelClick = () => {
-    if (isDirty) {
-      setShowExitDialog(true)
-    } else {
-      navigate({ to: '/events' })
-    }
-  }
-
-  const handleConfirmExit = () => {
-    setShowExitDialog(false)
-    navigate({ to: '/events' })
-  }
-
+  // TODO: Update Save & Publish button handler
   const onSubmit: SubmitHandler<EventPostData> = async (data) => {
     try {
       await createEvent.mutateAsync(data)
       navigate({ to: '/events/create-success' })
     } catch (err) {
-      setError(
-        `Error creating event: ${
-          err instanceof Error ? err.message : String(err)
-        }`,
-      )
+       console.error(err)
+       // handle error, maybe setError state
     }
+  }
+
+  const addVolunteer = () => {
+    // TODO: Implement add volunteer logic
   }
 
   return (
@@ -83,7 +80,14 @@ export default function CreateEvent() {
       {/* Header row */}
       <div className="flex items-start justify-between gap-8">
         <div className="flex items-start gap-4">
-            <Button variant="ghost" size="icon" className="size-10" onClick={handleCancelClick}>
+            <Button variant="ghost" size="icon" className="size-10" 
+            onClick={() => {
+              if (isDirty) {
+                setShowExitDialog(true)
+              } else {
+                navigate({ to: '/events' })
+              }
+            }}>
               <ChevronLeft className="size-8" />
             </Button>
 
@@ -102,7 +106,13 @@ export default function CreateEvent() {
             type="button"
             variant="outline"
             className="h-[42px] w-[136px] rounded-[6px] !border-[#545f71] text-[16px] font-semibold text-[#475569]"
-            onClick={handleCancelClick}
+            onClick={() => {
+              if (isDirty) {
+                setShowExitDialog(true)
+              } else {
+                navigate({ to: '/events' })
+              }
+            }}
           >
             Cancel
           </Button>
@@ -135,14 +145,14 @@ export default function CreateEvent() {
               {/* Event Name */}
               <div className="col-span-2 space-y-2">
                 <Label
-                  htmlFor="project-name"
+                  htmlFor="eventName"
                   className="text-[14px] leading-[19px] text-[#545f71]"
                 >
                   Event Name
                 </Label>
                 <Input
-                  id="project-name"
-                  {...register('name', {
+                  id="eventName"
+                  {...register('eventName', {
                     required: 'Project name is required',
                   })}
                   className="h-[48px] rounded-[6px] border-[#545f71]"
@@ -152,14 +162,14 @@ export default function CreateEvent() {
               {/* Event Status */}
               <div className="space-y-2">
                 <Label
-                  htmlFor="event-status"
+                  htmlFor="eventStatus"
                   className="text-[14px] leading-[19px] text-[#545f71]"
                 >
                   Event Status
                 </Label>
                 <Controller
                   control={control}
-                  name="postalCode"
+                  name="eventStatus"
                   rules={{ required: 'Event status is required' }}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
@@ -181,14 +191,14 @@ export default function CreateEvent() {
               {/* Location */}
               <div className="space-y-2">
                 <Label
-                  htmlFor="venue"
+                  htmlFor="location"
                   className="text-[14px] leading-[19px] text-[#545f71]"
                 >
                   Location
                 </Label>
                 <Input
-                  id="venue"
-                  {...register('venue', { required: 'Location is required' })}
+                  id="location"
+                  {...register('location', { required: 'Location is required' })}
                   className="h-[48px] rounded-[6px] border-[#545f71]"
                 />
               </div>
@@ -196,7 +206,7 @@ export default function CreateEvent() {
               {/* Start Date */}
               <div className="space-y-2">
                 <Label
-                  htmlFor="start-date"
+                  htmlFor="startDate"
                   className="text-[14px] leading-[19px] text-[#545f71]"
                 >
                   Start Date
@@ -208,7 +218,7 @@ export default function CreateEvent() {
                   control={control}
                   render={({ field }) => (
                     <DatePicker
-                      id="start-date"
+                      id="startDate"
                       value={field.value}
                       onChange={field.onChange}
                     />
@@ -219,7 +229,7 @@ export default function CreateEvent() {
               {/* End Date */}
               <div className="space-y-2">
                 <Label
-                  htmlFor="end-date"
+                  htmlFor="endDate"
                   className="text-[14px] leading-[19px] text-[#545f71]"
                 >
                   End Date
@@ -229,7 +239,7 @@ export default function CreateEvent() {
                   control={control}
                   render={({ field }) => (
                     <DatePicker
-                      id="end-date"
+                      id="endDate"
                       value={field.value}
                       onChange={field.onChange}
                     />
@@ -240,14 +250,14 @@ export default function CreateEvent() {
               {/* Project Description */}
               <div className="space-y-2">
                 <Label
-                  htmlFor="project-description"
+                  htmlFor="projectDescription"
                   className="text-[14px] leading-[19px] text-[#545f71]"
                 >
                   Project Description
                 </Label>
                 <Textarea
-                  id="project-description"
-                  {...register('description', {
+                  id="projectDescription"
+                  {...register('projectDescription', {
                     required: 'Description is required',
                   })}
                   className="h-[160px] resize-none rounded-[6px] border-[#545f71]"
@@ -287,11 +297,6 @@ export default function CreateEvent() {
                 </Dropzone>
               </div>
             </div>
-
-            {/* Server errors (if any) */}
-            {error && <ErrorAlert message={error} />}
-
-            
           </CardContent>
         </Card>
 
@@ -304,6 +309,7 @@ export default function CreateEvent() {
             <Button
               type="button"
               className="h-[34px] w-[163px] rounded-[6px] bg-[#5f733c] px-4 py-3 text-[16px] font-semibold"
+              onClick={addVolunteer}
             >
               + Add Volunteer
             </Button>
@@ -346,9 +352,12 @@ export default function CreateEvent() {
             <Button
               variant="outline"
               className="h-[42px] w-[136px] rounded-[6px] border border-[#5f733c] bg-transparent text-[16px] font-semibold text-[#5f733c] hover:bg-[#5f733c]/10"
-              onClick={handleConfirmExit}
+              onClick={() => {
+                setShowExitDialog(false)
+                navigate({ to: '/events' })
+              }}
             >
-              Cancel
+              Leave
             </Button>
           </DialogFooter>
         </DialogContent>

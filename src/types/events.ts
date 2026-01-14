@@ -20,12 +20,12 @@ export type Event = {
 }
 
 export type EventPostData = {
-  name: string
-  description: string
+  eventName: string
+  eventStatus: string
+  location: string
   startDate: Date
   endDate: Date
-  venue: string
-  postalCode: string
+  projectDescription: string
   coverImage?: string
 }
 
