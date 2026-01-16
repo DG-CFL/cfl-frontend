@@ -119,7 +119,7 @@ export default function CreateEvent() {
           <Button
             type="button"
             variant="outline"
-            className="h-[42px] w-[136px] rounded-[6px] !border-[#545f71] text-[16px] font-semibold text-[#475569]"
+            className="h-10 px-8 rounded-md !border-slate-600 text-base font-semibold text-slate-600"
             onClick={() => {
               if (isDirty) {
                 setShowExitDialog(true)
@@ -133,7 +133,7 @@ export default function CreateEvent() {
           <Button
             type="submit"
             form="create-event-form"
-            className="h-[42px] w-[138px] rounded-[6px] bg-[#545f71] text-[16px] font-semibold"
+            className="h-10 px-8 rounded-md bg-slate-600 text-base font-semibold"
           >
             Save &amp; Publish
           </Button>
@@ -160,30 +160,30 @@ export default function CreateEvent() {
         )}
 
         {/* Event Details Section */}
-        <Card className="rounded-[10px] border border-[#bfbfbf] p-0 gap-0">
+        <Card className="rounded-xl border border-slate-300 p-0 gap-0">
           {/* green section header */}
-          <div className="h-[61px] rounded-t-[10px] bg-[rgba(101,163,13,0.43)] px-8 flex items-center">
-            <h3 className="leading-[32px] tracking-[-0.144px]">
+          <div className="h-16 rounded-t-xl bg-[rgba(101,163,13,0.43)] px-8 flex items-center">
+            <h3>
               Event Details
             </h3>
           </div>
 
           <CardContent className="px-8 py-6">
-            <div className="grid grid-cols-2 gap-x-[40px] gap-y-[20px]">
+            <div className="grid grid-cols-2 gap-x-10 gap-y-5">
               {/* Event Name */}
               <div className="col-span-2 space-y-2">
                 <Label
                   htmlFor="eventName"
-                  className="text-[14px] leading-[19px] text-[#545f71]"
+                  className="text-sm text-slate-600"
                 >
                   Event Name
                 </Label>
                 <Input
                   id="eventName"
                   {...register('eventName', {
-                    required: 'Project name is required',
+                    required: 'Event name is required',
                   })}
-                  className="h-[48px] rounded-[6px] border-[#545f71]"
+                  className="h-12 rounded-md border-slate-500"
                 />
               </div>
 
@@ -191,7 +191,7 @@ export default function CreateEvent() {
               <div className="space-y-2">
                 <Label
                   htmlFor="eventStatus"
-                  className="text-[14px] leading-[19px] text-[#545f71]"
+                  className="text-sm text-slate-600"
                 >
                   Event Status
                 </Label>
@@ -201,7 +201,7 @@ export default function CreateEvent() {
                   rules={{ required: 'Event status is required' }}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="items-center !h-[48px] !w-full rounded-[6px] border-[#545f71] text-base md:text-sm">
+                      <SelectTrigger className="items-center !h-12 w-full rounded-md border-slate-500 text-base md:text-sm">
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
                       <SelectContent>
@@ -209,7 +209,7 @@ export default function CreateEvent() {
                           <SelectItem
                             key={status.value}
                             value={status.value}
-                            className="h-[48px] text-md"
+                            className="h-12 text-md"
                           >
                             <div className="flex items-center gap-2">
                               <div
@@ -229,14 +229,14 @@ export default function CreateEvent() {
               <div className="space-y-2">
                 <Label
                   htmlFor="location"
-                  className="text-[14px] leading-[19px] text-[#545f71]"
+                  className="text-sm text-slate-600"
                 >
                   Location
                 </Label>
                 <Input
                   id="location"
                   {...register('location', { required: 'Location is required' })}
-                  className="h-[48px] rounded-[6px] border-[#545f71]"
+                  className="h-12 rounded-md border-slate-500"
                 />
               </div>
 
@@ -244,7 +244,7 @@ export default function CreateEvent() {
               <div className="space-y-2">
                 <Label
                   htmlFor="startDate"
-                  className="text-[14px] leading-[19px] text-[#545f71]"
+                  className="text-sm text-slate-600"
                 >
                   Start Date
                 </Label>
@@ -267,7 +267,7 @@ export default function CreateEvent() {
               <div className="space-y-2">
                 <Label
                   htmlFor="endDate"
-                  className="text-[14px] leading-[19px] text-[#545f71]"
+                  className="text-sm text-slate-600"
                 >
                   End Date
                 </Label>
@@ -284,11 +284,11 @@ export default function CreateEvent() {
                 />
               </div>
 
-              {/* Project Description */}
+              {/* Event Description */}
               <div className="space-y-2">
                 <Label
                   htmlFor="eventDescription"
-                  className="text-[14px] leading-[19px] text-[#545f71]"
+                  className="text-sm text-slate-600"
                 >
                   Event Description
                 </Label>
@@ -297,13 +297,13 @@ export default function CreateEvent() {
                   {...register('eventDescription', {
                     required: 'Description is required',
                   })}
-                  className="h-[160px] resize-none rounded-[6px] border-[#545f71]"
+                  className="h-40 resize-none rounded-md border-slate-500"
                 />
               </div>
 
               {/* Upload Cover Image */}
               <div className="space-y-2">
-                <Label className="text-[14px] leading-[19px] text-[#545f71]">
+                <Label className="text-sm text-slate-600">
                   Upload Cover Image
                 </Label>
                 <Dropzone
@@ -313,23 +313,23 @@ export default function CreateEvent() {
                   onDrop={(acceptedFiles) =>
                     setCoverImage(acceptedFiles.length ? acceptedFiles : undefined)
                   }
-                  className="h-[160px] rounded-[6px] border-[3px] border-transparent !bg-[#969696]"
+                  className="h-40 rounded-md border-[3px] border-transparent !bg-[#969696]"
                   style={{
                     backgroundImage: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='6' ry='6' stroke='%23BFBFBF' stroke-width='3' stroke-dasharray='16%2c 16' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e")`,
                   }}
                 >
                   <DropzoneEmptyState className="gap-2">
                     <CloudUpload className="size-10 text-white/80" />
-                    <p className="text-[14px] leading-[24px] text-[#f4f4f4]">
+                    <p className="text-sm leading-6 text-slate-50">
                       Click to upload or drag and drop
                     </p>
                   </DropzoneEmptyState>
                   <DropzoneContent className="gap-2">
                     <CloudUpload className="size-10 text-white/80" />
-                    <p className="truncate text-[14px] leading-[24px] text-[#f4f4f4]">
+                    <p className="truncate text-sm leading-6 text-slate-50">
                       {coverImage?.[0]?.name ?? 'Click to upload or drag and drop'}
                     </p>
-                    <p className="text-[12px] text-white/70">Click to replace</p>
+                    <p className="text-xs text-white/70">Click to replace</p>
                   </DropzoneContent>
                 </Dropzone>
               </div>
@@ -338,14 +338,14 @@ export default function CreateEvent() {
         </Card>
 
         {/* Volunteer Coordinators Section */}
-        <Card className="gap-0 rounded-[10px] border border-[#bfbfbf] p-0">
-          <div className="flex h-[61px] items-center justify-between rounded-t-[10px] bg-[rgba(101,163,13,0.43)] px-8">
-            <h3 className="leading-[32px] tracking-[-0.144px]">
+        <Card className="gap-0 rounded-xl border border-slate-300 p-0">
+          <div className="flex h-16 items-center justify-between rounded-t-xl bg-[rgba(101,163,13,0.43)] px-8">
+            <h3>
               Volunteer Coordinators
             </h3>
             <Button
               type="button"
-              className="h-[34px] w-[163px] rounded-[6px] bg-[#5f733c] px-4 py-3 text-[16px] font-semibold hover:bg-[#4d5e30]"
+              className="h-9 w-auto rounded-md bg-[#5f733c] px-4 py-3 text-base font-semibold hover:bg-[#4d5e30]"
               onClick={() => append({ name: '', role: '' })}
             >
               + Add Volunteer
@@ -355,32 +355,32 @@ export default function CreateEvent() {
           <CardContent className="px-8 py-6">
             <div className="flex flex-col gap-6">
               {fields.map((field, index) => (
-                <div key={field.id} className="grid grid-cols-2 gap-x-[40px]">
+                <div key={field.id} className="grid grid-cols-2 gap-x-10">
                   <div className="space-y-2">
                     <Label
                       htmlFor={`coordinators.${index}.name`}
-                      className="text-[14px] leading-[19px] text-[#545f71]"
+                      className="text-sm text-slate-600"
                     >
                       Name of Volunteer Coordinator
                     </Label>
                     <Input
                       id={`coordinators.${index}.name`}
                       {...register(`coordinators.${index}.name` as const)}
-                      className="h-[48px] rounded-[6px] border-[#545f71]"
+                      className="h-12 rounded-md border-slate-500"
                     />
                   </div>
                   <div className="flex items-end gap-2">
                     <div className="w-full space-y-2">
                       <Label
                         htmlFor={`coordinators.${index}.role`}
-                        className="text-[14px] leading-[19px] text-[#545f71]"
+                        className="text-sm text-slate-600"
                       >
                         Role
                       </Label>
                       <Input
                         id={`coordinators.${index}.role`}
                         {...register(`coordinators.${index}.role` as const)}
-                        className="h-[48px] rounded-[6px] border-[#545f71]"
+                        className="h-12 rounded-md border-slate-500"
                       />
                     </div>
                     <Button
@@ -401,7 +401,7 @@ export default function CreateEvent() {
       </form>
 
       <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
-        <DialogContent className="bg-[#BDD797] border-[#545f71]">
+        <DialogContent className="bg-[#BDD797] border-slate-600">
           <DialogHeader className="text-center sm:text-center">
             <h2>Are you sure?</h2>
             <p>
@@ -410,14 +410,14 @@ export default function CreateEvent() {
           </DialogHeader>
           <DialogFooter className="sm:justify-center gap-[10px]">
             <Button
-              className="h-[42px] w-[136px] rounded-[6px] bg-[#5f733c] text-[16px] font-semibold text-white hover:bg-[#4d5e30]"
+              className="h-10 w-34 rounded-md bg-[#5f733c] text-base font-semibold text-white hover:bg-[#4d5e30]"
               onClick={() => setShowExitDialog(false)}
             >
               Stay
             </Button>
             <Button
               variant="outline"
-              className="h-[42px] w-[136px] rounded-[6px] border border-[#5f733c] bg-transparent text-[16px] font-semibold text-[#5f733c] hover:bg-[#5f733c]/10"
+              className="h-10 w-34 rounded-md border border-[#5f733c] bg-transparent text-base font-semibold text-[#5f733c] hover:bg-[#5f733c]/10"
               onClick={() => {
                 setShowExitDialog(false)
                 navigate({ to: '/events' })
