@@ -26,7 +26,7 @@ export type EventPostData = {
   location: string
   startDate: Date
   endDate: Date
-  projectDescription: string
+  eventDescription: string
   coverImage?: string
   coordinators: Array<Person>
 }
