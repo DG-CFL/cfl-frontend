@@ -1,3 +1,4 @@
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -50,16 +51,18 @@ export default function CreateEvent() {
   const {
     register,
     handleSubmit,
-    formState: { isDirty },
+    formState: { isDirty, errors },
     control,
   } = useForm<EventPostData>({
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
     defaultValues: {
       eventName: '',
       eventStatus: '',
       location: '',
       startDate: new Date(),
       endDate: new Date(),
-      projectDescription: '',
+      eventDescription: '',
       coordinators: [{ name: '', role: '' }],
     },
   })
@@ -68,6 +71,10 @@ export default function CreateEvent() {
     control,
     name: 'coordinators',
   })
+
+  const errorMessages = Object.values(errors)
+    .map((e: any) => e?.message)
+    .filter((msg): msg is string => typeof msg === 'string')
 
   const [showExitDialog, setShowExitDialog] = useState(false)
 
@@ -138,6 +145,20 @@ export default function CreateEvent() {
         onSubmit={handleSubmit(onSubmit)}
         className="mt-6 ml-[56px] space-y-6"
       >
+        {errorMessages.length > 0 && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Please resolve the following errors:</AlertTitle>
+            <AlertDescription>
+              <ul className="list-disc pl-5 mt-2">
+                {errorMessages.map((msg, idx) => (
+                  <li key={idx}>{msg}</li>
+                ))}
+              </ul>
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Event Details Section */}
         <Card className="rounded-[10px] border border-[#bfbfbf] p-0 gap-0">
           {/* green section header */}
@@ -266,14 +287,14 @@ export default function CreateEvent() {
               {/* Project Description */}
               <div className="space-y-2">
                 <Label
-                  htmlFor="projectDescription"
+                  htmlFor="eventDescription"
                   className="text-[14px] leading-[19px] text-[#545f71]"
                 >
-                  Project Description
+                  Event Description
                 </Label>
                 <Textarea
-                  id="projectDescription"
-                  {...register('projectDescription', {
+                  id="eventDescription"
+                  {...register('eventDescription', {
                     required: 'Description is required',
                   })}
                   className="h-[160px] resize-none rounded-[6px] border-[#545f71]"
@@ -334,7 +355,7 @@ export default function CreateEvent() {
           <CardContent className="px-8 py-6">
             <div className="flex flex-col gap-6">
               {fields.map((field, index) => (
-                <div key={field.id} className="relative grid grid-cols-2 gap-x-[40px]">
+                <div key={field.id} className="grid grid-cols-2 gap-x-[40px]">
                   <div className="space-y-2">
                     <Label
                       htmlFor={`coordinators.${index}.name`}
@@ -348,23 +369,25 @@ export default function CreateEvent() {
                       className="h-[48px] rounded-[6px] border-[#545f71]"
                     />
                   </div>
-                  <div className="relative space-y-2">
-                    <Label
-                      htmlFor={`coordinators.${index}.role`}
-                      className="text-[14px] leading-[19px] text-[#545f71]"
-                    >
-                      Role
-                    </Label>
-                    <Input
-                      id={`coordinators.${index}.role`}
-                      {...register(`coordinators.${index}.role` as const)}
-                      className="h-[48px] rounded-[6px] border-[#545f71]"
-                    />
+                  <div className="flex items-end gap-2">
+                    <div className="w-full space-y-2">
+                      <Label
+                        htmlFor={`coordinators.${index}.role`}
+                        className="text-[14px] leading-[19px] text-[#545f71]"
+                      >
+                        Role
+                      </Label>
+                      <Input
+                        id={`coordinators.${index}.role`}
+                        {...register(`coordinators.${index}.role` as const)}
+                        className="h-[48px] rounded-[6px] border-[#545f71]"
+                      />
+                    </div>
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute -right-12 top-[29px] size-10 text-red-500 hover:bg-red-50 hover:text-red-700"
+                      className="mb-1 size-10 text-red-500 hover:bg-red-50 hover:text-red-700"
                       onClick={() => remove(index)}
                     >
                       <Trash2 className="size-5" />
