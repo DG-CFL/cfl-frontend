@@ -3,10 +3,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog'
 import {
   Dropzone,
@@ -24,15 +22,22 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui_custom/DatePicker'
-import { ErrorAlert } from '@/components/ui_custom/ErrorAlert'
 import { useCreateEvent } from '@/operations/events'
 import type { EventPostData } from '@/types/events'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { ChevronLeft, CloudUpload, CloudUploadIcon } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
+import { AlertCircle, ChevronLeft, CloudUpload, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import { Controller, useForm, type SubmitHandler } from 'react-hook-form'
+import {
+  Controller,
+  useFieldArray,
+  useForm,
+  type SubmitHandler,
+} from 'react-hook-form'
 
-const EVENT_STATUSES = ['Draft', 'Published', 'Open', 'Closed', 'Completed'] // i have no idea about the statuses
+const EVENT_STATUSES = [
+  { label: 'Active', value: 'Active', color: 'bg-green-500' },
+  { label: 'Inactive', value: 'Inactive', color: 'bg-red-500' },
+]
 
 export default function CreateEvent() {
   const navigate = useNavigate()
@@ -55,7 +60,13 @@ export default function CreateEvent() {
       startDate: new Date(),
       endDate: new Date(),
       projectDescription: '',
+      coordinators: [{ name: '', role: '' }],
     },
+  })
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'coordinators',
   })
 
   const [showExitDialog, setShowExitDialog] = useState(false)
@@ -66,13 +77,9 @@ export default function CreateEvent() {
       await createEvent.mutateAsync(data)
       navigate({ to: '/events/create-success' })
     } catch (err) {
-       console.error(err)
-       // handle error, maybe setError state
+      console.error(err)
+      // handle error, maybe setError state
     }
-  }
-
-  const addVolunteer = () => {
-    // TODO: Implement add volunteer logic
   }
 
   return (
@@ -173,13 +180,22 @@ export default function CreateEvent() {
                   rules={{ required: 'Event status is required' }}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="!h-[48px] !w-full rounded-[6px] border-[#545f71] text-base md:text-sm">
+                      <SelectTrigger className="items-center !h-[48px] !w-full rounded-[6px] border-[#545f71] text-base md:text-sm">
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
                       <SelectContent>
                         {EVENT_STATUSES.map((status) => (
-                          <SelectItem key={status} value={status} className='text-md'>
-                            {status}
+                          <SelectItem
+                            key={status.value}
+                            value={status.value}
+                            className="h-[48px] text-md"
+                          >
+                            <div className="flex items-center gap-2">
+                              <div
+                                className={`size-2 rounded-full ${status.color}`}
+                              />
+                              {status.label}
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -301,34 +317,61 @@ export default function CreateEvent() {
         </Card>
 
         {/* Volunteer Coordinators Section */}
-        <Card className="rounded-[10px] border border-[#bfbfbf] p-0 gap-0">
-          <div className="h-[61px] rounded-t-[10px] bg-[rgba(101,163,13,0.43)] px-8 flex items-center justify-between">
-            <h2 className="text-[24px] font-semibold leading-[32px] tracking-[-0.144px] text-black">
+        <Card className="gap-0 rounded-[10px] border border-[#bfbfbf] p-0">
+          <div className="flex h-[61px] items-center justify-between rounded-t-[10px] bg-[rgba(101,163,13,0.43)] px-8">
+            <h3 className="leading-[32px] tracking-[-0.144px]">
               Volunteer Coordinators
-            </h2>
+            </h3>
             <Button
               type="button"
-              className="h-[34px] w-[163px] rounded-[6px] bg-[#5f733c] px-4 py-3 text-[16px] font-semibold"
-              onClick={addVolunteer}
+              className="h-[34px] w-[163px] rounded-[6px] bg-[#5f733c] px-4 py-3 text-[16px] font-semibold hover:bg-[#4d5e30]"
+              onClick={() => append({ name: '', role: '' })}
             >
               + Add Volunteer
             </Button>
           </div>
 
           <CardContent className="px-8 py-6">
-            <div className="grid grid-cols-2 gap-x-[48px] gap-y-[24px]">
-              <div className="space-y-2">
-                <Label className="text-[14px] leading-[19px] text-[#545f71]">
-                  Name of Volunteer Coordinator
-                </Label>
-                <Input className="h-[48px] rounded-[6px] border-[#545f71]" />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[14px] leading-[19px] text-[#545f71]">
-                  Role
-                </Label>
-                <Input className="h-[48px] rounded-[6px] border-[#545f71]" />
-              </div>
+            <div className="flex flex-col gap-6">
+              {fields.map((field, index) => (
+                <div key={field.id} className="relative grid grid-cols-2 gap-x-[40px]">
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor={`coordinators.${index}.name`}
+                      className="text-[14px] leading-[19px] text-[#545f71]"
+                    >
+                      Name of Volunteer Coordinator
+                    </Label>
+                    <Input
+                      id={`coordinators.${index}.name`}
+                      {...register(`coordinators.${index}.name` as const)}
+                      className="h-[48px] rounded-[6px] border-[#545f71]"
+                    />
+                  </div>
+                  <div className="relative space-y-2">
+                    <Label
+                      htmlFor={`coordinators.${index}.role`}
+                      className="text-[14px] leading-[19px] text-[#545f71]"
+                    >
+                      Role
+                    </Label>
+                    <Input
+                      id={`coordinators.${index}.role`}
+                      {...register(`coordinators.${index}.role` as const)}
+                      className="h-[48px] rounded-[6px] border-[#545f71]"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute -right-12 top-[29px] size-10 text-red-500 hover:bg-red-50 hover:text-red-700"
+                      onClick={() => remove(index)}
+                    >
+                      <Trash2 className="size-5" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>

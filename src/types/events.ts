@@ -19,6 +19,7 @@ export type Event = {
   volunteers: Array<Person>
 }
 
+// may need to change
 export type EventPostData = {
   eventName: string
   eventStatus: string
@@ -27,6 +28,7 @@ export type EventPostData = {
   endDate: Date
   projectDescription: string
   coverImage?: string
+  coordinators: Array<Person>
 }
 
 export type EventPutData = EventPostData 
