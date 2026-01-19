@@ -3,9 +3,9 @@ import { Outlet } from "@tanstack/react-router";
 
 export default function AppLayout() {
   return (
-    <div className="flex min-h-screen overflow-x-visible">
+    <div className="flex w-full min-h-screen">
       <Sidebar />
-      <div className="w-max flex-1">
+      <div className="w-full">
         <Outlet />
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import {
   flexRender,
   getCoreRowModel,
@@ -294,7 +295,6 @@ export function VolunteerTable ({setClickedRow } : VolunteerTableProps) {
       rowSelection,
     },
   })
-
   const handleRowClick = (row : Volunteer) => {
     setClickedRow(row)
   }
@@ -303,10 +303,12 @@ export function VolunteerTable ({setClickedRow } : VolunteerTableProps) {
     <div className="w-full">
       <div className="flex justify-between py-4">
         <div className="flex  items-end">
-          <ActionButton>
-            <CirclePlus />
-            Send Email
-          </ActionButton>
+          <Link to="/volunteers/email">
+            <ActionButton>
+              <CirclePlus />
+              Send Email
+            </ActionButton>
+          </Link>
           <ActionButton>
             <Trash />
             Delete 
