@@ -1,5 +1,12 @@
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+} from '@/components/ui/dialog'
 import {
   Dropzone,
   DropzoneContent,
@@ -7,15 +14,31 @@ import {
 } from '@/components/ui/dropzone'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui_custom/DatePicker'
-import { ErrorAlert } from '@/components/ui_custom/ErrorAlert'
 import { useCreateEvent } from '@/operations/events'
 import type { EventPostData } from '@/types/events'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { ChevronLeft, Upload } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
+import { AlertCircle, ChevronLeft, CloudUpload, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import { Controller, useForm, type SubmitHandler } from 'react-hook-form'
+import {
+  Controller,
+  useFieldArray,
+  useForm,
+  type SubmitHandler,
+} from 'react-hook-form'
+
+const EVENT_STATUSES = [
+  { label: 'Active', value: 'Active', color: 'bg-green-500' },
+  { label: 'Inactive', value: 'Inactive', color: 'bg-red-500' },
+]
 
 export default function CreateEvent() {
   const navigate = useNavigate()
@@ -28,114 +51,203 @@ export default function CreateEvent() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { isDirty, errors },
     control,
-  } = useForm<EventPostData>()
+  } = useForm<EventPostData>({
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
+    defaultValues: {
+      eventName: '',
+      eventStatus: '',
+      location: '',
+      startDate: new Date(),
+      endDate: new Date(),
+      eventDescription: '',
+      coordinators: [{ name: '', role: '' }],
+    },
+  })
 
-  const [error, setError] = useState<string | null>(null)
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'coordinators',
+  })
 
+  const errorMessages = Object.values(errors)
+    .map((e: any) => e?.message)
+    .filter((msg): msg is string => typeof msg === 'string')
+
+  const [showExitDialog, setShowExitDialog] = useState(false)
+
+  // TODO: Update Save & Publish button handler
   const onSubmit: SubmitHandler<EventPostData> = async (data) => {
     try {
       await createEvent.mutateAsync(data)
       navigate({ to: '/events/create-success' })
     } catch (err) {
-      setError("Error creating event: " + error)
+      console.error(err)
+      // handle error, maybe setError state
     }
   }
 
   return (
     <div className="mx-auto flex w-screen max-w-[1662px] flex-col gap-6 px-10 py-14">
-      {/* Header with Back Button */}
-      <div className="flex items-start gap-4">
-        <Link to="/events">
-          <Button variant="ghost" size="icon" className="size-10">
-            <ChevronLeft className="size-8" />
+      {/* Header row */}
+      <div className="flex items-start justify-between gap-8">
+        <div className="flex items-start gap-4">
+            <Button variant="ghost" size="icon" className="size-10" 
+            onClick={() => {
+              if (isDirty) {
+                setShowExitDialog(true)
+              } else {
+                navigate({ to: '/events' })
+              }
+            }}>
+              <ChevronLeft className="size-8" />
+            </Button>
+
+          <div className="flex flex-col gap-2">
+            <h1>
+              Create New Event
+            </h1>
+            <p className="text-xl leading-7 text-muted-foreground">
+              Ensure all details are filled
+            </p>
+          </div>
+        </div>
+
+        <div className="flex gap-[10px] pt-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="h-10 px-8 rounded-md !border-slate-600 text-base font-semibold text-slate-600"
+            onClick={() => {
+              if (isDirty) {
+                setShowExitDialog(true)
+              } else {
+                navigate({ to: '/events' })
+              }
+            }}
+          >
+            Cancel
           </Button>
-        </Link>
-        <div className="flex flex-col gap-1">
-          <h1>Create New Event</h1>
-          <p className="text-xl leading-7 text-muted-foreground">
-            Fill in the details below to define a volunteer project
-          </p>
+          <Button
+            type="submit"
+            form="create-event-form"
+            className="h-10 px-8 rounded-md bg-slate-600 text-base font-semibold"
+          >
+            Save &amp; Publish
+          </Button>
         </div>
       </div>
 
-      {/* Form Card */}
-      <form onSubmit={handleSubmit(onSubmit)} >
-        <Card className=" gap-0 rounded-[10px] border border-muted-foreground/30">
-          <CardContent className="w-full flex flex-col space-y-4 px-8 py-8">
-            {/* Upload Cover Image */}
-            <div className="space-y-2">
-              <Label className="text-base text-[#545F71]">
-                Upload Cover Image
-              </Label>
-              <Dropzone
-                accept={{ 'image/*': [] }}
-                maxFiles={1}
-                src={coverImage}
-                onDrop={(acceptedFiles) =>
-                  setCoverImage(
-                    acceptedFiles.length ? acceptedFiles : undefined,
-                  )
-                }
-                className="h-[222px] gap-3 rounded-lg border border-input bg-[#99999a] shadow-md transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 hover:border-ring/50"
-              >
-                <DropzoneEmptyState className="gap-3">
-                  <Upload className="size-12 text-[#545F71]" />
-                  <p className="text-base text-[#545F71]">
-                    Drag & Drop Files Here
-                  </p>
-                </DropzoneEmptyState>
-                <DropzoneContent className="gap-3">
-                  <Upload className="size-12 text-[#545F71]" />
-                  <p className="truncate text-base text-[#545F71]">
-                    {coverImage?.[0]?.name ?? 'Drag & Drop Files Here'}
-                  </p>
-                  <p className="text-sm text-[#545F71]">Click to replace</p>
-                </DropzoneContent>
-              </Dropzone>
-            </div>
+      <form
+        id="create-event-form"
+        onSubmit={handleSubmit(onSubmit)}
+        className="mt-6 ml-[56px] space-y-6"
+      >
+        {errorMessages.length > 0 && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Please resolve the following errors:</AlertTitle>
+            <AlertDescription>
+              <ul className="list-disc pl-5 mt-2">
+                {errorMessages.map((msg, idx) => (
+                  <li key={idx}>{msg}</li>
+                ))}
+              </ul>
+            </AlertDescription>
+          </Alert>
+        )}
 
-            {/* Project Name */}
-            <div className="space-y-2">
-              <Label
-                htmlFor="project-name"
-                className="text-base text-[#545F71]"
-              >
-                Project Name
-              </Label>
-              <Input
-                id="project-name"
-                {...register('name', { required: 'Project name is required' })}
-                className="h-12"
-              />
-              {errors.name && <ErrorAlert message={errors.name.message} />}
-            </div>
+        {/* Event Details Section */}
+        <Card className="rounded-xl border border-slate-300 p-0 gap-0">
+          {/* green section header */}
+          <div className="h-16 rounded-t-xl bg-[rgba(101,163,13,0.43)] px-8 flex items-center">
+            <h3>
+              Event Details
+            </h3>
+          </div>
 
-            {/* Project Description */}
-            <div className="space-y-2">
-              <Label
-                htmlFor="project-description"
-                className="text-base text-[#545F71]"
-              >
-                Project Description
-              </Label>
-              <Textarea
-                id="project-description"
-                {...register('description', {
-                  required: 'Description is required',
-                })}
-                className="h-[114px] resize-none"
-              />
-              {errors.description && (
-                <ErrorAlert message={errors.description.message} />
-              )}
-            </div>
+          <CardContent className="px-8 py-6">
+            <div className="grid grid-cols-2 gap-x-10 gap-y-5">
+              {/* Event Name */}
+              <div className="col-span-2 space-y-2">
+                <Label
+                  htmlFor="eventName"
+                  className="text-sm text-slate-600"
+                >
+                  Event Name
+                </Label>
+                <Input
+                  id="eventName"
+                  {...register('eventName', {
+                    required: 'Event name is required',
+                  })}
+                  className="h-12 rounded-md border-slate-500"
+                />
+              </div>
 
-            {/* Start Date & End Date */}
-            <div className="flex gap-3">
-              <div className=" flex-1 space-y-2">
-                <Label htmlFor="start-date">Start Date</Label>
+              {/* Event Status */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="eventStatus"
+                  className="text-sm text-slate-600"
+                >
+                  Event Status
+                </Label>
+                <Controller
+                  control={control}
+                  name="eventStatus"
+                  rules={{ required: 'Event status is required' }}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger className="items-center !h-12 w-full rounded-md border-slate-500 text-base md:text-sm">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {EVENT_STATUSES.map((status) => (
+                          <SelectItem
+                            key={status.value}
+                            value={status.value}
+                            className="h-12 text-md"
+                          >
+                            <div className="flex items-center gap-2">
+                              <div
+                                className={`size-2 rounded-full ${status.color}`}
+                              />
+                              {status.label}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+
+              {/* Location */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="location"
+                  className="text-sm text-slate-600"
+                >
+                  Location
+                </Label>
+                <Input
+                  id="location"
+                  {...register('location', { required: 'Location is required' })}
+                  className="h-12 rounded-md border-slate-500"
+                />
+              </div>
+
+              {/* Start Date */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="startDate"
+                  className="text-sm text-slate-600"
+                >
+                  Start Date
+                </Label>
                 <Controller
                   {...register('startDate', {
                     required: 'Start date is required',
@@ -143,89 +255,179 @@ export default function CreateEvent() {
                   control={control}
                   render={({ field }) => (
                     <DatePicker
-                      id="start-date"
+                      id="startDate"
                       value={field.value}
                       onChange={field.onChange}
                     />
                   )}
                 />
-                {errors.startDate && (
-                  <ErrorAlert message={errors.startDate.message} />
-                )}
               </div>
 
-              <div className="flex-1 space-y-2">
-                <Label htmlFor="end-date">End Date</Label>
+              {/* End Date */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="endDate"
+                  className="text-sm text-slate-600"
+                >
+                  End Date
+                </Label>
                 <Controller
                   {...register('endDate', { required: 'End date is required' })}
                   control={control}
                   render={({ field }) => (
                     <DatePicker
-                      id="end-date"
+                      id="endDate"
                       value={field.value}
                       onChange={field.onChange}
                     />
                   )}
                 />
-                {errors.endDate && (
-                  <ErrorAlert message={errors.endDate.message} />
-                )}
-              </div>
-            </div>
-
-            {/* Venue & Postal Code */}
-            <div className="flex gap-3">
-              <div className="flex-1 space-y-2">
-                <Label htmlFor="venue" className="text-base text-[#545F71]">
-                  Venue
-                </Label>
-                <Input
-                  id="venue"
-                  {...register('venue', { required: 'Venue is required' })}
-                  className="h-12 rounded-md border border-muted-foreground/30 p-3"
-                />
-                {errors.venue && <ErrorAlert message={errors.venue.message} />}
               </div>
 
-              <div className="flex-1 space-y-2">
+              {/* Event Description */}
+              <div className="space-y-2">
                 <Label
-                  htmlFor="postal-code"
-                  className="text-base text-[#545F71]"
+                  htmlFor="eventDescription"
+                  className="text-sm text-slate-600"
                 >
-                  Postal Code
+                  Event Description
                 </Label>
-                <Input
-                  id="postal-code"
-                  {...register('postalCode', {
-                    required: 'Postal code is required',
+                <Textarea
+                  id="eventDescription"
+                  {...register('eventDescription', {
+                    required: 'Description is required',
                   })}
-                  className="h-12 rounded-md border border-muted-foreground/30 p-3"
+                  className="h-40 resize-none rounded-md border-slate-500"
                 />
-                {errors.postalCode && (
-                  <ErrorAlert message={errors.postalCode.message} />
-                )}
+              </div>
+
+              {/* Upload Cover Image */}
+              <div className="space-y-2">
+                <Label className="text-sm text-slate-600">
+                  Upload Cover Image
+                </Label>
+                <Dropzone
+                  accept={{ 'image/*': [] }}
+                  maxFiles={1}
+                  src={coverImage}
+                  onDrop={(acceptedFiles) =>
+                    setCoverImage(acceptedFiles.length ? acceptedFiles : undefined)
+                  }
+                  className="h-40 rounded-md border-[3px] border-transparent !bg-[#969696]"
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='6' ry='6' stroke='%23BFBFBF' stroke-width='3' stroke-dasharray='16%2c 16' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e")`,
+                  }}
+                >
+                  <DropzoneEmptyState className="gap-2">
+                    <CloudUpload className="size-10 text-white/80" />
+                    <p className="text-sm leading-6 text-slate-50">
+                      Click to upload or drag and drop
+                    </p>
+                  </DropzoneEmptyState>
+                  <DropzoneContent className="gap-2">
+                    <CloudUpload className="size-10 text-white/80" />
+                    <p className="truncate text-sm leading-6 text-slate-50">
+                      {coverImage?.[0]?.name ?? 'Click to upload or drag and drop'}
+                    </p>
+                    <p className="text-xs text-white/70">Click to replace</p>
+                  </DropzoneContent>
+                </Dropzone>
               </div>
             </div>
+          </CardContent>
+        </Card>
 
-            {/* Server errors (if any) */}
-            {error && <ErrorAlert message={error} />}
+        {/* Volunteer Coordinators Section */}
+        <Card className="gap-0 rounded-xl border border-slate-300 p-0">
+          <div className="flex h-16 items-center justify-between rounded-t-xl bg-[rgba(101,163,13,0.43)] px-8">
+            <h3>
+              Volunteer Coordinators
+            </h3>
+            <Button
+              type="button"
+              className="h-9 w-auto rounded-md bg-[#5f733c] px-4 py-3 text-base font-semibold hover:bg-[#4d5e30]"
+              onClick={() => append({ name: '', role: '' })}
+            >
+              + Add Volunteer
+            </Button>
+          </div>
 
-            {/* Action Buttons */}
-            <div className="flex justify-end gap-[10px] pt-2">
-              <Button
-                variant="outline"
-                className="h-[42px] w-[154px] rounded-md border border-muted-foreground/30 px-4 py-3 text-base"
-                onClick={() => navigate({ to: '/events' })}
-              >
-                Cancel
-              </Button>
-              <Button className="h-[42px] w-[154px] rounded-md bg-[#545F71] px-4 py-3 text-base font-semibold">
-                Save & Publish
-              </Button>
+          <CardContent className="px-8 py-6">
+            <div className="flex flex-col gap-6">
+              {fields.map((field, index) => (
+                <div key={field.id} className="grid grid-cols-2 gap-x-10">
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor={`coordinators.${index}.name`}
+                      className="text-sm text-slate-600"
+                    >
+                      Name of Volunteer Coordinator
+                    </Label>
+                    <Input
+                      id={`coordinators.${index}.name`}
+                      {...register(`coordinators.${index}.name` as const)}
+                      className="h-12 rounded-md border-slate-500"
+                    />
+                  </div>
+                  <div className="flex items-end gap-2">
+                    <div className="w-full space-y-2">
+                      <Label
+                        htmlFor={`coordinators.${index}.role`}
+                        className="text-sm text-slate-600"
+                      >
+                        Role
+                      </Label>
+                      <Input
+                        id={`coordinators.${index}.role`}
+                        {...register(`coordinators.${index}.role` as const)}
+                        className="h-12 rounded-md border-slate-500"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="mb-1 size-10 text-red-500 hover:bg-red-50 hover:text-red-700"
+                      onClick={() => remove(index)}
+                    >
+                      <Trash2 className="size-5" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
       </form>
+
+      <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+        <DialogContent className="bg-[#BDD797] border-slate-600">
+          <DialogHeader className="text-center sm:text-center">
+            <h2>Are you sure?</h2>
+            <p>
+              You have unsaved changes. Are you sure you want to leave?
+            </p>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-center gap-[10px]">
+            <Button
+              className="h-10 w-34 rounded-md bg-[#5f733c] text-base font-semibold text-white hover:bg-[#4d5e30]"
+              onClick={() => setShowExitDialog(false)}
+            >
+              Stay
+            </Button>
+            <Button
+              variant="outline"
+              className="h-10 w-34 rounded-md border border-[#5f733c] bg-transparent text-base font-semibold text-[#5f733c] hover:bg-[#5f733c]/10"
+              onClick={() => {
+                setShowExitDialog(false)
+                navigate({ to: '/events' })
+              }}
+            >
+              Leave
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
