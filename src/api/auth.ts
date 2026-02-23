@@ -1,10 +1,14 @@
 import type { SignUpPostData, UserAccount } from '@/types/auth'
-import { api } from './baseApi'
+import axios from 'axios'
+
+const BASE_URL = import.meta.env.VITE_BACKEND_URL
 
 /**
  * Signs up a new user
  */
-export async function signUpUser(signUpData: SignUpPostData): Promise<UserAccount> {
-  const res = await api.post('/auth/signup', signUpData)
+export async function signUpUser(
+  signUpData: SignUpPostData,
+): Promise<UserAccount> {
+  const res = await axios.post(`${BASE_URL}/auth/signup`, signUpData)
   return res.data
 }
