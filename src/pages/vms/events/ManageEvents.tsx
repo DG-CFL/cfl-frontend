@@ -9,7 +9,7 @@ import { PlusCircle } from 'lucide-react'
 export default function ManageEvents() {
   const { data: events, isLoading} = useGetEvents()
 
-  if (isLoading || !events) {
+  if (isLoading) {
     return <LoadingSkeleton/>
   }
 
@@ -29,7 +29,7 @@ export default function ManageEvents() {
       </div>
 
       <div className="grid gap-x-10 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
-        {events.map((event) => (
+        {events?.map((event) => (
           <EventCard
             key={event.id}
             id={event.id}
