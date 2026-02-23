@@ -9,6 +9,6 @@ const BASE_URL = import.meta.env.VITE_BACKEND_URL
 export async function signUpUser(
   signUpData: SignUpPostData,
 ): Promise<UserAccount> {
-  const res = await axios.post(`${BASE_URL}/auth/signup`, signUpData)
+  const res = await axios.post(`${BASE_URL}/api/auth/signup`, signUpData)
   return res.data
 }
