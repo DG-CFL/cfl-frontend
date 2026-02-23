@@ -1,10 +1,18 @@
 import { Button } from '@/components/ui/button'
 import { EventCard } from '@/components/ui_custom/EventCard'
 import { eventListData } from '@/data/events'
+import { useGetEvents } from '@/operations/events'
+import LoadingSkeleton from '@/pages/LoadingSkeleton'
 import { Link } from '@tanstack/react-router'
 import { PlusCircle } from 'lucide-react'
 
 export default function ManageEvents() {
+  const { data: events, isLoading} = useGetEvents()
+
+  if (isLoading || !events) {
+    return <LoadingSkeleton/>
+  }
+
   return (
     <div className="mx-auto w-full space-y-12 px-10 py-14 md:max-w-[calc(403px*2+24px)] xl:max-w-[calc(403px*3+24px*2)]">
       <div className="flex items-center justify-between">
@@ -21,7 +29,7 @@ export default function ManageEvents() {
       </div>
 
       <div className="grid gap-x-10 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
-        {eventListData.map((event) => (
+        {events.map((event) => (
           <EventCard
             key={event.id}
             id={event.id}

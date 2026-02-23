@@ -6,19 +6,16 @@ import { eventData, eventListData } from '@/data/events'
  * Returns the list of all events
  */
 export async function getEvents(): Promise<Event[]> {
-  // const res = await api.get("/events")
-  // return res.data
-  return eventListData
+  const res = await api.get("/events")
+  return res.data
 }
 
 /**
  * Returns an event
  */
 export async function getEvent(eventId: number): Promise<Event> {
-  // TODO: Replace with actual API call when backend is ready
-  // const res = await api.get(`/events/${eventId}`)
-  // return res.data
-  return eventData
+  const res = await api.get(`/events/${eventId}`)
+  return res.data
 }
 
 /**
