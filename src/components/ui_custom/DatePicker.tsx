@@ -111,7 +111,7 @@ export function DatePicker({
   }
 
   return (
-    <div className="relative w-48">
+    <div className="relative w-full">
       <Input
         id={id}
         value={inputValue}
@@ -120,7 +120,7 @@ export function DatePicker({
         placeholder={placeholder}
         maxLength={10}
         inputMode="numeric"
-        className="h-12 pr-12 text-base"
+        className="h-[48px] w-full border-[#545f71] rounded-[6px] pr-12 text-base"
         aria-label="Date input"
       />
       <Popover open={open} onOpenChange={setOpen}>

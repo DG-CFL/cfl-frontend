@@ -11,7 +11,11 @@ import {
   registerEventRoute,
   viewEventRoute,
 } from './vms/events'
-import { volunteerPageRoute } from './vms/volunteers'
+import { 
+  createEmailRoute,
+  volunteersLayoutRoute,
+  volunteerPageRoute
+} from './vms/volunteers'
 import {
   authLayoutRoute,
   signUpRoute,
@@ -29,7 +33,7 @@ import { landingPageRoute } from './vms'
 
 export const rootRoute = createRootRoute({
   component: () => (
-    <div className="flex">
+    <div className="flex-1">
       <Outlet />
       <TanStackRouterDevtools />
     </div>
@@ -50,7 +54,10 @@ const routeTree = rootRoute.addChildren([
     ]),
     calendarPageRoute,
     landingPageRoute,
-    volunteerPageRoute,
+    volunteersLayoutRoute.addChildren([
+      volunteerPageRoute,
+      createEmailRoute
+    ]),
     analyticsPageRoute,
   ]),
   authLayoutRoute.addChildren([
