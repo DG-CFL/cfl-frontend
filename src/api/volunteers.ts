@@ -4,31 +4,31 @@ import { api } from './baseApi'
 // Returns a list of volunteers
 // TODO: Accept params for filtering, sorting and pagination
 export async function getVolunteers(): Promise<Volunteer[]> {
-  const res = await api.get('/volunteers')
+  const res = await api.get('/vms/volunteers')
   return res.data
 }
 
 // Returns a volunteer specified by the volunteerId
 export async function getVolunteer(volunteerId: number): Promise<Volunteer> {
-  const res = await api.get(`/volunteers/${volunteerId}`)
+  const res = await api.get(`/vms/volunteers/${volunteerId}`)
   return res.data
 }
 
 // Returns the list of the specified volunteer's certifications
 export async function getVolunteerCertifications(volunteerId: number): Promise<VolunteerCertification> {
-  const res = await api.get(`/volunteers/${volunteerId}/certifications`)
+  const res = await api.get(`/vms/volunteers/${volunteerId}/certifications`)
   return res.data
 }
 
 // Returns the list of events attended by the specified volunteer
 export async function getVolunteerHistory(volunteerId: number): Promise<VolunteerEvent> {
-  const res = await api.get(`/volunteers/${volunteerId}/history`)
+  const res = await api.get(`/vms/volunteers/${volunteerId}/history`)
   return res.data
 }
 
 // Deletes all volunteers specified by the list of volunteerIds
 export async function deleteVolunteers(volunteerIds: number[]) {
-  await api.delete('/volunteers', {
+  await api.delete('/vms/volunteers', {
     data: { ids: volunteerIds },
   })
 }
