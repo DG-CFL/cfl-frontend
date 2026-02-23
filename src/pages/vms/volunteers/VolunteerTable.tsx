@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import {
   flexRender,
@@ -284,9 +284,10 @@ export function VolunteerTable({ setClickedRow }: VolunteerTableProps) {
   const [rowSelection, setRowSelection] = useState({})
 
   const { data: volunteers } = useGetVolunteers()
+  const data = useMemo(() => volunteers ?? [], [volunteers])
 
   const table = useReactTable({
-    data: volunteers || [],
+    data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
