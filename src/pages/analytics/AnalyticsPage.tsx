@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Download, Plus, ArrowUp, ArrowDown } from "lucide-react";
+import { useGetAnalytics } from "@/operations/analytics";
 
 interface MetricCardProps {
   title: string;
@@ -287,13 +288,18 @@ function CertificationsChart() {
 }
 
 export default function AnalyticsPage() {
+  const {data: analytics, isLoading } = useGetAnalytics()
+
+  console.log(analytics)
+
+
   const [timePeriod, setTimePeriod] = useState("this-year");
 
   return (
     <div className="w-full min-h-screen bg-[#F7F7F7] p-6">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
-        <h1 className="text-4xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-4xl font-bold text-gray-900">Analytics</h1>
         <div className="flex flex-wrap items-center gap-3">
           <Select value={timePeriod} onValueChange={setTimePeriod}>
             <SelectTrigger 
