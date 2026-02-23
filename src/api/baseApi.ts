@@ -1,4 +1,4 @@
-import axios, { type AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import { getAuth } from 'firebase/auth'
 import { camelToSnake, snakeToCamel } from './utils/utils'
 
