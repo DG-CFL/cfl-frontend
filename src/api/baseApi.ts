@@ -3,7 +3,7 @@ import { getAuth } from 'firebase/auth'
 import { camelToSnake, snakeToCamel } from './utils/utils'
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL + "/api/v1",
+  baseURL: import.meta.env.VITE_BACKEND_URL + "/api",
   headers: {}, withCredentials: true 
 })
 
