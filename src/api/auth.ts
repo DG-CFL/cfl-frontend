@@ -7,6 +7,6 @@ import { api } from './baseApi'
 export async function signUpUser(
   signUpData: SignUpPostData,
 ): Promise<UserAccount> {
-  const res = await api.post('/auth/signup')
+  const res = await api.post('/auth/signup', signUpData)
   return res.data
 }
