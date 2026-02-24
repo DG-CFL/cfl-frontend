@@ -62,13 +62,13 @@ export default function EditEvent() {
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
     defaultValues: {
-      eventName: '',
+      name: '',
       eventStatus: '',
-      location: '',
+      venue: '',
       startDate: new Date(),
       endDate: new Date(),
-      eventDescription: '',
-      coordinators: [{ name: '', role: '' }],
+      description: '',
+      trainers: [{ name: '', role: '' }],
     },
   })
 
@@ -86,13 +86,13 @@ export default function EditEvent() {
   useEffect(() => {
     if (eventData) {
       reset({
-        eventName: eventData.name,
+        name: eventData.name,
         eventStatus: eventData.status,
-        location: eventData.location,
+        venue: eventData.location,
         startDate: new Date(eventData.startDate),
         endDate: new Date(eventData.endDate),
-        eventDescription: eventData.description,
-        coordinators: eventData.coordinators.length > 0 
+        description: eventData.description,
+        trainers: eventData.coordinators.length > 0 
           ? eventData.coordinators 
           : [{ name: '', role: '' }],
       })

@@ -19,16 +19,14 @@ export type Event = {
   volunteers: Array<Person>
 }
 
-// may need to change
 export type EventPostData = {
-  eventName: string
-  eventStatus: string
-  location: string
+  name: string
+  description: string
   startDate: Date
   endDate: Date
-  eventDescription: string
+  venue: string
   coverImage?: string
-  coordinators: Array<Person>
+  trainers: Array<Person>
 }
 
 export type EventPutData = EventPostData 
