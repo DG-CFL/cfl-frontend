@@ -28,3 +28,7 @@ export const CALENDAR_FILTERS: Array<{ id: CalendarCategory; label: string }> = 
   { id: 'event', label: 'Events' },
   { id: 'training', label: 'Trainings' },
 ]
+
+export const getEventColor = (category: CalendarCategory) => {
+  return STATUS_COLORS[category] || { background: '#E5E7EB', text: '#374151' }
+}

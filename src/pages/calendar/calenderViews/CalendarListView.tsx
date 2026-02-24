@@ -1,6 +1,6 @@
 import { format, isSameMonth } from 'date-fns'
 import { Clock, MapPin, User } from 'lucide-react'
-import type { CalendarCategory, CalendarCategoryColors } from '@/pages/calendar/SampleCalendarData'
+import { getEventColor, type CalendarCategory, type CalendarCategoryColors } from '@/pages/calendar/SampleCalendarData'
 import type { Event } from '@/types/events'
 
 type CalendarEventListViewProps = {
@@ -46,7 +46,7 @@ const CalendarListView = ({ events, colors, selectedDate }: CalendarEventListVie
                 {/* Events Column */}
                 <div className="flex-1 space-y-3">
                   {events.map((event) => {
-                    const color = colors[event.status as CalendarCategory]
+                    const color = getEventColor(event.category)
                     
                     return (
                       <div
