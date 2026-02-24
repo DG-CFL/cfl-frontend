@@ -65,7 +65,8 @@ const CalendarPage = () => {
 
   const { data: events, isLoading, isError } = useGetEvents()
 
-  const filteredEvents = events?.filter((event) => activeFilters.includes(event.category)) ?? []
+  // const filteredEvents = events?.filter((event) => activeFilters.includes(event.category)) ?? []
+  const filteredEvents = events ?? [];
 
   const handleSelectDate = (date: Date) => {
     setSelectedDate(date)
