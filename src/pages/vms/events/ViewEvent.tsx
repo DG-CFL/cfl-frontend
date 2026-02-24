@@ -133,7 +133,7 @@ export default function ViewEvent() {
           <div className="space-y-6">
             <h2>Volunteer Coordinators</h2>
             <div className="space-y-5">
-              {data.coordinators.map((person) => (
+              {data.volunteerCoordinators.map((person) => (
                 <PersonListItem key={person.role} person={person} />
               ))}
             </div>

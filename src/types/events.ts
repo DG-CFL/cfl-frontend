@@ -15,7 +15,7 @@ export type Event = {
   startDate: Date
   endDate: Date
   description: string
-  coordinators: Array<Person>
+  volunteerCoordinators: Array<Person>
   volunteers: Array<Person>
 }
 

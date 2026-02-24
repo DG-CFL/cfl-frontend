@@ -90,8 +90,8 @@ export default function EditEvent() {
         startDate: new Date(eventData.startDate),
         endDate: new Date(eventData.endDate),
         description: eventData.description,
-        trainers: eventData.coordinators.length > 0 
-          ? eventData.coordinators 
+        trainers: eventData.volunteerCoordinators.length > 0 
+          ? eventData.volunteerCoordinators 
           : [{ name: '', role: '' }],
       })
     }
