@@ -63,7 +63,6 @@ export default function EditEvent() {
     reValidateMode: 'onSubmit',
     defaultValues: {
       name: '',
-      eventStatus: '',
       venue: '',
       startDate: new Date(),
       endDate: new Date(),
@@ -75,7 +74,7 @@ export default function EditEvent() {
   // Field Array Coordinators
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'coordinators',
+    name: 'trainers',
   })
 
   const errorMessages = Object.values(errors)
@@ -87,7 +86,6 @@ export default function EditEvent() {
     if (eventData) {
       reset({
         name: eventData.name,
-        eventStatus: eventData.status,
         venue: eventData.location,
         startDate: new Date(eventData.startDate),
         endDate: new Date(eventData.endDate),
@@ -205,53 +203,15 @@ export default function EditEvent() {
                 </Label>
                 <Input
                   id="eventName"
-                  {...register('eventName', {
+                  {...register('name', {
                     required: 'Event name is required',
                   })}
                   className="h-12 rounded-md border-slate-500"
                 />
               </div>
 
-              {/* Event Status */}
-              <div className="space-y-2">
-                <Label
-                  htmlFor="eventStatus"
-                  className="text-sm text-slate-600"
-                >
-                  Event Status
-                </Label>
-                <Controller
-                  control={control}
-                  name="eventStatus"
-                  rules={{ required: 'Event status is required' }}
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="items-center !h-12 w-full rounded-md border-slate-500 text-base md:text-sm">
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {EVENT_STATUSES.map((status) => (
-                          <SelectItem
-                            key={status.value}
-                            value={status.value}
-                            className="h-12 text-md"
-                          >
-                            <div className="flex items-center gap-2">
-                              <div
-                                className={`size-2 rounded-full ${status.color}`}
-                              />
-                              {status.label}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
-
               {/* Location */}
-              <div className="space-y-2">
+              <div className="col-span-2 space-y-2">
                 <Label
                   htmlFor="location"
                   className="text-sm text-slate-600"
@@ -260,7 +220,7 @@ export default function EditEvent() {
                 </Label>
                 <Input
                   id="location"
-                  {...register('location', { required: 'Location is required' })}
+                  {...register('venue', { required: 'Location is required' })}
                   className="h-12 rounded-md border-slate-500"
                 />
               </div>
@@ -319,7 +279,7 @@ export default function EditEvent() {
                 </Label>
                 <Textarea
                   id="eventDescription"
-                  {...register('eventDescription', {
+                  {...register('description', {
                     required: 'Description is required',
                   })}
                   className="h-40 resize-none rounded-md border-slate-500"
@@ -383,28 +343,28 @@ export default function EditEvent() {
                 <div key={field.id} className="grid grid-cols-2 gap-x-10">
                   <div className="space-y-2">
                     <Label
-                      htmlFor={`coordinators.${index}.name`}
+                      htmlFor={`trainers.${index}.name`}
                       className="text-sm text-slate-600"
                     >
                       Name of Volunteer Coordinator
                     </Label>
                     <Input
-                      id={`coordinators.${index}.name`}
-                      {...register(`coordinators.${index}.name` as const)}
+                      id={`trainers.${index}.name`}
+                      {...register(`trainers.${index}.name` as const)}
                       className="h-12 rounded-md border-slate-500"
                     />
                   </div>
                   <div className="flex items-end gap-2">
                     <div className="w-full space-y-2">
                       <Label
-                        htmlFor={`coordinators.${index}.role`}
+                        htmlFor={`trainers.${index}.role`}
                         className="text-sm text-slate-600"
                       >
                         Role
                       </Label>
                       <Input
-                        id={`coordinators.${index}.role`}
-                        {...register(`coordinators.${index}.role` as const)}
+                        id={`trainers.${index}.role`}
+                        {...register(`trainers.${index}.role` as const)}
                         className="h-12 rounded-md border-slate-500"
                       />
                     </div>

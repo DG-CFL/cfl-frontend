@@ -319,7 +319,7 @@ export default function CreateEvent() {
                 <div key={field.id} className="grid grid-cols-2 gap-x-10">
                   <div className="space-y-2">
                     <Label
-                      htmlFor={`coordinators.${index}.name`}
+                      htmlFor={`trainers.${index}.name`}
                       className="text-sm text-slate-600"
                     >
                       Name of Volunteer Coordinator
