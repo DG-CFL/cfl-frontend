@@ -6,7 +6,7 @@ export type Person = {
 export type EventCategory = 'event' | 'training'
 
 export type Event = {
-  id: number
+  eventId: number
   name: string
   status: string
   category: EventCategory

@@ -28,10 +28,10 @@ const CalendarMonthView = ({
           return (
             <Link
               to="/events/$eventId/view"
-              params={{ eventId: event.id.toString() }}
+              params={{ eventId: event.eventId.toString() }}
             >
               <span
-                key={event.id}
+                key={event.eventId}
                 className="flex items-center truncate rounded-md px-2 py-1 font-poppins text-xs font-medium leading-4"
                 style={{
                   backgroundColor: palette.background,

@@ -28,7 +28,7 @@ export const getDayEventsLayout = (
         start: startMinutes,
         end: endMinutes,
         duration: endMinutes - startMinutes,
-        id: event.id,
+        id: event.eventId,
       }
     })
     .sort((a, b) => {

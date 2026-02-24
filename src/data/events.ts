@@ -2,7 +2,7 @@ import type { Event } from "@/types/events"
 
 export const eventListData: Array<Event> = [
   {
-    id: 1,
+    eventId: 1,
     name: 'Community Charity Gala',
     status: 'Active',
     location: 'Harborview Conference Center, Seattle, WA, 98101',
@@ -23,7 +23,7 @@ export const eventListData: Array<Event> = [
     category: 'training',
   },
   {
-    id: 2,
+    eventId: 2,
     name: 'Youth Leadership Summit',
     status: 'Active',
     location: 'Northside Innovation Hub, Austin, TX, 78701',
@@ -44,7 +44,7 @@ export const eventListData: Array<Event> = [
     category: 'event',
   },
   {
-    id: 3,
+    eventId: 3,
     name: 'Spring Volunteer Drive',
     status: 'Active',
     location: 'Civic Green Park, Denver, CO, 80202',
@@ -65,7 +65,7 @@ export const eventListData: Array<Event> = [
     category: 'training',
   },
   {
-    id: 4,
+    eventId: 4,
     name: 'Community Arts Festival',
     status: 'Active',
     location: 'Riverside Pavilion, Portland, OR, 97201',
@@ -86,7 +86,7 @@ export const eventListData: Array<Event> = [
     category: 'event',
   },
   {
-    id: 5,
+    eventId: 5,
     name: 'Neighborhood Cleanup Day',
     status: 'Active',
     location: 'Central Plaza, Chicago, IL, 60601',
@@ -107,7 +107,7 @@ export const eventListData: Array<Event> = [
     category: 'training',
   },
   {
-    id: 6,
+    eventId: 6,
     name: 'Annual Donor Reception',
     status: 'Active',
     location: 'Skyline Terrace, New York, NY, 10001',
@@ -130,7 +130,7 @@ export const eventListData: Array<Event> = [
 ]
 
 export const eventData: Event = {
-  id: 1,
+  eventId: 1,
   name: 'Event Name',
   status: 'Active',
   location: 'Orchard Central, Somerset, 666666',

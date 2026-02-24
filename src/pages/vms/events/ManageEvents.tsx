@@ -31,8 +31,8 @@ export default function ManageEvents() {
       <div className="grid gap-x-10 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
         {events?.map((event) => (
           <EventCard
-            key={event.id}
-            id={event.id}
+            key={event.eventId}
+            id={event.eventId}
             name={event.name}
             location={event.location}
             dateRange={`${event.startDate} – ${event.endDate}`}

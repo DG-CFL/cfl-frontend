@@ -50,7 +50,7 @@ const CalendarListView = ({ events, colors, selectedDate }: CalendarEventListVie
                     
                     return (
                       <div
-                        key={event.id}
+                        key={event.eventId}
                         className="flex items-center gap-4 rounded-lg border border-[#9CA3AF] bg-white p-4 shadow-sm transition-all hover:shadow-md"
                       >
                         {/* Color Strip */}
