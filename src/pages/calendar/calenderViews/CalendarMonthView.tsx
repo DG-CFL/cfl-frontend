@@ -1,6 +1,7 @@
-import type {
-  CalendarCategory,
-  CalendarCategoryColors,
+import {
+  getEventColor,
+  type CalendarCategory,
+  type CalendarCategoryColors,
 } from '../SampleCalendarData'
 import { CalendarBody, CalendarHeader } from '@/components/ui/calendarpage'
 import type { Event } from '@/types/events'
@@ -23,7 +24,7 @@ const CalendarMonthView = ({
       <CalendarHeader className="border-t border-muted-foreground/20 bg-white" />
       <CalendarBody events={events} selectedDate={selectedDate}>
         {({ event }) => {
-          const palette = colors[event.category]
+          const color = getEventColor(event.category)
 
           return (
             <Link
@@ -34,8 +35,8 @@ const CalendarMonthView = ({
                 key={event.eventId}
                 className="flex items-center truncate rounded-md px-2 py-1 font-poppins text-xs font-medium leading-4"
                 style={{
-                  backgroundColor: palette.background,
-                  color: palette.text,
+                  backgroundColor: color.background,
+                  color: color.text,
                 }}
               >
                 {event.name}
