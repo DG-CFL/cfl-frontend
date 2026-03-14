@@ -6,6 +6,10 @@ type ErrorAlertProps = {
 }
 
 export function ErrorAlert({ message }: ErrorAlertProps) {
+
+  if (message && message.includes('email-already-in-use')) {
+    message = "This user already exists";
+  }
   return (
     <Alert variant={'destructive'} className='text-left'>
       <AlertCircleIcon />
