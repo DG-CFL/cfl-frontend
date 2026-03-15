@@ -85,10 +85,10 @@ const CalendarDayView = ({
                   return (
                     <Link
                       to="/events/$eventId/view"
-                      params={{ eventId: event.id }}
+                      params={{ eventId: event.eventId.toString() }}
                     >
                       <div
-                        key={event.id}
+                        key={event.eventId}
                         className={cn(
                           'absolute flex overflow-hidden rounded-md shadow-sm ring-1 ring-black/5 transition-all hover:z-10 hover:shadow-md',
                           isShortEvent
