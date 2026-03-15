@@ -9,7 +9,6 @@ import {
   useCalendarMonth,
   useCalendarYear,
 } from '@/components/ui/calendarpage'
-import { ErrorAlert } from '@/components/ui_custom/ErrorAlert'
 import { useGetEvents } from '@/operations/events'
 import type {
   CalendarDisplayMode,
@@ -23,6 +22,7 @@ import CalendarListView from './calenderViews/CalendarListView'
 import CalendarMonthView from './calenderViews/CalendarMonthView'
 import CalendarWeekView from './calenderViews/CalendarWeekView'
 import CalendarYearView from './calenderViews/CalendarYearView'
+import { parseCalendarEvents } from './CalendarParser'
 import type { CalendarCategory } from './SampleCalendarData'
 import {
   CALENDAR_FILTERS,
@@ -63,10 +63,19 @@ const CalendarPage = () => {
     [month, year],
   )
 
-  const { data: events, isLoading, isError } = useGetEvents()
+  const { data: eventsData, isLoading, isError } = useGetEvents()
 
-  // const filteredEvents = events?.filter((event) => activeFilters.includes(event.category)) ?? []
-  const filteredEvents = events ?? [];
+  const normalizedEvents = useMemo(() => {
+    if (isError) {
+      return []
+    }
+
+    return parseCalendarEvents(eventsData as unknown)
+  }, [eventsData, isError])
+
+  const filteredEvents = normalizedEvents.filter((event) =>
+    activeFilters.includes(event.category),
+  )
 
   const handleSelectDate = (date: Date) => {
     setSelectedDate(date)
@@ -171,10 +180,6 @@ const CalendarPage = () => {
 
   if (isLoading) {
     return <LoadingSkeleton />
-  }
-
-  if (isError) {
-    return <ErrorAlert />
   }
 
   return (
