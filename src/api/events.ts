@@ -1,6 +1,5 @@
 import type { Event, EventPostData, EventPutData, EventRegistrationPostData } from '@/types/events'
 import { api } from './baseApi'
-import { eventData, eventListData } from '@/data/events'
 
 const baseUrl = '/v1'
 
