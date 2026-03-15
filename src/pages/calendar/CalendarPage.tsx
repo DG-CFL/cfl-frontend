@@ -9,7 +9,6 @@ import {
   useCalendarMonth,
   useCalendarYear,
 } from '@/components/ui/calendarpage'
-import { ErrorAlert } from '@/components/ui_custom/ErrorAlert'
 import { useGetEvents } from '@/operations/events'
 import type {
   CalendarDisplayMode,
@@ -66,7 +65,7 @@ const CalendarPage = () => {
   const { data: events, isLoading, isError } = useGetEvents()
 
   // const filteredEvents = events?.filter((event) => activeFilters.includes(event.category)) ?? []
-  const filteredEvents = events ?? [];
+  const filteredEvents = isError ? [] : (events ?? [])
 
   const handleSelectDate = (date: Date) => {
     setSelectedDate(date)
@@ -171,10 +170,6 @@ const CalendarPage = () => {
 
   if (isLoading) {
     return <LoadingSkeleton />
-  }
-
-  if (isError) {
-    return <ErrorAlert />
   }
 
   return (
