@@ -2,6 +2,11 @@ import { addDays, addWeeks, format, subDays, subWeeks } from 'date-fns'
 import { Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
+import {
+  CALENDAR_FILTERS,
+  STATUS_COLORS
+} from './SampleCalendarData'
+import type { CalendarCategory } from './SampleCalendarData'
 import { Button } from '@/components/ui/button'
 import type { CalendarState } from '@/components/ui/calendarpage'
 import {
@@ -23,11 +28,6 @@ import CalendarListView from './calenderViews/CalendarListView'
 import CalendarMonthView from './calenderViews/CalendarMonthView'
 import CalendarWeekView from './calenderViews/CalendarWeekView'
 import CalendarYearView from './calenderViews/CalendarYearView'
-import type { CalendarCategory } from './SampleCalendarData'
-import {
-  CALENDAR_FILTERS,
-  STATUS_COLORS
-} from './SampleCalendarData'
 
 const CalendarPage = () => {
   const [view, setView] = useState<CalendarViewOption>('month')
@@ -169,14 +169,6 @@ const CalendarPage = () => {
 
   const showSidebar = mode === 'grid' && (view === 'month' || view === 'year')
 
-  if (isLoading) {
-    return <LoadingSkeleton />
-  }
-
-  if (isError) {
-    return <ErrorAlert />
-  }
-
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background">
       {showSidebar && (
@@ -211,7 +203,13 @@ const CalendarPage = () => {
                 />
               </div>
               <div className="flex-1 min-h-0 px-6 pb-6">
-                {renderActiveView()}
+                {isError ? (
+                  <ErrorAlert />
+                ) : isLoading ? (
+                  <LoadingSkeleton variant="inline" className="min-h-[400px]" />
+                ) : (
+                  renderActiveView()
+                )}
               </div>
             </main>
           </CalendarProvider>
