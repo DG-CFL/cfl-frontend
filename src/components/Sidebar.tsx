@@ -1,5 +1,5 @@
 import { useState, useEffect, type CSSProperties } from "react"
-import { Link } from "@tanstack/react-router"
+import { Link, useNavigate } from "@tanstack/react-router"
 import {
   Home,
   Calendar,
@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react"
+import { getAuth, signOut } from "firebase/auth"
 
 type Item = {
   label: string
@@ -37,6 +38,17 @@ export default function Sidebar() {
   const [expanded, setExpanded] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
   const collapsed = !expanded || isMobile
+    const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    try {
+      const auth = getAuth()
+      await signOut(auth)
+      navigate({ to: '/login' })
+    } catch (error) {
+      console.error('Error signing out:', error)
+    }
+  }
 
   useEffect(() => {
     const checkMobile = () => {
@@ -114,9 +126,9 @@ export default function Sidebar() {
             }}
           />
           {collapsed ? (
-            <CollapsedBottom items={BOTTOM} />
+            <CollapsedBottom items={BOTTOM} onLogout={handleLogout} />
           ) : (
-            <ExpandedBottom items={BOTTOM} />
+            <ExpandedBottom items={BOTTOM} onLogout={handleLogout} />
           )}
         </div>
       </aside>
@@ -254,17 +266,29 @@ function CollapsedTopItem({ item }: { item: Item }) {
   )
 }
 
-function ExpandedBottom({ items }: { items: Item[] }) {
+function ExpandedBottom({
+  items,
+  onLogout,
+}: {
+  items: Item[]
+  onLogout: () => void
+}) {
   return (
     <div style={{ padding: "0 6px" }}>
       {items.map((it) => (
-        <ExpandedBottomItem key={it.to} item={it} />
+        <ExpandedBottomItem key={it.to} item={it} onLogout={onLogout} />
       ))}
     </div>
   )
 }
 
-function ExpandedBottomItem({ item }: { item: Item }) {
+function ExpandedBottomItem({
+  item,
+  onLogout,
+}: {
+  item: Item
+  onLogout: () => void
+}) {
   const Icon = item.icon
 
   const base: CSSProperties = {
@@ -288,6 +312,28 @@ function ExpandedBottomItem({ item }: { item: Item }) {
     background: "#E6E8EB",
   }
 
+    if (item.label === "Sign Out") {
+    return (
+      <button
+        type="button"
+        onClick={onLogout}
+        style={{
+          ...base,
+          width: "100%",
+          border: "none",
+          cursor: "pointer",
+          textAlign: "left",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <Icon size={18} />
+          <span>{item.label}</span>
+        </div>
+        <span style={{ fontSize: 16, opacity: 0.6 }}>›</span>
+      </button>
+    )
+  }
+
   return (
     <Link
       to={item.to}
@@ -305,7 +351,13 @@ function ExpandedBottomItem({ item }: { item: Item }) {
   )
 }
 
-function CollapsedBottom({ items }: { items: Item[] }) {
+function CollapsedBottom({
+  items,
+  onLogout,
+}: {
+  items: Item[]
+  onLogout: () => void
+}) {
   return (
     <div
       style={{
@@ -316,13 +368,19 @@ function CollapsedBottom({ items }: { items: Item[] }) {
       }}
     >
       {items.map((it) => (
-        <CollapsedBottomItem key={it.to} item={it} />
+        <CollapsedBottomItem key={it.to} item={it} onLogout={onLogout} />
       ))}
     </div>
   )
 }
 
-function CollapsedBottomItem({ item }: { item: Item }) {
+function CollapsedBottomItem({
+  item,
+  onLogout,
+}: {
+  item: Item
+  onLogout: () => void
+}) {
   const Icon = item.icon
 
   const base: CSSProperties = {
@@ -339,6 +397,24 @@ function CollapsedBottomItem({ item }: { item: Item }) {
     ...base,
     color: "#0E121B",
     opacity: 1,
+  }
+
+  if (item.label === "Sign Out") {
+    return (
+      <button
+        type="button"
+        onClick={onLogout}
+        style={{
+          ...base,
+          border: "none",
+          background: "transparent",
+          cursor: "pointer",
+        }}
+        title={item.label}
+      >
+        <Icon size={18} />
+      </button>
+    )
   }
 
   return (
