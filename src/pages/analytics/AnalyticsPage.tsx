@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -315,11 +316,14 @@ export default function AnalyticsPage() {
               <SelectItem value="last-3-months">Last 3 Months</SelectItem>
             </SelectContent>
           </Select>
-          <Button 
+          <Button
+            asChild
             className="h-9 bg-white border border-gray-300 text-gray-600 hover:bg-gray-50 rounded-lg px-4 text-sm font-normal shadow-none"
           >
-            <Plus className="w-4 h-4 mr-2 text-gray-600" />
-            Create Custom Report
+            <Link to="/create-custom-report">
+              <Plus className="w-4 h-4 mr-2 text-gray-600" />
+              Create Custom Report
+            </Link>
           </Button>
           <Button 
             className="h-9 bg-[#6B7C3F] hover:bg-[#5a6a35] text-white border-0 rounded-lg px-4 text-sm font-normal shadow-none"
