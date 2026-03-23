@@ -30,5 +30,5 @@ export const CALENDAR_FILTERS: Array<{ id: CalendarCategory; label: string }> = 
 ]
 
 export const getEventColor = (category: CalendarCategory) => {
-  return STATUS_COLORS[category] || { background: '#E5E7EB', text: '#374151' }
+  return STATUS_COLORS[category]
 }

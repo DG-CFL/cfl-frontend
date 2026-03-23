@@ -2,25 +2,6 @@ import { addDays, addWeeks, format, subDays, subWeeks } from 'date-fns'
 import { Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
-import {
-  CALENDAR_FILTERS,
-  STATUS_COLORS
-} from './SampleCalendarData'
-import type { CalendarCategory } from './SampleCalendarData'
-import { Button } from '@/components/ui/button'
-import type { CalendarState } from '@/components/ui/calendarpage'
-import {
-  CalendarProvider,
-  useCalendarMonth,
-  useCalendarYear,
-} from '@/components/ui/calendarpage'
-import { useGetEvents } from '@/operations/events'
-import type {
-  CalendarDisplayMode,
-  CalendarViewOption,
-} from '@/pages/calendar/CalendarHeader'
-import { CalendarBarHeader } from '@/pages/calendar/CalendarHeader'
-import CalendarBar from '@/pages/calendar/CalendarSideBar'
 import LoadingSkeleton from '../LoadingSkeleton'
 import CalendarDayView from './calenderViews/CalendarDayView'
 import CalendarListView from './calenderViews/CalendarListView'
@@ -28,6 +9,22 @@ import CalendarMonthView from './calenderViews/CalendarMonthView'
 import CalendarWeekView from './calenderViews/CalendarWeekView'
 import CalendarYearView from './calenderViews/CalendarYearView'
 import { parseCalendarEvents } from './CalendarParser'
+import { CALENDAR_FILTERS, STATUS_COLORS } from './SampleCalendarData'
+import type {
+  CalendarDisplayMode,
+  CalendarViewOption,
+} from '@/pages/calendar/CalendarHeader'
+import type { CalendarState } from '@/components/ui/calendarpage'
+import type { CalendarCategory } from './SampleCalendarData'
+import CalendarBar from '@/pages/calendar/CalendarSideBar'
+import { CalendarBarHeader } from '@/pages/calendar/CalendarHeader'
+import { useGetEvents } from '@/operations/events'
+import { Button } from '@/components/ui/button'
+import {
+  CalendarProvider,
+  useCalendarMonth,
+  useCalendarYear,
+} from '@/components/ui/calendarpage'
 
 const CalendarPage = () => {
   const [view, setView] = useState<CalendarViewOption>('month')
@@ -214,9 +211,7 @@ const CalendarPage = () => {
                 />
               </div>
               <div className="flex-1 min-h-0 px-6 pb-6">
-                {isError ? (
-                  <ErrorAlert />
-                ) : isLoading ? (
+                {isLoading ? (
                   <LoadingSkeleton variant="inline" className="min-h-[400px]" />
                 ) : (
                   renderActiveView()
