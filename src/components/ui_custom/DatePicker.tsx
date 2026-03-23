@@ -13,12 +13,15 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
 
 interface DatePickerProps {
   id: string
   value?: Date
   onChange?: (date: Date | undefined) => void
   placeholder?: string
+  /** Merged onto the inner text input (layout, colors, etc.) */
+  inputClassName?: string
 }
 
 export function DatePicker({
@@ -26,6 +29,7 @@ export function DatePicker({
   value,
   onChange,
   placeholder = 'MM/DD/YYYY',
+  inputClassName,
 }: DatePickerProps) {
   const [open, setOpen] = useState(false)
   const [date, setDate] = useState<Date | undefined>(value)
@@ -120,7 +124,10 @@ export function DatePicker({
         placeholder={placeholder}
         maxLength={10}
         inputMode="numeric"
-        className="h-[48px] w-full border-[#545f71] rounded-[6px] pr-12 text-base"
+        className={cn(
+          'h-[48px] w-full rounded-[6px] border-[#545f71] pr-12 text-base',
+          inputClassName,
+        )}
         aria-label="Date input"
       />
       <Popover open={open} onOpenChange={setOpen}>

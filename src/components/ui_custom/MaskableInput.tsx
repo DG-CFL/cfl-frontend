@@ -12,13 +12,19 @@ import {
 interface MaskableInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string
+  inputGroupClassName?: string
 }
 
-export function MaskableInput({ id, className, ...props }: MaskableInputProps) {
+export function MaskableInput({
+  id,
+  className,
+  inputGroupClassName,
+  ...props
+}: MaskableInputProps) {
   const [show, setShow] = React.useState(false)
 
   return (
-    <InputGroup>
+    <InputGroup className={inputGroupClassName}>
       <InputGroupInput id={id} type={show ? 'text' : 'password'} {...props} />
       <InputGroupAddon align={'inline-end'}>
         <InputGroupButton size={"icon-sm"} onClick={() => setShow(!show)}>
