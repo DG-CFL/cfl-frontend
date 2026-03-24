@@ -4,6 +4,7 @@ import { useNavigate, useParams } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import type { SubmitHandler } from 'react-hook-form'
 import type { EventRegistrationPostData } from '@/types/events'
+import { useCurrentUser } from '@/auth/AuthProvider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -24,6 +25,7 @@ export default function RegisterEvent() {
   const { eventId } = useParams({ strict: false })
   const { data: event, isLoading, isError } = useGetEvent(Number(eventId!))
   const registerEvent = useRegisterEventParticipant(Number(eventId))
+  const currentUser = useCurrentUser()
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
   const [showExitDialog, setShowExitDialog] = useState(false)
@@ -38,7 +40,6 @@ export default function RegisterEvent() {
     email: string
     phone: string
     nricLast4: string
-    questionAnswer: 'yes' | 'no'
   }
 
   const defaultValues: RegistrationFormData = useMemo(
@@ -51,7 +52,6 @@ export default function RegisterEvent() {
       email: '',
       phone: '',
       nricLast4: '',
-      questionAnswer: 'yes',
     }),
     [],
   )
@@ -87,10 +87,12 @@ export default function RegisterEvent() {
   const onSubmit: SubmitHandler<RegistrationFormData> = async () => {
     try {
       setError(null)
+      if (!currentUser?.userId) {
+        setError('Please sign in to register for this event.')
+        return
+      }
       const payload: EventRegistrationPostData = {
-        volunteerId: 0,
-        eventId: Number(eventId),
-        numberOfAttendees: 1,
+        volunteerId: currentUser.userId,
       }
       await registerEvent.mutateAsync(payload)
       setIsSubmitted(true)
@@ -294,27 +296,6 @@ export default function RegisterEvent() {
             {errors.nricLast4 && <ErrorAlert message={errors.nricLast4.message} />}
           </div>
 
-          <div className="col-span-2 space-y-2">
-            <Label className="text-base text-[#545F71]">A question?</Label>
-            <div className="flex gap-4">
-              <label className="flex h-12 w-[240px] items-center gap-2 rounded-md border border-input px-4">
-                <input
-                  type="radio"
-                  value="yes"
-                  {...register('questionAnswer')}
-                />
-                <span>Yes</span>
-              </label>
-              <label className="flex h-12 w-[240px] items-center gap-2 rounded-md border border-input px-4">
-                <input
-                  type="radio"
-                  value="no"
-                  {...register('questionAnswer')}
-                />
-                <span>No</span>
-              </label>
-            </div>
-          </div>
         </div>
 
         {error && <ErrorAlert message={error} />}

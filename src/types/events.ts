@@ -32,7 +32,5 @@ export type EventPostData = {
 export type EventPutData = EventPostData 
 
 export type EventRegistrationPostData = {
-  volunteerId: number
-  eventId: number
-  numberOfAttendees: number
+  volunteerId: string
 }
