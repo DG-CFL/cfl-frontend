@@ -239,46 +239,73 @@ export default function SignUp() {
       </FieldGroup>
 
       <div className="flex w-full flex-col gap-5 text-left">
-        <div className="flex items-start gap-3">
-          <Checkbox
-            id="email-opt-in"
-            className="mt-0.5"
-            {...register('marketingEmailPref')}
-          />
-          <Label
-            htmlFor="email-opt-in"
-            className="text-base font-normal leading-snug text-foreground"
-          >
-            I want to receive email notifications from Caring for Life
-          </Label>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-start gap-3">
+            <Controller
+              name="marketingEmailPref"
+              control={control}
+              render={({ field }) => (
+                <Checkbox
+                  id="email-opt-in"
+                  className="mt-0.5"
+                  checked={!!field.value}
+                  onCheckedChange={field.onChange}
+                  onBlur={field.onBlur}
+                  ref={field.ref}
+                />
+              )}
+            />
+            <Label
+              htmlFor="email-opt-in"
+              className="text-base font-normal leading-snug text-foreground"
+            >
+              I want to receive email notifications from Caring for Life
+            </Label>
+          </div>
         </div>
-        <div className="flex items-start gap-3">
-          <Checkbox
-            id="terms"
-            className="mt-0.5"
-            {...register('acknowledgedTermsOfUse', {
-              validate: (v) =>
-                v === true || 'You must agree to the Terms of Use and Privacy Policy',
-            })}
-          />
-          <Label htmlFor="terms" className="text-base font-normal leading-snug text-foreground">
-            I acknowledge that I agree to the{' '}
-            <a
-              href="#"
-              className="text-sky-600 underline underline-offset-2 hover:text-sky-700"
-              onClick={(e) => e.preventDefault()}
-            >
-              Terms of Use
-            </a>{' '}
-            and have read the{' '}
-            <a
-              href="#"
-              className="text-sky-600 underline underline-offset-2 hover:text-sky-700"
-              onClick={(e) => e.preventDefault()}
-            >
-              Privacy Policy
-            </a>
-          </Label>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-start gap-3">
+            <Controller
+              name="acknowledgedTermsOfUse"
+              control={control}
+              rules={{
+                validate: (v) =>
+                  v === true ||
+                  'You must agree to the Terms of Use and Privacy Policy',
+              }}
+              render={({ field }) => (
+                <Checkbox
+                  id="terms"
+                  className="mt-0.5"
+                  checked={!!field.value}
+                  onCheckedChange={field.onChange}
+                  onBlur={field.onBlur}
+                  ref={field.ref}
+                />
+              )}
+            />
+            <Label htmlFor="terms" className="text-base font-normal leading-snug text-foreground">
+              I acknowledge that I agree to the{' '}
+              <a
+                href="#"
+                className="text-sky-600 underline underline-offset-2 hover:text-sky-700"
+                onClick={(e) => e.preventDefault()}
+              >
+                Terms of Use
+              </a>{' '}
+              and have read the{' '}
+              <a
+                href="#"
+                className="text-sky-600 underline underline-offset-2 hover:text-sky-700"
+                onClick={(e) => e.preventDefault()}
+              >
+                Privacy Policy
+              </a>
+            </Label>
+          </div>
+          {errors.acknowledgedTermsOfUse && (
+            <ErrorAlert message={errors.acknowledgedTermsOfUse.message} />
+          )}
         </div>
       </div>
 
