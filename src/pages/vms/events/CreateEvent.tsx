@@ -28,7 +28,9 @@ type EventCreateFormData = {
   name: string
   description: string
   startDate: Date
+  startTime: string
   endDate: Date
+  endTime: string
   venue: string
   postalCode?: number
   trainers: Array<{
@@ -44,6 +46,13 @@ async function fileToDataUrl(file: File): Promise<string> {
     reader.onerror = () => reject(new Error('Failed to read cover image'))
     reader.readAsDataURL(file)
   })
+}
+
+function combineDateAndTime(date: Date, time: string): string {
+  const [hours, minutes] = time.split(':').map(Number)
+  const combined = new Date(date)
+  combined.setHours(hours || 0, minutes || 0, 0, 0)
+  return combined.toISOString()
 }
 
 export default function CreateEvent() {
@@ -66,7 +75,9 @@ export default function CreateEvent() {
       name: '',
       venue: '',
       startDate: new Date(),
+      startTime: '09:00',
       endDate: new Date(),
+      endTime: '17:00',
       description: '',
       postalCode: undefined,
       trainers: [],
@@ -94,8 +105,8 @@ export default function CreateEvent() {
       const eventPayload: EventPostData = {
         name: data.name,
         description: data.description,
-        startDate: data.startDate.toISOString(),
-        endDate: data.endDate.toISOString(),
+        startDate: combineDateAndTime(data.startDate, data.startTime),
+        endDate: combineDateAndTime(data.endDate, data.endTime),
         venue: data.venue,
         postalCode: data.postalCode,
         coverImage: coverImage?.[0]
@@ -266,6 +277,42 @@ export default function CreateEvent() {
                       onChange={field.onChange}
                     />
                   )}
+                />
+              </div>
+
+              {/* Start Time */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="startTime"
+                  className="text-sm text-slate-600"
+                >
+                  Start Time
+                </Label>
+                <Input
+                  id="startTime"
+                  type="time"
+                  {...register('startTime', {
+                    required: 'Start time is required',
+                  })}
+                  className="h-12 rounded-md border-slate-500"
+                />
+              </div>
+
+              {/* End Time */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="endTime"
+                  className="text-sm text-slate-600"
+                >
+                  End Time
+                </Label>
+                <Input
+                  id="endTime"
+                  type="time"
+                  {...register('endTime', {
+                    required: 'End time is required',
+                  })}
+                  className="h-12 rounded-md border-slate-500"
                 />
               </div>
 
