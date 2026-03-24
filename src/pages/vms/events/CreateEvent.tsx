@@ -265,84 +265,68 @@ export default function CreateEvent() {
                 />
               </div>
 
-              {/* Start Date */}
+              {/* Start Date & Time */}
               <div className="space-y-2">
                 <Label
                   htmlFor="startDate"
                   className="text-sm text-slate-600"
                 >
-                  Start Date
+                  Start Date &amp; Time
                 </Label>
-                <Controller
-                  {...register('startDate', {
-                    required: 'Start date is required',
-                  })}
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      id="startDate"
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  )}
-                />
+                <div className="grid grid-cols-[1fr_140px] gap-3">
+                  <Controller
+                    {...register('startDate', {
+                      required: 'Start date is required',
+                    })}
+                    control={control}
+                    render={({ field }) => (
+                      <DatePicker
+                        id="startDate"
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    )}
+                  />
+                  <Input
+                    id="startTime"
+                    type="time"
+                    {...register('startTime', {
+                      required: 'Start time is required',
+                    })}
+                    className="h-12 rounded-md border-slate-500"
+                  />
+                </div>
               </div>
 
-              {/* End Date */}
+              {/* End Date & Time */}
               <div className="space-y-2">
                 <Label
                   htmlFor="endDate"
                   className="text-sm text-slate-600"
                 >
-                  End Date
+                  End Date &amp; Time
                 </Label>
-                <Controller
-                  {...register('endDate', { required: 'End date is required' })}
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      id="endDate"
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  )}
-                />
-              </div>
-
-              {/* Start Time */}
-              <div className="space-y-2">
-                <Label
-                  htmlFor="startTime"
-                  className="text-sm text-slate-600"
-                >
-                  Start Time
-                </Label>
-                <Input
-                  id="startTime"
-                  type="time"
-                  {...register('startTime', {
-                    required: 'Start time is required',
-                  })}
-                  className="h-12 rounded-md border-slate-500"
-                />
-              </div>
-
-              {/* End Time */}
-              <div className="space-y-2">
-                <Label
-                  htmlFor="endTime"
-                  className="text-sm text-slate-600"
-                >
-                  End Time
-                </Label>
-                <Input
-                  id="endTime"
-                  type="time"
-                  {...register('endTime', {
-                    required: 'End time is required',
-                  })}
-                  className="h-12 rounded-md border-slate-500"
-                />
+                <div className="grid grid-cols-[1fr_140px] gap-3">
+                  <Controller
+                    {...register('endDate', { required: 'End date is required' })}
+                    control={control}
+                    render={({ field }) => (
+                      <DatePicker
+                        id="endDate"
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    )}
+                  />
+                  <Input
+                    id="endTime"
+                    type="time"
+                    {...register('endTime', {
+                      required: 'End time is required',
+                    })}
+                    className="h-12 rounded-md border-slate-500"
+                  />
+                </div>
               </div>
 
               {/* Postal Code */}
