@@ -1,3 +1,9 @@
+import { useNavigate } from '@tanstack/react-router'
+import { AlertCircle, ChevronLeft, CloudUpload, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import type { SubmitHandler } from 'react-hook-form'
+import type { EventPostData } from '@/types/events'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -14,31 +20,31 @@ import {
 } from '@/components/ui/dropzone'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui_custom/DatePicker'
 import { useCreateEvent } from '@/operations/events'
-import type { EventPostData } from '@/types/events'
-import { useNavigate } from '@tanstack/react-router'
-import { AlertCircle, ChevronLeft, CloudUpload, Trash2 } from 'lucide-react'
-import { useState } from 'react'
-import {
-  Controller,
-  useFieldArray,
-  useForm,
-  type SubmitHandler,
-} from 'react-hook-form'
 
-const EVENT_STATUSES = [
-  { label: 'Active', value: 'Active', color: 'bg-green-500' },
-  { label: 'Inactive', value: 'Inactive', color: 'bg-red-500' },
-]
+type EventCreateFormData = {
+  name: string
+  description: string
+  startDate: Date
+  endDate: Date
+  venue: string
+  postalCode?: number
+  trainers: Array<{
+    id: string
+    role: string
+  }>
+}
+
+async function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result))
+    reader.onerror = () => reject(new Error('Failed to read cover image'))
+    reader.readAsDataURL(file)
+  })
+}
 
 export default function CreateEvent() {
   const navigate = useNavigate()
@@ -53,7 +59,7 @@ export default function CreateEvent() {
     handleSubmit,
     formState: { isDirty, errors },
     control,
-  } = useForm<EventPostData>({
+  } = useForm<EventCreateFormData>({
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
     defaultValues: {
@@ -62,7 +68,8 @@ export default function CreateEvent() {
       startDate: new Date(),
       endDate: new Date(),
       description: '',
-      trainers: [{ name: '', role: '' }],
+      postalCode: undefined,
+      trainers: [],
     },
   })
 
@@ -78,9 +85,26 @@ export default function CreateEvent() {
   const [showExitDialog, setShowExitDialog] = useState(false)
 
   // TODO: Update Save & Publish button handler
-  const onSubmit: SubmitHandler<EventPostData> = async (data) => {
+  const onSubmit: SubmitHandler<EventCreateFormData> = async (data) => {
     try {
-      await createEvent.mutateAsync(data)
+      const filteredTrainers = data.trainers.filter(
+        (trainer) => trainer.id.trim() !== '' && trainer.role.trim() !== '',
+      )
+
+      const eventPayload: EventPostData = {
+        name: data.name,
+        description: data.description,
+        startDate: data.startDate.toISOString(),
+        endDate: data.endDate.toISOString(),
+        venue: data.venue,
+        postalCode: data.postalCode,
+        coverImage: coverImage?.[0]
+          ? await fileToDataUrl(coverImage[0])
+          : undefined,
+        trainers: filteredTrainers,
+      }
+
+      await createEvent.mutateAsync(eventPayload)
       navigate({ to: '/events/create-success' })
     } catch (err) {
       console.error(err)
@@ -245,6 +269,25 @@ export default function CreateEvent() {
                 />
               </div>
 
+              {/* Postal Code */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="postalCode"
+                  className="text-sm text-slate-600"
+                >
+                  Postal Code
+                </Label>
+                <Input
+                  id="postalCode"
+                  type="number"
+                  {...register('postalCode', {
+                    valueAsNumber: true,
+                    min: { value: 0, message: 'Postal code must be 0 or more' },
+                  })}
+                  className="h-12 rounded-md border-slate-500"
+                />
+              </div>
+
               {/* Event Description */}
               <div className="space-y-2">
                 <Label
@@ -307,7 +350,7 @@ export default function CreateEvent() {
             <Button
               type="button"
               className="h-9 w-auto rounded-md bg-[#5f733c] px-4 py-3 text-base font-semibold hover:bg-[#4d5e30]"
-              onClick={() => append({ name: '', role: '' })}
+              onClick={() => append({ id: '', role: '' })}
             >
               + Add Volunteer
             </Button>
@@ -319,14 +362,14 @@ export default function CreateEvent() {
                 <div key={field.id} className="grid grid-cols-2 gap-x-10">
                   <div className="space-y-2">
                     <Label
-                      htmlFor={`trainers.${index}.name`}
+                      htmlFor={`trainers.${index}.id`}
                       className="text-sm text-slate-600"
                     >
-                      Name of Volunteer Coordinator
+                      Volunteer Coordinator ID
                     </Label>
                     <Input
-                      id={`trainers.${index}.name`}
-                      {...register(`trainers.${index}.name` as const)}
+                      id={`trainers.${index}.id`}
+                      {...register(`trainers.${index}.id` as const)}
                       className="h-12 rounded-md border-slate-500"
                     />
                   </div>

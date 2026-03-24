@@ -22,11 +22,15 @@ export type Event = {
 export type EventPostData = {
   name: string
   description: string
-  startDate: Date
-  endDate: Date
+  startDate: string
+  endDate: string
   venue: string
+  postalCode?: number
   coverImage?: string
-  trainers: Array<Person>
+  trainers: Array<{
+    id: string
+    role: string
+  }>
 }
 
 export type EventPutData = EventPostData 
