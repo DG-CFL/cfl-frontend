@@ -210,6 +210,10 @@ function VolunteerHistoryTable() {
 export function VolunteerInformationPage({
   clickedRow,
 }: VolunteerInformationPageProps) {
+  const certifications = Array.isArray(clickedRow.certifications)
+    ? clickedRow.certifications
+    : []
+
   return (
     <div className="h-full flex flex-row w-full">
       <div className="h-full flex flex-col">
@@ -237,7 +241,15 @@ export function VolunteerInformationPage({
           <CardHeader>
             <h2>Certifications</h2>
           </CardHeader>
-          {clickedRow.certifications.map((x) => x)}
+          {certifications.length > 0 ? (
+            certifications.map((certification) => (
+              <p key={certification} className="px-6 pb-2">
+                {certification}
+              </p>
+            ))
+          ) : (
+            <p className="px-6 pb-2 text-muted-foreground">-</p>
+          )}
         </Card>
       </div>
       <VolunteerHistoryTable />
