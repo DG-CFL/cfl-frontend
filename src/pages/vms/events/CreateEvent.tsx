@@ -1,9 +1,10 @@
 import { useNavigate } from '@tanstack/react-router'
 import { AlertCircle, ChevronLeft, CloudUpload, Trash2 } from 'lucide-react'
-import { useState } from 'react'
-import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import { useMemo, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import type { SubmitHandler } from 'react-hook-form'
 import type { EventPostData } from '@/types/events'
+import type { Volunteer } from '@/types/volunteers'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -23,6 +24,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui_custom/DatePicker'
 import { useCreateEvent } from '@/operations/events'
+import { useGetVolunteers } from '@/operations/volunteers'
 
 type EventCreateFormData = {
   name: string
@@ -35,7 +37,6 @@ type EventCreateFormData = {
   postalCode?: number
   trainers: Array<{
     id: string
-    role: string
   }>
 }
 
@@ -58,10 +59,16 @@ function combineDateAndTime(date: Date, time: string): string {
 export default function CreateEvent() {
   const navigate = useNavigate()
   const createEvent = useCreateEvent()
+  const { data: volunteers } = useGetVolunteers()
 
   const [coverImage, setCoverImage] = useState<Array<File> | undefined>(
     undefined,
   )
+  const [showVolunteerPicker, setShowVolunteerPicker] = useState(false)
+  const [volunteerSearch, setVolunteerSearch] = useState('')
+  const [selectedVolunteers, setSelectedVolunteers] = useState<
+    Array<Volunteer>
+  >([])
 
   const {
     register,
@@ -84,24 +91,43 @@ export default function CreateEvent() {
     },
   })
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'trainers',
-  })
-
   const errorMessages = Object.values(errors)
     .map((e: any) => e?.message)
     .filter((msg): msg is string => typeof msg === 'string')
 
   const [showExitDialog, setShowExitDialog] = useState(false)
 
+  const filteredVolunteers = useMemo(() => {
+    const volunteerList = volunteers ?? []
+    const searchTerm = volunteerSearch.trim().toLowerCase()
+
+    if (!searchTerm) {
+      return volunteerList
+    }
+
+    return volunteerList.filter((volunteer) =>
+      volunteer.name.toLowerCase().includes(searchTerm),
+    )
+  }, [volunteers, volunteerSearch])
+
+  const addVolunteerCoordinator = (volunteer: Volunteer) => {
+    setSelectedVolunteers((current) => {
+      if (current.some((entry) => entry.id === volunteer.id)) {
+        return current
+      }
+      return [...current, volunteer]
+    })
+  }
+
+  const removeVolunteerCoordinator = (volunteerId: string) => {
+    setSelectedVolunteers((current) =>
+      current.filter((entry) => entry.id !== volunteerId),
+    )
+  }
+
   // TODO: Update Save & Publish button handler
   const onSubmit: SubmitHandler<EventCreateFormData> = async (data) => {
     try {
-      const filteredTrainers = data.trainers.filter(
-        (trainer) => trainer.id.trim() !== '' && trainer.role.trim() !== '',
-      )
-
       const eventPayload: EventPostData = {
         name: data.name,
         description: data.description,
@@ -112,7 +138,10 @@ export default function CreateEvent() {
         coverImage: coverImage?.[0]
           ? await fileToDataUrl(coverImage[0])
           : undefined,
-        trainers: filteredTrainers,
+        trainers: selectedVolunteers.map((volunteer) => ({
+          id: volunteer.id,
+          role: 'Volunteer Coordinator',
+        })),
       }
 
       await createEvent.mutateAsync(eventPayload)
@@ -397,7 +426,7 @@ export default function CreateEvent() {
             <Button
               type="button"
               className="h-9 w-auto rounded-md bg-[#5f733c] px-4 py-3 text-base font-semibold hover:bg-[#4d5e30]"
-              onClick={() => append({ id: '', role: '' })}
+              onClick={() => setShowVolunteerPicker(true)}
             >
               + Add Volunteer
             </Button>
@@ -405,51 +434,79 @@ export default function CreateEvent() {
 
           <CardContent className="px-8 py-6">
             <div className="flex flex-col gap-6">
-              {fields.map((field, index) => (
-                <div key={field.id} className="grid grid-cols-2 gap-x-10">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor={`trainers.${index}.id`}
-                      className="text-sm text-slate-600"
-                    >
-                      Volunteer Coordinator ID
-                    </Label>
-                    <Input
-                      id={`trainers.${index}.id`}
-                      {...register(`trainers.${index}.id` as const)}
-                      className="h-12 rounded-md border-slate-500"
-                    />
-                  </div>
-                  <div className="flex items-end gap-2">
-                    <div className="w-full space-y-2">
-                      <Label
-                        htmlFor={`trainers.${index}.role`}
-                        className="text-sm text-slate-600"
-                      >
-                        Role
-                      </Label>
-                      <Input
-                        id={`trainers.${index}.role`}
-                        {...register(`trainers.${index}.role` as const)}
-                        className="h-12 rounded-md border-slate-500"
-                      />
-                    </div>
+              {selectedVolunteers.length === 0 ? (
+                <p className="text-sm text-slate-500">
+                  No volunteer coordinators selected yet.
+                </p>
+              ) : (
+                selectedVolunteers.map((volunteer) => (
+                  <div
+                    key={volunteer.id}
+                    className="flex items-center justify-between rounded-md border border-slate-300 px-4 py-3"
+                  >
+                    <p className="text-base text-slate-700">{volunteer.name}</p>
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="mb-1 size-10 text-red-500 hover:bg-red-50 hover:text-red-700"
-                      onClick={() => remove(index)}
+                      className="size-10 text-red-500 hover:bg-red-50 hover:text-red-700"
+                      onClick={() => removeVolunteerCoordinator(volunteer.id)}
                     >
                       <Trash2 className="size-5" />
                     </Button>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
       </form>
+
+      <Dialog open={showVolunteerPicker} onOpenChange={setShowVolunteerPicker}>
+        <DialogContent className="max-w-2xl border-slate-300">
+          <DialogHeader className="text-left">
+            <h2>Select Volunteer Coordinators</h2>
+            <p>Search by name and click a volunteer to add.</p>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Input
+              placeholder="Search volunteers"
+              value={volunteerSearch}
+              onChange={(event) => setVolunteerSearch(event.target.value)}
+            />
+            <div className="max-h-80 overflow-y-auto rounded-md border border-slate-300">
+              {filteredVolunteers.length === 0 ? (
+                <p className="px-4 py-3 text-sm text-slate-500">
+                  No volunteers found.
+                </p>
+              ) : (
+                filteredVolunteers.map((volunteer) => (
+                  <button
+                    key={volunteer.id}
+                    type="button"
+                    className="flex w-full items-center justify-between border-b border-slate-200 px-4 py-3 text-left last:border-b-0 hover:bg-slate-50"
+                    onClick={() => addVolunteerCoordinator(volunteer)}
+                  >
+                    <span>{volunteer.name}</span>
+                    {selectedVolunteers.some(
+                      (selected) => selected.id === volunteer.id,
+                    ) && (
+                      <span className="text-xs font-semibold text-slate-500">
+                        Added
+                      </span>
+                    )}
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="button" onClick={() => setShowVolunteerPicker(false)}>
+              Done
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
         <DialogContent className="bg-[#BDD797] border-slate-600">
