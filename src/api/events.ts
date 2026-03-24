@@ -45,6 +45,9 @@ export async function registerEventParticipant(
   eventId: number,
   registrationData: EventRegistrationPostData,
 ): Promise<void> {
-  const res = await api.post(`${baseUrl}/events/${eventId}/register`, registrationData)
+  const res = await api.post(
+    `${baseUrl}/sessions/events/${eventId}/register`,
+    registrationData,
+  )
   return res.data
 }

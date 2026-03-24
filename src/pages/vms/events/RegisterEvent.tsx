@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { getAuth } from 'firebase/auth'
 import { CheckCircle2, X } from 'lucide-react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
@@ -39,7 +40,6 @@ export default function RegisterEvent() {
     birthYear: string
     email: string
     phone: string
-    nricLast4: string
   }
 
   const defaultValues: RegistrationFormData = useMemo(
@@ -51,7 +51,6 @@ export default function RegisterEvent() {
       birthYear: '',
       email: '',
       phone: '',
-      nricLast4: '',
     }),
     [],
   )
@@ -83,6 +82,26 @@ export default function RegisterEvent() {
       localStorage.removeItem(draftStorageKey)
     }
   }, [draftStorageKey, reset])
+
+  useEffect(() => {
+    const authUser = getAuth().currentUser
+    const fullName = currentUser?.name.trim() || authUser?.displayName?.trim() || ''
+    const [firstName = '', ...lastNameParts] = fullName.length > 0 ? fullName.split(/\s+/) : []
+    const lastName = lastNameParts.join(' ')
+    const email = authUser?.email?.trim() || ''
+    const phone = authUser?.phoneNumber?.trim() || ''
+
+    const currentValues = getValues()
+    const hydratedValues: RegistrationFormData = {
+      ...currentValues,
+      firstName: currentValues.firstName || firstName,
+      lastName: currentValues.lastName || lastName,
+      email: currentValues.email || email,
+      phone: currentValues.phone || phone,
+    }
+
+    reset(hydratedValues, { keepDirty: true })
+  }, [currentUser, getValues, reset])
 
   const onSubmit: SubmitHandler<RegistrationFormData> = async () => {
     try {
@@ -275,25 +294,6 @@ export default function RegisterEvent() {
               {...register('phone', { required: 'Phone number is required' })}
             />
             {errors.phone && <ErrorAlert message={errors.phone.message} />}
-          </div>
-
-          <div className="col-span-2 space-y-2">
-            <Label htmlFor="nric-last-4" className="text-base text-[#545F71]">
-              NRIC (Last 4 digits)
-            </Label>
-            <Input
-              id="nric-last-4"
-              className="h-12"
-              placeholder='e.g. "123A" of Sxxxx123A'
-              {...register('nricLast4', {
-                required: 'NRIC last 4 digits are required',
-                pattern: {
-                  value: /^[0-9]{3}[A-Za-z]$/,
-                  message: 'Format should be 3 digits followed by 1 letter',
-                },
-              })}
-            />
-            {errors.nricLast4 && <ErrorAlert message={errors.nricLast4.message} />}
           </div>
 
         </div>
