@@ -25,6 +25,29 @@ export type TrainerBookingPayload = {
 
 type Step = "dates" | "grid" | "success"
 
+/** Flat indices are row-major (day × time). A linear [min,max] range wrongly fills whole days when dragging vertically. */
+function intervalsInRectangle(
+  flatA: number,
+  flatB: number,
+  intervalsPerDay: number,
+): Array<number> {
+  const d0 = Math.floor(flatA / intervalsPerDay)
+  const s0 = flatA % intervalsPerDay
+  const d1 = Math.floor(flatB / intervalsPerDay)
+  const s1 = flatB % intervalsPerDay
+  const dayMin = Math.min(d0, d1)
+  const dayMax = Math.max(d0, d1)
+  const slotMin = Math.min(s0, s1)
+  const slotMax = Math.max(s0, s1)
+  const out: Array<number> = []
+  for (let d = dayMin; d <= dayMax; d++) {
+    for (let s = slotMin; s <= slotMax; s++) {
+      out.push(d * intervalsPerDay + s)
+    }
+  }
+  return out
+}
+
 function AvailabilityGrid({
   selectedDays,
   startHour,
@@ -85,19 +108,18 @@ function AvailabilityGrid({
   const handleInteractionMove = (interval: number) => {
     if (!isDragging || dragStart === null) return
     setDragEnd(interval)
-    const start = Math.min(dragStart, interval)
-    const end = Math.max(dragStart, interval)
-    const next: Array<number> = []
-    for (let i = start; i <= end; i++) next.push(i)
-    setDraggedOverIntervals(next)
+    setDraggedOverIntervals(
+      intervalsInRectangle(dragStart, interval, intervalsPerDay),
+    )
   }
 
   const handleInteractionEnd = () => {
     if (dragStart !== null && dragEnd !== null) {
-      const start = Math.min(dragStart, dragEnd)
-      const end = Math.max(dragStart, dragEnd)
-      const rangeIntervals: Array<number> = []
-      for (let i = start; i <= end; i++) rangeIntervals.push(i)
+      const rangeIntervals = intervalsInRectangle(
+        dragStart,
+        dragEnd,
+        intervalsPerDay,
+      )
 
       setMarkedIntervals((prev) => {
         if (isOnMouseMarked) {
@@ -156,7 +178,7 @@ function AvailabilityGrid({
       onMouseLeave={handleMouseLeave}
     >
       <p className="mb-3 text-sm text-gray-600">
-        Click and drag across cells to toggle availability (like When2Meet).
+        Click and drag across cells to toggle availability.
         Press Esc to undo the current drag.
       </p>
       <div className="flex min-w-[520px] flex-col">
@@ -464,7 +486,7 @@ export default function TrainerBookingPage() {
 
             <details className="rounded-xl border border-dashed border-gray-300 bg-white p-4">
               <summary className="cursor-pointer text-sm font-medium text-gray-700">
-                View raw payload (for development)
+                View raw payload
               </summary>
               <pre className="mt-3 max-h-64 overflow-auto rounded-lg bg-[#0E121B] p-4 text-left text-xs text-emerald-100">
                 {JSON.stringify(savedPayload, null, 2)}

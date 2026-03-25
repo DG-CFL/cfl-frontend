@@ -1,6 +1,6 @@
 import { createRootRoute, createRouter, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import { appLayoutRoute, homeRoute } from './app'
+import { appLayoutRoute, homeRoute, profileRoute, settingsRoute } from './app'
 import {
   createEventRoute,
   createEventSuccessRoute,
@@ -45,6 +45,8 @@ export const rootRoute = createRootRoute({
 const routeTree = rootRoute.addChildren([
   appLayoutRoute.addChildren([
     homeRoute,
+    profileRoute,
+    settingsRoute,
     eventsLayoutRoute.addChildren([
       manageEventsRoute,
       viewEventRoute,
