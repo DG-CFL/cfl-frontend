@@ -29,6 +29,7 @@ import {
 } from './auth'
 import { calendarPageRoute } from './calendar'
 import { analyticsPageRoute, analyticsPdfPreviewRoute } from './analytics'
+import { trainerBookingRoute } from './trainerBooking'
 import { createCustomReportRoute } from './createCustomReport'
 import { landingPageRoute } from './vms'
 
@@ -60,6 +61,7 @@ const routeTree = rootRoute.addChildren([
       createEmailRoute
     ]),
     analyticsPageRoute,
+    trainerBookingRoute,
     analyticsPdfPreviewRoute,
     createCustomReportRoute,
   ]),

@@ -1,16 +1,17 @@
 import { useState, useEffect, type CSSProperties } from "react"
 import { Link, useNavigate } from "@tanstack/react-router"
 import {
-  Home,
-  Calendar,
-  Users,
   BarChart2,
-  TrendingUp,
-  User as UserIcon,
-  Settings,
-  LogOut,
+  Calendar,
+  CalendarClock,
   ChevronLeft,
   ChevronRight,
+  Home,
+  LogOut,
+  Settings,
+  TrendingUp,
+  User as UserIcon,
+  Users,
 } from "lucide-react"
 import { getAuth, signOut } from "firebase/auth"
 
@@ -26,6 +27,7 @@ const TOP: Item[] = [
   { label: "Volunteer Management System", to: "/vms", icon: Users },
   { label: "Events", to: "/events", icon: BarChart2 },
   { label: "Analytics", to: "/analytics", icon: TrendingUp },
+  { label: "Trainer Booking", to: "/trainer-booking", icon: CalendarClock },
 ]
 
 const BOTTOM: Item[] = [
