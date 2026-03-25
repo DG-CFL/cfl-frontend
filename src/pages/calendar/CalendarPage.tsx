@@ -25,6 +25,8 @@ import {
   useCalendarMonth,
   useCalendarYear,
 } from '@/components/ui/calendarpage'
+import { Link } from '@tanstack/react-router'
+
 
 const CalendarPage = () => {
   const [view, setView] = useState<CalendarViewOption>('month')
@@ -221,10 +223,13 @@ const CalendarPage = () => {
           </CalendarProvider>
         </div>
         <Button
+          asChild
           size="icon"
           className="fixed bottom-8 right-8 h-14 w-14 rounded-full bg-[#334155] shadow-lg hover:bg-[#1e293b]"
         >
-          <Plus className="h-6 w-6" />
+          <Link to="/events/create">
+            <Plus className="h-6 w-6" />
+          </Link>
         </Button>
       </div>
     </div>
