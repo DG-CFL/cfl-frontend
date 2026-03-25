@@ -156,14 +156,18 @@ export default function ViewEvent() {
   )
 }
 
-function PersonListItem({ person }: { person: Person }) {
+function PersonListItem({ person }: { person: Person | string }) {
+  const isStringEntry = typeof person === 'string'
+  const displayName = isStringEntry ? person : person.name
+  const displayRole = isStringEntry ? 'Volunteer' : person.role
+
   return (
     <div className="flex items-center gap-4">
       <div className="size-12 rounded-full bg-muted" aria-hidden="true" />
       <div className="space-y-1">
-        <h3>{person.name}</h3>
+        <h3>{displayName}</h3>
         <p className="text-base leading-7 text-muted-foreground">
-          {person.role}
+          {displayRole}
         </p>
       </div>
     </div>

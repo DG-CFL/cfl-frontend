@@ -9,7 +9,7 @@ type CalendarEventListViewProps = {
   selectedDate: Date
 }
 
-const CalendarListView = ({ events, colors, selectedDate }: CalendarEventListViewProps) => {
+const CalendarListView = ({ events, colors: _colors, selectedDate }: CalendarEventListViewProps) => {
   // Filter events by selected month and sort by date
   const sortedFeatures = events
     .filter(feature => isSameMonth(feature.startDate, selectedDate))
@@ -97,13 +97,6 @@ const CalendarListView = ({ events, colors, selectedDate }: CalendarEventListVie
               </div>
             )
           })}
-          
-          {sortedFeatures.length === 0 && (
-            <div className="flex h-64 flex-col items-center justify-center text-center text-gray-500">
-              <p className="text-lg font-medium">No events found for this month</p>
-              <p className="text-sm">Try adjusting your filters or selecting a different month</p>
-            </div>
-          )}
         </div>
       </div>
     </div>

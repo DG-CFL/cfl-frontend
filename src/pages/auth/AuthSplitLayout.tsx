@@ -1,5 +1,5 @@
 import { Outlet } from '@tanstack/react-router'
-import logo from '@/assets/cfl-logo.png'
+import logo from '@/assets/b0bcc1e094e7d036a3aeff9e780dc240edc44799.png'
 
 export default function AuthSplitLayout() {
   return (

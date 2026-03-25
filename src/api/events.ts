@@ -1,14 +1,18 @@
-import type { Event, EventPostData, EventPutData, EventRegistrationPostData } from '@/types/events'
 import { api } from './baseApi'
-import { eventData, eventListData } from '@/data/events'
+import type {
+  Event,
+  EventPostData,
+  EventPutData,
+  EventRegistrationPostData,
+} from '@/types/events'
 
 const baseUrl = '/v1'
 
 /**
  * Returns the list of all events
  */
-export async function getEvents(): Promise<Event[]> {
-  const res = await api.get(`${baseUrl}/events`)
+export async function getEvents(): Promise<Array<Event>> {
+  const res = await api.get(`${baseUrl}/sessions/events`)
   return res.data
 }
 
@@ -16,7 +20,7 @@ export async function getEvents(): Promise<Event[]> {
  * Returns an event
  */
 export async function getEvent(eventId: number): Promise<Event> {
-  const res = await api.get(`${baseUrl}/events/${eventId}`)
+  const res = await api.get(`${baseUrl}/sessions/events/${eventId}`)
   return res.data
 }
 
@@ -24,7 +28,7 @@ export async function getEvent(eventId: number): Promise<Event> {
  * Creates a new event
  */
 export async function createEvent(eventData: EventPostData): Promise<Event> {
-  const res = await api.post(`${baseUrl}/events`, eventData)
+  const res = await api.post(`${baseUrl}/sessions/events`, eventData)
   return res.data
 }
 
@@ -35,7 +39,7 @@ export async function editEvent(
   eventId: number,
   eventData: EventPutData,
 ): Promise<Event> {
-  const res = await api.put(`${baseUrl}/events/${eventId}`, eventData)
+  const res = await api.put(`${baseUrl}/sessions/events/${eventId}`, eventData)
   return res.data
 }
 
@@ -46,6 +50,9 @@ export async function registerEventParticipant(
   eventId: number,
   registrationData: EventRegistrationPostData,
 ): Promise<void> {
-  const res = await api.post(`${baseUrl}/events/${eventId}/register`, registrationData)
+  const res = await api.post(
+    `${baseUrl}/sessions/events/${eventId}/register`,
+    registrationData,
+  )
   return res.data
 }

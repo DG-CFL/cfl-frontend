@@ -78,6 +78,14 @@ const columnFilter = <T,>(
   )
 }
 
+const toStringArray = (value: unknown): Array<string> => {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  return value.filter((entry): entry is string => typeof entry === 'string')
+}
+
 export const columns: ColumnDef<Volunteer>[] = [
   {
     id: 'select',
@@ -150,19 +158,16 @@ export const columns: ColumnDef<Volunteer>[] = [
       // If no filter value is applied, show all rows
       if (value.length === 0) return true
 
+      const selectedLanguages = toStringArray(row.getValue(columnId))
       return (
-        value.filter(
-          (x: string) => !(row.getValue(columnId) as string[]).includes(x),
-        ).length === 0
+        value.filter((x: string) => !selectedLanguages.includes(x)).length === 0
       )
     },
     header: ({ column }) => {
       return columnFilter(column, 'Language', ['English', 'Chinese', 'Malay'])
     },
     cell: ({ row }) => (
-      <div className="text-center">
-        {(row.getValue('language') as string[]).join(', ')}
-      </div>
+      <div className="text-center">{toStringArray(row.getValue('language')).join(', ')}</div>
     ),
   },
   {
@@ -224,10 +229,9 @@ export const columns: ColumnDef<Volunteer>[] = [
     filterFn: (row, columnId, value) => {
       if (value.length === 0) return true
 
+      const certifications = toStringArray(row.getValue(columnId))
       return (
-        value.filter(
-          (x: string) => !(row.getValue(columnId) as string[]).includes(x),
-        ).length === 0
+        value.filter((x: string) => !certifications.includes(x)).length === 0
       )
     },
     header: ({ column }) => {

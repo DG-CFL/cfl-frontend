@@ -1,12 +1,14 @@
-import logo from '@/assets/cfl-logo.png'
+import { useNavigate, useSearch } from '@tanstack/react-router'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import type { SubmitHandler } from 'react-hook-form'
+import logo from '@/assets/f8d056c6f473eacb3909366c8b70735165d428ae.png'
 import { resetPassword } from '@/auth/operations'
 import { Button } from '@/components/ui/button'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { ErrorAlert } from '@/components/ui_custom/ErrorAlert'
 import { MaskableInput } from '@/components/ui_custom/MaskableInput'
-import { useNavigate, useParams, useSearch } from '@tanstack/react-router'
-import { useState } from 'react'
-import { useForm, type SubmitHandler } from 'react-hook-form'
+
 
 type ResetPasswordFormData = {
   password: string

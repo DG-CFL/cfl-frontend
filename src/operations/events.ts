@@ -1,3 +1,9 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type {
+  EventPostData,
+  EventPutData,
+  EventRegistrationPostData,
+} from '@/types/events'
 import {
   createEvent,
   editEvent,
@@ -5,12 +11,6 @@ import {
   getEvents,
   registerEventParticipant,
 } from '@/api/events'
-import type {
-  EventPostData,
-  EventPutData,
-  EventRegistrationPostData,
-} from '@/types/events'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 /**
  * Returns the list of all events
@@ -19,6 +19,10 @@ export function useGetEvents() {
   return useQuery({
     queryKey: ['events'],
     queryFn: getEvents,
+    // Keep events data cached across route transitions.
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -58,6 +62,9 @@ export function useEditEvent(eventId: number) {
       await queryClient.invalidateQueries({
         queryKey: ['events', eventId],
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['events'],
+      })
     },
   })
 }
@@ -73,6 +80,9 @@ export function useRegisterEventParticipant(eventId: number) {
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ['events', eventId],
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['events'],
       })
     },
   })

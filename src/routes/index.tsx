@@ -28,7 +28,8 @@ import {
   forgotPasswordRoute,
 } from './auth'
 import { calendarPageRoute } from './calendar'
-import { analyticsPageRoute } from './analytics'
+import { analyticsPageRoute, analyticsPdfPreviewRoute } from './analytics'
+import { createCustomReportRoute } from './createCustomReport'
 import { landingPageRoute } from './vms'
 
 export const rootRoute = createRootRoute({
@@ -59,6 +60,8 @@ const routeTree = rootRoute.addChildren([
       createEmailRoute
     ]),
     analyticsPageRoute,
+    analyticsPdfPreviewRoute,
+    createCustomReportRoute,
   ]),
   authLayoutRoute.addChildren([
     signUpRoute,

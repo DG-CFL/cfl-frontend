@@ -1,3 +1,10 @@
+import { useNavigate } from '@tanstack/react-router'
+import { AlertCircle, ChevronLeft, CloudUpload, Trash2 } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import type { SubmitHandler } from 'react-hook-form'
+import type { EventPostData } from '@/types/events'
+import type { Volunteer } from '@/types/volunteers'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -14,61 +21,74 @@ import {
 } from '@/components/ui/dropzone'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui_custom/DatePicker'
 import { useCreateEvent } from '@/operations/events'
-import type { EventPostData } from '@/types/events'
-import { useNavigate } from '@tanstack/react-router'
-import { AlertCircle, ChevronLeft, CloudUpload, Trash2 } from 'lucide-react'
-import { useState } from 'react'
-import {
-  Controller,
-  useFieldArray,
-  useForm,
-  type SubmitHandler,
-} from 'react-hook-form'
+import { useGetVolunteers } from '@/operations/volunteers'
 
-const EVENT_STATUSES = [
-  { label: 'Active', value: 'Active', color: 'bg-green-500' },
-  { label: 'Inactive', value: 'Inactive', color: 'bg-red-500' },
-]
+type EventCreateFormData = {
+  name: string
+  description: string
+  startDate: Date
+  startTime: string
+  endDate: Date
+  endTime: string
+  venue: string
+  postalCode?: number
+  trainers: Array<{
+    id: string
+  }>
+}
+
+async function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result))
+    reader.onerror = () => reject(new Error('Failed to read cover image'))
+    reader.readAsDataURL(file)
+  })
+}
+
+function combineDateAndTime(date: Date, time: string): string {
+  const [hours, minutes] = time.split(':').map(Number)
+  const combined = new Date(date)
+  combined.setHours(hours || 0, minutes || 0, 0, 0)
+  return combined.toISOString()
+}
 
 export default function CreateEvent() {
   const navigate = useNavigate()
   const createEvent = useCreateEvent()
+  const { data: volunteers } = useGetVolunteers()
 
   const [coverImage, setCoverImage] = useState<Array<File> | undefined>(
     undefined,
   )
+  const [showVolunteerPicker, setShowVolunteerPicker] = useState(false)
+  const [volunteerSearch, setVolunteerSearch] = useState('')
+  const [selectedVolunteers, setSelectedVolunteers] = useState<
+    Array<Volunteer>
+  >([])
 
   const {
     register,
     handleSubmit,
     formState: { isDirty, errors },
     control,
-  } = useForm<EventPostData>({
+  } = useForm<EventCreateFormData>({
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
     defaultValues: {
       name: '',
       venue: '',
       startDate: new Date(),
+      startTime: '09:00',
       endDate: new Date(),
+      endTime: '17:00',
       description: '',
-      trainers: [{ name: '', role: '' }],
+      postalCode: undefined,
+      trainers: [],
     },
-  })
-
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'trainers',
   })
 
   const errorMessages = Object.values(errors)
@@ -77,10 +97,54 @@ export default function CreateEvent() {
 
   const [showExitDialog, setShowExitDialog] = useState(false)
 
+  const filteredVolunteers = useMemo(() => {
+    const volunteerList = volunteers ?? []
+    const searchTerm = volunteerSearch.trim().toLowerCase()
+
+    if (!searchTerm) {
+      return volunteerList
+    }
+
+    return volunteerList.filter((volunteer) =>
+      volunteer.name.toLowerCase().includes(searchTerm),
+    )
+  }, [volunteers, volunteerSearch])
+
+  const addVolunteerCoordinator = (volunteer: Volunteer) => {
+    setSelectedVolunteers((current) => {
+      if (current.some((entry) => entry.id === volunteer.id)) {
+        return current
+      }
+      return [...current, volunteer]
+    })
+  }
+
+  const removeVolunteerCoordinator = (volunteerId: string) => {
+    setSelectedVolunteers((current) =>
+      current.filter((entry) => entry.id !== volunteerId),
+    )
+  }
+
   // TODO: Update Save & Publish button handler
-  const onSubmit: SubmitHandler<EventPostData> = async (data) => {
+  const onSubmit: SubmitHandler<EventCreateFormData> = async (data) => {
     try {
-      await createEvent.mutateAsync(data)
+      const eventPayload: EventPostData = {
+        name: data.name,
+        description: data.description,
+        startDate: combineDateAndTime(data.startDate, data.startTime),
+        endDate: combineDateAndTime(data.endDate, data.endTime),
+        venue: data.venue,
+        postalCode: data.postalCode,
+        coverImage: coverImage?.[0]
+          ? await fileToDataUrl(coverImage[0])
+          : undefined,
+        trainers: selectedVolunteers.map((volunteer) => ({
+          id: volunteer.id,
+          role: 'Volunteer Coordinator',
+        })),
+      }
+
+      await createEvent.mutateAsync(eventPayload)
       navigate({ to: '/events/create-success' })
     } catch (err) {
       console.error(err)
@@ -201,47 +265,86 @@ export default function CreateEvent() {
                 />
               </div>
 
-              {/* Start Date */}
+              {/* Start Date & Time */}
               <div className="space-y-2">
                 <Label
                   htmlFor="startDate"
                   className="text-sm text-slate-600"
                 >
-                  Start Date
+                  Start Date &amp; Time
                 </Label>
-                <Controller
-                  {...register('startDate', {
-                    required: 'Start date is required',
-                  })}
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      id="startDate"
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  )}
-                />
+                <div className="grid grid-cols-[1fr_140px] gap-3">
+                  <Controller
+                    {...register('startDate', {
+                      required: 'Start date is required',
+                    })}
+                    control={control}
+                    render={({ field }) => (
+                      <DatePicker
+                        id="startDate"
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    )}
+                  />
+                  <Input
+                    id="startTime"
+                    type="time"
+                    {...register('startTime', {
+                      required: 'Start time is required',
+                    })}
+                    className="h-12 rounded-md border-slate-500"
+                  />
+                </div>
               </div>
 
-              {/* End Date */}
+              {/* End Date & Time */}
               <div className="space-y-2">
                 <Label
                   htmlFor="endDate"
                   className="text-sm text-slate-600"
                 >
-                  End Date
+                  End Date &amp; Time
                 </Label>
-                <Controller
-                  {...register('endDate', { required: 'End date is required' })}
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      id="endDate"
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  )}
+                <div className="grid grid-cols-[1fr_140px] gap-3">
+                  <Controller
+                    {...register('endDate', { required: 'End date is required' })}
+                    control={control}
+                    render={({ field }) => (
+                      <DatePicker
+                        id="endDate"
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    )}
+                  />
+                  <Input
+                    id="endTime"
+                    type="time"
+                    {...register('endTime', {
+                      required: 'End time is required',
+                    })}
+                    className="h-12 rounded-md border-slate-500"
+                  />
+                </div>
+              </div>
+
+              {/* Postal Code */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="postalCode"
+                  className="text-sm text-slate-600"
+                >
+                  Postal Code
+                </Label>
+                <Input
+                  id="postalCode"
+                  type="number"
+                  {...register('postalCode', {
+                    valueAsNumber: true,
+                    min: { value: 0, message: 'Postal code must be 0 or more' },
+                  })}
+                  className="h-12 rounded-md border-slate-500"
                 />
               </div>
 
@@ -307,7 +410,7 @@ export default function CreateEvent() {
             <Button
               type="button"
               className="h-9 w-auto rounded-md bg-[#5f733c] px-4 py-3 text-base font-semibold hover:bg-[#4d5e30]"
-              onClick={() => append({ name: '', role: '' })}
+              onClick={() => setShowVolunteerPicker(true)}
             >
               + Add Volunteer
             </Button>
@@ -315,51 +418,79 @@ export default function CreateEvent() {
 
           <CardContent className="px-8 py-6">
             <div className="flex flex-col gap-6">
-              {fields.map((field, index) => (
-                <div key={field.id} className="grid grid-cols-2 gap-x-10">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor={`trainers.${index}.name`}
-                      className="text-sm text-slate-600"
-                    >
-                      Name of Volunteer Coordinator
-                    </Label>
-                    <Input
-                      id={`trainers.${index}.name`}
-                      {...register(`trainers.${index}.name` as const)}
-                      className="h-12 rounded-md border-slate-500"
-                    />
-                  </div>
-                  <div className="flex items-end gap-2">
-                    <div className="w-full space-y-2">
-                      <Label
-                        htmlFor={`trainers.${index}.role`}
-                        className="text-sm text-slate-600"
-                      >
-                        Role
-                      </Label>
-                      <Input
-                        id={`trainers.${index}.role`}
-                        {...register(`trainers.${index}.role` as const)}
-                        className="h-12 rounded-md border-slate-500"
-                      />
-                    </div>
+              {selectedVolunteers.length === 0 ? (
+                <p className="text-sm text-slate-500">
+                  No volunteer coordinators selected yet.
+                </p>
+              ) : (
+                selectedVolunteers.map((volunteer) => (
+                  <div
+                    key={volunteer.id}
+                    className="flex items-center justify-between rounded-md border border-slate-300 px-4 py-3"
+                  >
+                    <p className="text-base text-slate-700">{volunteer.name}</p>
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="mb-1 size-10 text-red-500 hover:bg-red-50 hover:text-red-700"
-                      onClick={() => remove(index)}
+                      className="size-10 text-red-500 hover:bg-red-50 hover:text-red-700"
+                      onClick={() => removeVolunteerCoordinator(volunteer.id)}
                     >
                       <Trash2 className="size-5" />
                     </Button>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
       </form>
+
+      <Dialog open={showVolunteerPicker} onOpenChange={setShowVolunteerPicker}>
+        <DialogContent className="max-w-2xl border-slate-300">
+          <DialogHeader className="text-left">
+            <h2>Select Volunteer Coordinators</h2>
+            <p>Search by name and click a volunteer to add.</p>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Input
+              placeholder="Search volunteers"
+              value={volunteerSearch}
+              onChange={(event) => setVolunteerSearch(event.target.value)}
+            />
+            <div className="max-h-80 overflow-y-auto rounded-md border border-slate-300">
+              {filteredVolunteers.length === 0 ? (
+                <p className="px-4 py-3 text-sm text-slate-500">
+                  No volunteers found.
+                </p>
+              ) : (
+                filteredVolunteers.map((volunteer) => (
+                  <button
+                    key={volunteer.id}
+                    type="button"
+                    className="flex w-full items-center justify-between border-b border-slate-200 px-4 py-3 text-left last:border-b-0 hover:bg-slate-50"
+                    onClick={() => addVolunteerCoordinator(volunteer)}
+                  >
+                    <span>{volunteer.name}</span>
+                    {selectedVolunteers.some(
+                      (selected) => selected.id === volunteer.id,
+                    ) && (
+                      <span className="text-xs font-semibold text-slate-500">
+                        Added
+                      </span>
+                    )}
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="button" onClick={() => setShowVolunteerPicker(false)}>
+              Done
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
         <DialogContent className="bg-[#BDD797] border-slate-600">
