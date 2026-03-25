@@ -34,7 +34,6 @@ type EventCreateFormData = {
   endDate: Date
   endTime: string
   venue: string
-  postalCode?: number
   trainers: Array<{
     id: string
   }>
@@ -86,7 +85,6 @@ export default function CreateEvent() {
       endDate: new Date(),
       endTime: '17:00',
       description: '',
-      postalCode: undefined,
       trainers: [],
     },
   })
@@ -134,7 +132,7 @@ export default function CreateEvent() {
         startDate: combineDateAndTime(data.startDate, data.startTime),
         endDate: combineDateAndTime(data.endDate, data.endTime),
         venue: data.venue,
-        postalCode: data.postalCode,
+        postalCode: 0,
         coverImage: coverImage?.[0]
           ? await fileToDataUrl(coverImage[0])
           : undefined,
@@ -327,25 +325,6 @@ export default function CreateEvent() {
                     className="h-12 rounded-md border-slate-500"
                   />
                 </div>
-              </div>
-
-              {/* Postal Code */}
-              <div className="space-y-2">
-                <Label
-                  htmlFor="postalCode"
-                  className="text-sm text-slate-600"
-                >
-                  Postal Code
-                </Label>
-                <Input
-                  id="postalCode"
-                  type="number"
-                  {...register('postalCode', {
-                    valueAsNumber: true,
-                    min: { value: 0, message: 'Postal code must be 0 or more' },
-                  })}
-                  className="h-12 rounded-md border-slate-500"
-                />
               </div>
 
               {/* Event Description */}

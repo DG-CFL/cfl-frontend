@@ -1,3 +1,10 @@
+import { format } from 'date-fns'
+import { useEffect, useMemo, useState } from 'react'
+import type { SubmitHandler } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
+import { useNavigate, useParams } from '@tanstack/react-router'
+import { AlertCircle, ChevronLeft, CloudUpload, Trash2 } from 'lucide-react'
+
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -14,124 +21,201 @@ import {
 } from '@/components/ui/dropzone'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui_custom/DatePicker'
 import { useEditEvent, useGetEvent } from '@/operations/events'
+import { useGetVolunteers } from '@/operations/volunteers'
 import LoadingSkeleton from '@/pages/LoadingSkeleton'
-import type { EventPostData, EventPutData } from '@/types/events'
-import { useNavigate, useParams } from '@tanstack/react-router'
-import { AlertCircle, ChevronLeft, CloudUpload, Trash2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import {
-  Controller,
-  useFieldArray,
-  useForm,
-  type SubmitHandler,
-} from 'react-hook-form'
+import type { EventPutData } from '@/types/events'
+import type { Volunteer } from '@/types/volunteers'
 
-const EVENT_STATUSES = [
-  { label: 'Active', value: 'Active', color: 'bg-green-500' },
-  { label: 'Inactive', value: 'Inactive', color: 'bg-red-500' },
-]
+type EventEditFormData = {
+  name: string
+  description: string
+  startDate: Date
+  startTime: string
+  endDate: Date
+  endTime: string
+  venue: string
+  trainers: Array<{ id: string }>
+}
+
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result))
+    reader.onerror = () =>
+      reject(new Error('Failed to read cover image'))
+    reader.readAsDataURL(file)
+  })
+}
+
+function combineDateAndTime(date: Date, time: string): string {
+  const [hours, minutes] = time.split(':').map(Number)
+  const combined = new Date(date)
+  combined.setHours(hours || 0, minutes || 0, 0, 0)
+  return combined.toISOString()
+}
+
+function toTimeValue(date: Date): string {
+  return format(date, 'HH:mm')
+}
+
+function extractCoordinatorIds(eventData: any): string[] {
+  const raw =
+    eventData?.volunteer_coordinators ?? eventData?.volunteerCoordinators ?? []
+  if (!Array.isArray(raw)) return []
+  if (typeof raw[0] === 'string') return raw
+  return raw
+    .map((x) => x?.id ?? x?.trainer ?? x?.volunteerId)
+    .filter((v): v is string => typeof v === 'string')
+}
 
 export default function EditEvent() {
   const navigate = useNavigate()
   const { eventId } = useParams({ strict: false })
-  const editEvent = useEditEvent(Number(eventId!))
-  const { data: eventData, isLoading } = useGetEvent(Number(eventId!))
+  const eventIdNum = Number(eventId!)
+
+  const editEvent = useEditEvent(eventIdNum)
+  const { data: eventData, isLoading } = useGetEvent(eventIdNum)
+  const { data: volunteers } = useGetVolunteers()
 
   const [showExitDialog, setShowExitDialog] = useState(false)
   const [coverImage, setCoverImage] = useState<Array<File> | undefined>(
     undefined,
   )
+  const [existingCoverImage, setExistingCoverImage] = useState<
+    string | undefined
+  >(undefined)
+
+  const [showVolunteerPicker, setShowVolunteerPicker] = useState(false)
+  const [volunteerSearch, setVolunteerSearch] = useState('')
+  const [selectedVolunteers, setSelectedVolunteers] = useState<Array<Volunteer>>(
+    [],
+  )
 
   const {
     register,
     handleSubmit,
+    control,
     reset,
     formState: { isDirty, errors },
-    control,
-  } = useForm<EventPostData>({
+  } = useForm<EventEditFormData>({
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
     defaultValues: {
       name: '',
       venue: '',
       startDate: new Date(),
+      startTime: '09:00',
       endDate: new Date(),
+      endTime: '17:00',
       description: '',
-      trainers: [{ name: '', role: '' }],
+      trainers: [],
     },
-  })
-
-  // Field Array Coordinators
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'trainers',
   })
 
   const errorMessages = Object.values(errors)
     .map((e: any) => e?.message)
     .filter((msg): msg is string => typeof msg === 'string')
 
-  
+  const filteredVolunteers = useMemo(() => {
+    const list = volunteers ?? []
+    const searchTerm = volunteerSearch.trim().toLowerCase()
+    if (!searchTerm) return list
+    return list.filter((volunteer) =>
+      volunteer.name.toLowerCase().includes(searchTerm),
+    )
+  }, [volunteers, volunteerSearch])
+
+  const addVolunteerCoordinator = (volunteer: Volunteer) => {
+    setSelectedVolunteers((current) => {
+      if (current.some((entry) => entry.id === volunteer.id)) return current
+      return [...current, volunteer]
+    })
+  }
+
+  const removeVolunteerCoordinator = (volunteerId: string) => {
+    setSelectedVolunteers((current) =>
+      current.filter((entry) => entry.id !== volunteerId),
+    )
+  }
+
   useEffect(() => {
-    if (eventData) {
-      reset({
-        name: eventData.name,
-        venue: eventData.location,
-        startDate: new Date(eventData.startDate),
-        endDate: new Date(eventData.endDate),
-        description: eventData.description,
-        trainers: eventData.volunteerCoordinators.length > 0 
-          ? eventData.volunteerCoordinators 
-          : [{ name: '', role: '' }],
-      })
-    }
+    if (!eventData) return
+
+    const start = new Date(eventData.startDate)
+    const end = new Date(eventData.endDate)
+    const venueValue = (eventData as any).venue ?? eventData.location ?? ''
+
+    reset({
+      name: eventData.name ?? '',
+      venue: venueValue,
+      startDate: start,
+      startTime: toTimeValue(start),
+      endDate: end,
+      endTime: toTimeValue(end),
+      description: eventData.description ?? '',
+      trainers: [],
+    })
+
+    setExistingCoverImage((eventData as any).coverImage ?? undefined)
   }, [eventData, reset])
 
-  
-  const onSubmit: SubmitHandler<EventPutData> = async (data) => {
+  useEffect(() => {
+    if (!eventData || !volunteers) return
+    const coordinatorIds = extractCoordinatorIds(eventData)
+    setSelectedVolunteers(
+      volunteers.filter((v) => coordinatorIds.includes(v.id)),
+    )
+  }, [eventData, volunteers])
+
+  const onSubmit: SubmitHandler<EventEditFormData> = async (data) => {
     try {
-      await editEvent.mutateAsync(data)
+      const payload: EventPutData = {
+        name: data.name,
+        description: data.description,
+        startDate: combineDateAndTime(data.startDate, data.startTime),
+        endDate: combineDateAndTime(data.endDate, data.endTime),
+        venue: data.venue,
+        postalCode: 0,
+        coverImage: coverImage?.[0]
+          ? await fileToDataUrl(coverImage[0])
+          : existingCoverImage,
+        trainers: selectedVolunteers.map((volunteer) => ({
+          id: volunteer.id,
+          role: 'Volunteer Coordinator',
+        })),
+      }
+
+      await editEvent.mutateAsync(payload)
       navigate({ to: '/events/edit-success' })
     } catch (err) {
       console.error(err)
-      // handle error
     }
   }
 
-  if (isLoading) {
-      return <LoadingSkeleton />
-  }
+  if (isLoading) return <LoadingSkeleton />
 
   return (
     <div className="mx-auto flex w-screen max-w-[1662px] flex-col gap-6 px-10 py-14">
       {/* Header row */}
       <div className="flex items-start justify-between gap-8">
         <div className="flex items-start gap-4">
-            <Button variant="ghost" size="icon" className="size-10" 
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-10"
             onClick={() => {
-              if (isDirty) {
-                setShowExitDialog(true)
-              } else {
-                navigate({ to: '/events' })
-              }
-            }}>
-              <ChevronLeft className="size-8" />
-            </Button>
+              if (isDirty) setShowExitDialog(true)
+              else navigate({ to: '/events' })
+            }}
+          >
+            <ChevronLeft className="size-8" />
+          </Button>
 
           <div className="flex flex-col gap-2">
-            <h1>
-              Edit Event Details
-            </h1>
+            <h1>Edit Event Details</h1>
             <p className="text-xl leading-7 text-muted-foreground">
               Ensure all details are filled
             </p>
@@ -144,15 +228,14 @@ export default function EditEvent() {
             variant="outline"
             className="h-10 px-8 rounded-md !border-slate-600 text-base font-semibold text-slate-600"
             onClick={() => {
-              if (isDirty) {
-                setShowExitDialog(true)
-              } else {
-                navigate({ to: '/events' })
+              if (isDirty) setShowExitDialog(true)
+              else navigate({ to: '/events' })
               }
-            }}
+            }
           >
             Cancel
           </Button>
+
           <Button
             type="submit"
             form="edit-event-form"
@@ -182,23 +265,15 @@ export default function EditEvent() {
           </Alert>
         )}
 
-        {/* Event Details Section */}
         <Card className="rounded-xl border border-slate-300 p-0 gap-0">
-          {/* green section header */}
           <div className="h-16 rounded-t-xl bg-[rgba(101,163,13,0.43)] px-8 flex items-center">
-            <h3>
-              Event Details
-            </h3>
+            <h3>Event Details</h3>
           </div>
 
           <CardContent className="px-8 py-6">
             <div className="grid grid-cols-2 gap-x-10 gap-y-5">
-              {/* Event Name */}
               <div className="col-span-2 space-y-2">
-                <Label
-                  htmlFor="eventName"
-                  className="text-sm text-slate-600"
-                >
+                <Label htmlFor="eventName" className="text-sm text-slate-600">
                   Event Name
                 </Label>
                 <Input
@@ -210,12 +285,8 @@ export default function EditEvent() {
                 />
               </div>
 
-              {/* Location */}
               <div className="col-span-2 space-y-2">
-                <Label
-                  htmlFor="location"
-                  className="text-sm text-slate-600"
-                >
+                <Label htmlFor="location" className="text-sm text-slate-600">
                   Location
                 </Label>
                 <Input
@@ -225,51 +296,62 @@ export default function EditEvent() {
                 />
               </div>
 
-              {/* Start Date */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="startDate"
-                  className="text-sm text-slate-600"
-                >
-                  Start Date
+                <Label htmlFor="startDate" className="text-sm text-slate-600">
+                  Start Date &amp; Time
                 </Label>
-                <Controller
-                  {...register('startDate', {
-                    required: 'Start date is required',
-                  })}
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      id="startDate"
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  )}
-                />
+                <div className="grid grid-cols-[1fr_140px] gap-3">
+                  <Controller
+                    {...register('startDate', {
+                      required: 'Start date is required',
+                    })}
+                    control={control}
+                    render={({ field }) => (
+                      <DatePicker
+                        id="startDate"
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    )}
+                  />
+                  <Input
+                    id="startTime"
+                    type="time"
+                    {...register('startTime', {
+                      required: 'Start time is required',
+                    })}
+                    className="h-12 rounded-md border-slate-500"
+                  />
+                </div>
               </div>
 
-              {/* End Date */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="endDate"
-                  className="text-sm text-slate-600"
-                >
-                  End Date
+                <Label htmlFor="endDate" className="text-sm text-slate-600">
+                  End Date &amp; Time
                 </Label>
-                <Controller
-                  {...register('endDate', { required: 'End date is required' })}
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      id="endDate"
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  )}
-                />
+                <div className="grid grid-cols-[1fr_140px] gap-3">
+                  <Controller
+                    {...register('endDate', { required: 'End date is required' })}
+                    control={control}
+                    render={({ field }) => (
+                      <DatePicker
+                        id="endDate"
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    )}
+                  />
+                  <Input
+                    id="endTime"
+                    type="time"
+                    {...register('endTime', {
+                      required: 'End time is required',
+                    })}
+                    className="h-12 rounded-md border-slate-500"
+                  />
+                </div>
               </div>
 
-              {/* Project Description */}
               <div className="space-y-2">
                 <Label
                   htmlFor="eventDescription"
@@ -286,7 +368,6 @@ export default function EditEvent() {
                 />
               </div>
 
-              {/* Upload Cover Image */}
               <div className="space-y-2">
                 <Label className="text-sm text-slate-600">
                   Upload Cover Image
@@ -296,7 +377,9 @@ export default function EditEvent() {
                   maxFiles={1}
                   src={coverImage}
                   onDrop={(acceptedFiles) =>
-                    setCoverImage(acceptedFiles.length ? acceptedFiles : undefined)
+                    setCoverImage(
+                      acceptedFiles.length ? acceptedFiles : undefined,
+                    )
                   }
                   className="h-40 rounded-md border-[3px] border-transparent !bg-[#969696]"
                   style={{
@@ -312,7 +395,8 @@ export default function EditEvent() {
                   <DropzoneContent className="gap-2">
                     <CloudUpload className="size-10 text-white/80" />
                     <p className="truncate text-sm leading-6 text-slate-50">
-                      {coverImage?.[0]?.name ?? 'Click to upload or drag and drop'}
+                      {coverImage?.[0]?.name ??
+                        'Click to upload or drag and drop'}
                     </p>
                     <p className="text-xs text-white/70">Click to replace</p>
                   </DropzoneContent>
@@ -322,16 +406,13 @@ export default function EditEvent() {
           </CardContent>
         </Card>
 
-        {/* Volunteer Coordinators Section */}
         <Card className="gap-0 rounded-xl border border-slate-300 p-0">
           <div className="flex h-16 items-center justify-between rounded-t-xl bg-[rgba(101,163,13,0.43)] px-8">
-            <h3>
-              Volunteer Coordinators
-            </h3>
+            <h3>Volunteer Coordinators</h3>
             <Button
               type="button"
               className="h-9 w-auto rounded-md bg-[#5f733c] px-4 py-3 text-base font-semibold hover:bg-[#4d5e30]"
-              onClick={() => append({ name: '', role: '' })}
+              onClick={() => setShowVolunteerPicker(true)}
             >
               + Add Volunteer
             </Button>
@@ -339,59 +420,96 @@ export default function EditEvent() {
 
           <CardContent className="px-8 py-6">
             <div className="flex flex-col gap-6">
-              {fields.map((field, index) => (
-                <div key={field.id} className="grid grid-cols-2 gap-x-10">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor={`trainers.${index}.name`}
-                      className="text-sm text-slate-600"
-                    >
-                      Name of Volunteer Coordinator
-                    </Label>
-                    <Input
-                      id={`trainers.${index}.name`}
-                      {...register(`trainers.${index}.name` as const)}
-                      className="h-12 rounded-md border-slate-500"
-                    />
-                  </div>
-                  <div className="flex items-end gap-2">
-                    <div className="w-full space-y-2">
-                      <Label
-                        htmlFor={`trainers.${index}.role`}
-                        className="text-sm text-slate-600"
-                      >
-                        Role
-                      </Label>
-                      <Input
-                        id={`trainers.${index}.role`}
-                        {...register(`trainers.${index}.role` as const)}
-                        className="h-12 rounded-md border-slate-500"
-                      />
-                    </div>
+              {selectedVolunteers.length === 0 ? (
+                <p className="text-sm text-slate-500">
+                  No volunteer coordinators selected yet.
+                </p>
+              ) : (
+                selectedVolunteers.map((volunteer) => (
+                  <div
+                    key={volunteer.id}
+                    className="flex items-center justify-between rounded-md border border-slate-300 px-4 py-3"
+                  >
+                    <p className="text-base text-slate-700">
+                      {volunteer.name}
+                    </p>
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="mb-1 size-10 text-red-500 hover:bg-red-50 hover:text-red-700"
-                      onClick={() => remove(index)}
+                      className="size-10 text-red-500 hover:bg-red-50 hover:text-red-700"
+                      onClick={() => removeVolunteerCoordinator(volunteer.id)}
                     >
                       <Trash2 className="size-5" />
                     </Button>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
       </form>
 
+      <Dialog
+        open={showVolunteerPicker}
+        onOpenChange={setShowVolunteerPicker}
+      >
+        <DialogContent className="max-w-2xl border-slate-300">
+          <DialogHeader className="text-left">
+            <h2>Select Volunteer Coordinators</h2>
+            <p>Search by name and click a volunteer to add.</p>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <Input
+              placeholder="Search volunteers"
+              value={volunteerSearch}
+              onChange={(event) => setVolunteerSearch(event.target.value)}
+            />
+
+            <div className="max-h-80 overflow-y-auto rounded-md border border-slate-300">
+              {filteredVolunteers.length === 0 ? (
+                <p className="px-4 py-3 text-sm text-slate-500">
+                  No volunteers found.
+                </p>
+              ) : (
+                filteredVolunteers.map((volunteer) => (
+                  <button
+                    key={volunteer.id}
+                    type="button"
+                    className="flex w-full items-center justify-between border-b border-slate-200 px-4 py-3 text-left last:border-b-0 hover:bg-slate-50"
+                    onClick={() => addVolunteerCoordinator(volunteer)}
+                  >
+                    <span>{volunteer.name}</span>
+                    {selectedVolunteers.some(
+                      (selected) => selected.id === volunteer.id,
+                    ) && (
+                      <span className="text-xs font-semibold text-slate-500">
+                        Added
+                      </span>
+                    )}
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              onClick={() => setShowVolunteerPicker(false)}
+            >
+              Done
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
         <DialogContent className="bg-[#BDD797] border-slate-600">
           <DialogHeader className="text-center sm:text-center">
             <h2>Are you sure?</h2>
-            <p>
-              You have unsaved changes. Are you sure you want to leave?
-            </p>
+            <p>You have unsaved changes. Are you sure you want to leave?</p>
           </DialogHeader>
           <DialogFooter className="sm:justify-center gap-[10px]">
             <Button
