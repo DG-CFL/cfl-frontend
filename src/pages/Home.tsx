@@ -3,6 +3,10 @@ import { useCurrentUser } from "@/auth/AuthProvider";
 export default function Home() {
   const user = useCurrentUser()
 
+  const currentUser = useCurrentUser()
+
+  console.log('currentUser:', currentUser)
+
   return (
     <div className="w-screen flex flex-col md:flex-row h-screen bg-[#F7F7F7]">
       
