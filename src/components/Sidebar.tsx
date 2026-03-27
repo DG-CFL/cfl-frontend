@@ -3,7 +3,6 @@ import { Link, useNavigate } from "@tanstack/react-router"
 import {
   BarChart2,
   Calendar,
-  CalendarClock,
   ChevronLeft,
   ChevronRight,
   Home,
@@ -27,7 +26,6 @@ const TOP: Item[] = [
   { label: "Volunteer Management System", to: "/vms", icon: Users },
   { label: "Events", to: "/events", icon: BarChart2 },
   { label: "Analytics", to: "/analytics", icon: TrendingUp },
-  { label: "Trainer Booking", to: "/trainer-booking", icon: CalendarClock },
 ]
 
 const BOTTOM: Item[] = [
