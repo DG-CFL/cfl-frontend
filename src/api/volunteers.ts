@@ -1,7 +1,7 @@
 import type { Volunteer, VolunteerCertification, VolunteerEvent } from '@/types/volunteers'
 import { api } from './baseApi'
 
-const baseUrl = '/v1/vms'
+const baseUrl = '/v1/admin/vms'
 
 // Returns a list of volunteers
 // TODO: Accept params for filtering, sorting and pagination

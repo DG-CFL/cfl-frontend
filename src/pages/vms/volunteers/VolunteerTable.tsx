@@ -288,6 +288,7 @@ export function VolunteerTable({ setClickedRow }: VolunteerTableProps) {
   const [rowSelection, setRowSelection] = useState({})
 
   const { data: volunteers } = useGetVolunteers()
+  console.log('volunteers:', volunteers);
   const data = useMemo(() => volunteers ?? [], [volunteers])
 
   const table = useReactTable({
