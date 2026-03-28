@@ -19,7 +19,6 @@ import { useGetAnalytics } from "@/operations/analytics";
 import { AnalyticsReportContent } from "@/pages/analytics/AnalyticsReportContent";
 
 export default function AnalyticsPage() {
-  useGetAnalytics();
   const navigate = useNavigate();
   const [timePeriod, setTimePeriod] = useState("this-year");
   const [exportOpen, setExportOpen] = useState(false);

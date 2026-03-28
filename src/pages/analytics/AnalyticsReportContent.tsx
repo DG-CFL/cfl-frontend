@@ -1,9 +1,12 @@
 import { ArrowDown, ArrowUp, Download, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useGetAnalytics } from "@/operations/analytics";
+import LoadingSkeleton from "../LoadingSkeleton";
+import type { TrainingOverviewDataPoint } from "@/types/analytics";
 
 interface MetricCardProps {
   title: string;
-  value: string;
+  value: string | number;
   change: string;
   isPositive: boolean;
 }
@@ -46,17 +49,11 @@ export function MetricCard({
   );
 }
 
-export function TrainingOverviewChart() {
-  const dataPoints = [
-    { people: 120, sessions: 5 },
-    { people: 150, sessions: 7 },
-    { people: 180, sessions: 8 },
-    { people: 200, sessions: 10 },
-    { people: 220, sessions: 12 },
-    { people: 240, sessions: 12 },
-    { people: 250, sessions: 15 },
-  ];
+type TrainingOverviewChartProps = {
+  dataPoints: TrainingOverviewDataPoint[]
+}
 
+export function TrainingOverviewChart({dataPoints}: TrainingOverviewChartProps) {
   const width = 600;
   const height = 300;
   const padding = { top: 40, right: 60, bottom: 40, left: 60 };
@@ -220,14 +217,17 @@ export function TrainingOverviewChart() {
   );
 }
 
-export function CertificationsChart() {
-  const certified = 65;
-  const uncertified = 35;
-  const total = certified + uncertified;
+type CertificationChartProps = {
+  totalCount: number
+  certifiedCount: number
+}
 
+export function CertificationsChart({totalCount, certifiedCount}: CertificationChartProps) {
+ 
   const radius = 80;
   const circumference = 2 * Math.PI * radius;
-  const certifiedOffset = circumference - (certified / total) * circumference;
+  const certifiedOffset = circumference - (certifiedCount / totalCount) * circumference;
+  const certifiedPercent = Math.round((certifiedCount / totalCount) * 100)
 
   return (
     <Card className="bg-white">
@@ -265,7 +265,7 @@ export function CertificationsChart() {
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <div className="text-4xl font-bold text-gray-900">
-                {certified}%
+                {certifiedPercent}%
               </div>
               <div className="text-sm text-gray-600">of members</div>
               <div className="text-sm text-gray-600">certified</div>
@@ -289,50 +289,56 @@ export function CertificationsChart() {
 
 /** Same metrics + charts as the main Analytics page (for live view and PDF preview). */
 export function AnalyticsReportContent() {
+  const { data, isLoading} = useGetAnalytics()
+
+  if (isLoading || !data) {
+    return <LoadingSkeleton/>
+  }
+
   return (
     <>
       <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         <MetricCard
           title="Total Training Sessions"
-          value="12 / 15"
+          value={data.totalTrainingSessions}
           change="35%"
           isPositive={true}
         />
         <MetricCard
           title="No. of People Trained"
-          value="240"
+          value={data.numberPeopleTrained}
           change="20%"
           isPositive={true}
         />
         <MetricCard
           title="Newly Certified Volunteers"
-          value="45"
+          value={data.newlyCertifiedMembers}
           change="14%"
           isPositive={true}
         />
         <MetricCard
           title="Total Certified"
-          value="892"
+          value={data.certifiedMembers}
           change="5%"
           isPositive={true}
         />
         <MetricCard
           title="Average Attendance"
-          value="94.3%"
+          value={data.averageAttendance}
           change="35%"
           isPositive={true}
         />
         <MetricCard
           title="Volunteer Engagement"
-          value="78 / 100"
+          value={data.volunteerEngagement}
           change="25%"
           isPositive={false}
         />
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <TrainingOverviewChart />
-        <CertificationsChart />
+        <TrainingOverviewChart dataPoints={data.trainingOverview}/>
+        <CertificationsChart totalCount={data.totalMembers} certifiedCount={data.certifiedMembers}/>
       </div>
     </>
   );
