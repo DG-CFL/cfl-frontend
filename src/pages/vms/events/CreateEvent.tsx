@@ -23,7 +23,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui_custom/DatePicker'
-import { useCurrentUser } from '@/auth/AuthProvider'
 import { useCreateEvent } from '@/operations/events'
 import { useGetVolunteers } from '@/operations/volunteers'
 import {
@@ -62,7 +61,6 @@ function combineDateAndTime(date: Date, time: string): string {
 
 export default function CreateEvent() {
   const navigate = useNavigate()
-  const currentUser = useCurrentUser()
   const createEvent = useCreateEvent()
   const { data: volunteers } = useGetVolunteers()
 
@@ -139,7 +137,6 @@ export default function CreateEvent() {
   // TODO: Update Save & Publish button handler
   const onSubmit: SubmitHandler<EventCreateFormData> = async (data) => {
     try {
-      const trainerRole: string = currentUser?.role ?? 'public'
       const eventPayload: EventPostData = {
         name: data.name,
         description: data.description,
@@ -153,7 +150,7 @@ export default function CreateEvent() {
         trainers: selectedVolunteers
           .map((volunteer) => {
             const id = getVolunteerTrainerId(volunteer)
-            return id ? { id, role: trainerRole } : null
+            return id ? { id, role: 'public' } : null
           })
           .filter((entry): entry is EventTrainerAssignment => entry !== null),
       }
