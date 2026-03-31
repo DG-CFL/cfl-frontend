@@ -4,7 +4,7 @@ import { useNavigate, useParams } from '@tanstack/react-router'
 import { AlertCircle, ChevronLeft, CloudUpload, Trash2 } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
 import type { SubmitHandler } from 'react-hook-form'
-import type { EventPutData } from '@/types/events'
+import type { EventPutData, EventTrainerAssignment } from '@/types/events'
 import type { Volunteer } from '@/types/volunteers'
 import {
   getVolunteerTrainerId,
@@ -29,6 +29,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui_custom/DatePicker'
+import { useCurrentUser } from '@/auth/AuthProvider'
 import { useEditEvent, useGetEvent } from '@/operations/events'
 import { useGetVolunteers } from '@/operations/volunteers'
 import LoadingSkeleton from '@/pages/LoadingSkeleton'
@@ -80,6 +81,7 @@ function extractCoordinatorIds(eventData: any): Array<string> {
 
 export default function EditEvent() {
   const navigate = useNavigate()
+  const currentUser = useCurrentUser()
   const { eventId } = useParams({ strict: false })
   const eventIdNum = Number(eventId!)
 
@@ -189,6 +191,7 @@ export default function EditEvent() {
 
   const onSubmit: SubmitHandler<EventEditFormData> = async (data) => {
     try {
+      const trainerRole: string = currentUser?.role ?? 'public'
       const payload: EventPutData = {
         name: data.name,
         description: data.description,
@@ -200,8 +203,11 @@ export default function EditEvent() {
           ? await fileToDataUrl(coverImage[0])
           : existingCoverImage,
         trainers: selectedVolunteers
-          .map((volunteer) => getVolunteerTrainerId(volunteer))
-          .filter(Boolean),
+          .map((volunteer) => {
+            const id = getVolunteerTrainerId(volunteer)
+            return id ? { id, role: trainerRole } : null
+          })
+          .filter((entry): entry is EventTrainerAssignment => entry !== null),
       }
 
       await editEvent.mutateAsync(payload)
