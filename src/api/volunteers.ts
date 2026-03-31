@@ -10,21 +10,29 @@ export async function getVolunteers(): Promise<Volunteer[]> {
   return res.data
 }
 
-// Returns a volunteer specified by the volunteerId
-export async function getVolunteer(volunteerId: number): Promise<Volunteer> {
-  const res = await api.get(`${baseUrl}/volunteers/${volunteerId}`)
+/** `volunteerId` is the Firebase UID (path: `volunteer_id` in OpenAPI). */
+export async function getVolunteer(volunteerId: string): Promise<Volunteer> {
+  const res = await api.get(
+    `${baseUrl}/volunteers/${encodeURIComponent(volunteerId)}`,
+  )
   return res.data
 }
 
-// Returns the list of the specified volunteer's certifications
-export async function getVolunteerCertifications(volunteerId: number): Promise<VolunteerCertification> {
-  const res = await api.get(`${baseUrl}/volunteers/${volunteerId}/certifications`)
+export async function getVolunteerCertifications(
+  volunteerId: string,
+): Promise<VolunteerCertification> {
+  const res = await api.get(
+    `${baseUrl}/volunteers/${encodeURIComponent(volunteerId)}/certifications`,
+  )
   return res.data
 }
 
-// Returns the list of events attended by the specified volunteer
-export async function getVolunteerHistory(volunteerId: number): Promise<VolunteerEvent> {
-  const res = await api.get(`${baseUrl}/volunteers/${volunteerId}/history`)
+export async function getVolunteerHistory(
+  volunteerId: string,
+): Promise<VolunteerEvent> {
+  const res = await api.get(
+    `${baseUrl}/volunteers/${encodeURIComponent(volunteerId)}/history`,
+  )
   return res.data
 }
 

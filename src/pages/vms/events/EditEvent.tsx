@@ -71,7 +71,10 @@ function extractCoordinatorIds(eventData: any): Array<string> {
   if (!Array.isArray(raw)) return []
   if (typeof raw[0] === 'string') return raw
   return raw
-    .map((x) => x?.id ?? x?.trainer ?? x?.volunteerId)
+    .map(
+      (x) =>
+        x?.volunteerId ?? x?.volunteer_id ?? x?.id ?? x?.trainer,
+    )
     .filter((v): v is string => typeof v === 'string')
 }
 

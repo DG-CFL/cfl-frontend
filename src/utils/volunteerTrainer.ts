@@ -1,22 +1,12 @@
 import type { Volunteer } from '@/types/volunteers'
 
 /**
- * Resolves the Firebase / trainer id used for API `trainers` and selection matching.
+
  */
 export function getVolunteerTrainerId(volunteer: Volunteer): string {
-  const v = volunteer as Volunteer & {
-    firebaseUid?: string
-    uid?: string
-    userId?: string
-  }
-  const candidate =
-    v.firebaseId ??
-    v.firebaseID ??
-    v.firebaseUid ??
-    v.uid ??
-    v.userId ??
-    v.id
-  if (candidate === null || candidate === undefined) return ''
+  const v = volunteer as Volunteer & { volunteer_id?: string }
+  const candidate = v.volunteerId ?? v.volunteer_id ?? v.id
+  if (candidate === undefined) return ''
   const s = typeof candidate === 'string' ? candidate.trim() : String(candidate)
   return s
 }
