@@ -39,6 +39,11 @@ type EventCreateFormData = {
   }>
 }
 
+function getVolunteerTrainerId(volunteer: Volunteer): string {
+  const candidate = volunteer.firebaseId ?? volunteer.firebaseID ?? volunteer.id
+  return typeof candidate === 'string' ? candidate : String(candidate ?? '')
+}
+
 async function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -109,17 +114,24 @@ export default function CreateEvent() {
   }, [volunteers, volunteerSearch])
 
   const addVolunteerCoordinator = (volunteer: Volunteer) => {
+    const volunteerTrainerId = getVolunteerTrainerId(volunteer)
+    if (!volunteerTrainerId) return
+
     setSelectedVolunteers((current) => {
-      if (current.some((entry) => entry.id === volunteer.id)) {
+      if (
+        current.some(
+          (entry) => getVolunteerTrainerId(entry) === volunteerTrainerId,
+        )
+      ) {
         return current
       }
       return [...current, volunteer]
     })
   }
 
-  const removeVolunteerCoordinator = (volunteerId: string) => {
+  const removeVolunteerCoordinator = (trainerId: string) => {
     setSelectedVolunteers((current) =>
-      current.filter((entry) => entry.id !== volunteerId),
+      current.filter((entry) => getVolunteerTrainerId(entry) !== trainerId),
     )
   }
 
@@ -136,10 +148,9 @@ export default function CreateEvent() {
         coverImage: coverImage?.[0]
           ? await fileToDataUrl(coverImage[0])
           : undefined,
-        trainers: selectedVolunteers.map((volunteer) => ({
-          id: volunteer.id,
-          role: 'Volunteer Coordinator',
-        })),
+        trainers: selectedVolunteers
+          .map((volunteer) => getVolunteerTrainerId(volunteer))
+          .filter(Boolean),
       }
 
       await createEvent.mutateAsync(eventPayload)
@@ -404,7 +415,7 @@ export default function CreateEvent() {
               ) : (
                 selectedVolunteers.map((volunteer) => (
                   <div
-                    key={volunteer.id}
+                    key={getVolunteerTrainerId(volunteer) || volunteer.name}
                     className="flex items-center justify-between rounded-md border border-slate-300 px-4 py-3"
                   >
                     <p className="text-base text-slate-700">{volunteer.name}</p>
@@ -413,7 +424,9 @@ export default function CreateEvent() {
                       variant="ghost"
                       size="icon"
                       className="size-10 text-red-500 hover:bg-red-50 hover:text-red-700"
-                      onClick={() => removeVolunteerCoordinator(volunteer.id)}
+                      onClick={() =>
+                        removeVolunteerCoordinator(getVolunteerTrainerId(volunteer))
+                      }
                     >
                       <Trash2 className="size-5" />
                     </Button>
@@ -445,14 +458,16 @@ export default function CreateEvent() {
               ) : (
                 filteredVolunteers.map((volunteer) => (
                   <button
-                    key={volunteer.id}
+                    key={getVolunteerTrainerId(volunteer) || volunteer.name}
                     type="button"
                     className="flex w-full items-center justify-between border-b border-slate-200 px-4 py-3 text-left last:border-b-0 hover:bg-slate-50"
                     onClick={() => addVolunteerCoordinator(volunteer)}
                   >
                     <span>{volunteer.name}</span>
                     {selectedVolunteers.some(
-                      (selected) => selected.id === volunteer.id,
+                      (selected) =>
+                        getVolunteerTrainerId(selected) ===
+                        getVolunteerTrainerId(volunteer),
                     ) && (
                       <span className="text-xs font-semibold text-slate-500">
                         Added

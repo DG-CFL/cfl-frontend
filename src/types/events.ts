@@ -27,10 +27,7 @@ export type EventPostData = {
   venue: string
   postalCode?: number
   coverImage?: string
-  trainers: Array<{
-    id: string
-    role: string
-  }>
+  trainers: Array<string>
 }
 
 export type EventPutData = EventPostData 

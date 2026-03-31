@@ -12,7 +12,7 @@ const baseUrl = '/v1'
  * Returns the list of all events
  */
 export async function getEvents(): Promise<Array<Event>> {
-  const res = await api.get(`${baseUrl}/sessions/events`)
+  const res = await api.get(`${baseUrl}/events`)
   return res.data
 }
 
@@ -20,7 +20,7 @@ export async function getEvents(): Promise<Array<Event>> {
  * Returns an event
  */
 export async function getEvent(eventId: number): Promise<Event> {
-  const res = await api.get(`${baseUrl}/sessions/events/${eventId}`)
+  const res = await api.get(`${baseUrl}/events/${eventId}`)
   return res.data
 }
 
@@ -28,7 +28,7 @@ export async function getEvent(eventId: number): Promise<Event> {
  * Creates a new event
  */
 export async function createEvent(eventData: EventPostData): Promise<Event> {
-  const res = await api.post(`${baseUrl}/sessions/events`, eventData)
+  const res = await api.post(`${baseUrl}/events`, eventData)
   return res.data
 }
 

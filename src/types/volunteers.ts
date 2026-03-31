@@ -1,5 +1,7 @@
 export type Volunteer = {
   id: string
+  firebaseId?: string
+  firebaseID?: string
   name: string
   age: number
   gender: 'Male' | 'Female'

@@ -1,9 +1,11 @@
 import { format } from 'date-fns'
 import { useEffect, useMemo, useState } from 'react'
-import type { SubmitHandler } from 'react-hook-form'
-import { Controller, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { AlertCircle, ChevronLeft, CloudUpload, Trash2 } from 'lucide-react'
+import { Controller, useForm } from 'react-hook-form'
+import type { SubmitHandler } from 'react-hook-form'
+import type { EventPutData } from '@/types/events'
+import type { Volunteer } from '@/types/volunteers'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -26,8 +28,6 @@ import { DatePicker } from '@/components/ui_custom/DatePicker'
 import { useEditEvent, useGetEvent } from '@/operations/events'
 import { useGetVolunteers } from '@/operations/volunteers'
 import LoadingSkeleton from '@/pages/LoadingSkeleton'
-import type { EventPutData } from '@/types/events'
-import type { Volunteer } from '@/types/volunteers'
 
 type EventEditFormData = {
   name: string
@@ -38,6 +38,11 @@ type EventEditFormData = {
   endTime: string
   venue: string
   trainers: Array<{ id: string }>
+}
+
+function getVolunteerTrainerId(volunteer: Volunteer): string {
+  const candidate = volunteer.firebaseId ?? volunteer.firebaseID ?? volunteer.id
+  return typeof candidate === 'string' ? candidate : String(candidate ?? '')
 }
 
 function fileToDataUrl(file: File): Promise<string> {
@@ -61,7 +66,7 @@ function toTimeValue(date: Date): string {
   return format(date, 'HH:mm')
 }
 
-function extractCoordinatorIds(eventData: any): string[] {
+function extractCoordinatorIds(eventData: any): Array<string> {
   const raw =
     eventData?.volunteer_coordinators ?? eventData?.volunteerCoordinators ?? []
   if (!Array.isArray(raw)) return []
@@ -129,15 +134,24 @@ export default function EditEvent() {
   }, [volunteers, volunteerSearch])
 
   const addVolunteerCoordinator = (volunteer: Volunteer) => {
+    const volunteerTrainerId = getVolunteerTrainerId(volunteer)
+    if (!volunteerTrainerId) return
+
     setSelectedVolunteers((current) => {
-      if (current.some((entry) => entry.id === volunteer.id)) return current
+      if (
+        current.some(
+          (entry) => getVolunteerTrainerId(entry) === volunteerTrainerId,
+        )
+      ) {
+        return current
+      }
       return [...current, volunteer]
     })
   }
 
-  const removeVolunteerCoordinator = (volunteerId: string) => {
+  const removeVolunteerCoordinator = (trainerId: string) => {
     setSelectedVolunteers((current) =>
-      current.filter((entry) => entry.id !== volunteerId),
+      current.filter((entry) => getVolunteerTrainerId(entry) !== trainerId),
     )
   }
 
@@ -146,27 +160,28 @@ export default function EditEvent() {
 
     const start = new Date(eventData.startDate)
     const end = new Date(eventData.endDate)
-    const venueValue = (eventData as any).venue ?? eventData.location ?? ''
+    const eventDataWithVenue = eventData as { venue?: string; coverImage?: string }
+    const venueValue = eventDataWithVenue.venue || eventData.location
 
     reset({
-      name: eventData.name ?? '',
+      name: eventData.name,
       venue: venueValue,
       startDate: start,
       startTime: toTimeValue(start),
       endDate: end,
       endTime: toTimeValue(end),
-      description: eventData.description ?? '',
+      description: eventData.description,
       trainers: [],
     })
 
-    setExistingCoverImage((eventData as any).coverImage ?? undefined)
+    setExistingCoverImage(eventDataWithVenue.coverImage)
   }, [eventData, reset])
 
   useEffect(() => {
     if (!eventData || !volunteers) return
     const coordinatorIds = extractCoordinatorIds(eventData)
     setSelectedVolunteers(
-      volunteers.filter((v) => coordinatorIds.includes(v.id)),
+      volunteers.filter((v) => coordinatorIds.includes(getVolunteerTrainerId(v))),
     )
   }, [eventData, volunteers])
 
@@ -182,10 +197,9 @@ export default function EditEvent() {
         coverImage: coverImage?.[0]
           ? await fileToDataUrl(coverImage[0])
           : existingCoverImage,
-        trainers: selectedVolunteers.map((volunteer) => ({
-          id: volunteer.id,
-          role: 'Volunteer Coordinator',
-        })),
+        trainers: selectedVolunteers
+          .map((volunteer) => getVolunteerTrainerId(volunteer))
+          .filter(Boolean),
       }
 
       await editEvent.mutateAsync(payload)
@@ -427,7 +441,7 @@ export default function EditEvent() {
               ) : (
                 selectedVolunteers.map((volunteer) => (
                   <div
-                    key={volunteer.id}
+                    key={getVolunteerTrainerId(volunteer) || volunteer.name}
                     className="flex items-center justify-between rounded-md border border-slate-300 px-4 py-3"
                   >
                     <p className="text-base text-slate-700">
@@ -438,7 +452,9 @@ export default function EditEvent() {
                       variant="ghost"
                       size="icon"
                       className="size-10 text-red-500 hover:bg-red-50 hover:text-red-700"
-                      onClick={() => removeVolunteerCoordinator(volunteer.id)}
+                      onClick={() =>
+                        removeVolunteerCoordinator(getVolunteerTrainerId(volunteer))
+                      }
                     >
                       <Trash2 className="size-5" />
                     </Button>
@@ -475,14 +491,16 @@ export default function EditEvent() {
               ) : (
                 filteredVolunteers.map((volunteer) => (
                   <button
-                    key={volunteer.id}
+                    key={getVolunteerTrainerId(volunteer) || volunteer.name}
                     type="button"
                     className="flex w-full items-center justify-between border-b border-slate-200 px-4 py-3 text-left last:border-b-0 hover:bg-slate-50"
                     onClick={() => addVolunteerCoordinator(volunteer)}
                   >
                     <span>{volunteer.name}</span>
                     {selectedVolunteers.some(
-                      (selected) => selected.id === volunteer.id,
+                      (selected) =>
+                        getVolunteerTrainerId(selected) ===
+                        getVolunteerTrainerId(volunteer),
                     ) && (
                       <span className="text-xs font-semibold text-slate-500">
                         Added
