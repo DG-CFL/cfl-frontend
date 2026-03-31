@@ -8,6 +8,40 @@ import type {
 
 const baseUrl = '/v1'
 
+function absoluteUri(path: string): string {
+  const base = api.defaults.baseURL ?? ''
+  return `${base.replace(/\/$/, '')}/${path.replace(/^\//, '')}`
+}
+
+function sanitizeEventBodyForLog(
+  body: EventPostData | EventPutData,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...body }
+  const cover = out.coverImage
+  if (typeof cover === 'string' && cover.length > 160) {
+    out.coverImage = `[truncated data URL / base64, length=${cover.length}]`
+  }
+  return out
+}
+
+function logEventRequest(
+  method: string,
+  path: string,
+  body: EventPostData | EventPutData,
+): void {
+  console.log(
+    JSON.stringify(
+      {
+        method,
+        uri: absoluteUri(path),
+        body: sanitizeEventBodyForLog(body),
+      },
+      null,
+      2,
+    ),
+  )
+}
+
 /**
  * Returns the list of all events
  */
@@ -28,7 +62,9 @@ export async function getEvent(eventId: number): Promise<Event> {
  * Creates a new event
  */
 export async function createEvent(eventData: EventPostData): Promise<Event> {
-  const res = await api.post(`${baseUrl}/events`, eventData)
+  const path = `${baseUrl}/events`
+  logEventRequest('POST', path, eventData)
+  const res = await api.post(path, eventData)
   return res.data
 }
 
@@ -39,7 +75,9 @@ export async function editEvent(
   eventId: number,
   eventData: EventPutData,
 ): Promise<Event> {
-  const res = await api.put(`${baseUrl}/sessions/events/${eventId}`, eventData)
+  const path = `${baseUrl}/sessions/events/${eventId}`
+  logEventRequest('PUT', path, eventData)
+  const res = await api.put(path, eventData)
   return res.data
 }
 

@@ -6,6 +6,10 @@ import { Controller, useForm } from 'react-hook-form'
 import type { SubmitHandler } from 'react-hook-form'
 import type { EventPutData } from '@/types/events'
 import type { Volunteer } from '@/types/volunteers'
+import {
+  getVolunteerTrainerId,
+  isVolunteerSelected,
+} from '@/utils/volunteerTrainer'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -38,11 +42,6 @@ type EventEditFormData = {
   endTime: string
   venue: string
   trainers: Array<{ id: string }>
-}
-
-function getVolunteerTrainerId(volunteer: Volunteer): string {
-  const candidate = volunteer.firebaseId ?? volunteer.firebaseID ?? volunteer.id
-  return typeof candidate === 'string' ? candidate : String(candidate ?? '')
 }
 
 function fileToDataUrl(file: File): Promise<string> {
@@ -497,11 +496,7 @@ export default function EditEvent() {
                     onClick={() => addVolunteerCoordinator(volunteer)}
                   >
                     <span>{volunteer.name}</span>
-                    {selectedVolunteers.some(
-                      (selected) =>
-                        getVolunteerTrainerId(selected) ===
-                        getVolunteerTrainerId(volunteer),
-                    ) && (
+                    {isVolunteerSelected(volunteer, selectedVolunteers) && (
                       <span className="text-xs font-semibold text-slate-500">
                         Added
                       </span>

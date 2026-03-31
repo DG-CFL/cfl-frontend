@@ -2,6 +2,9 @@ export type Volunteer = {
   id: string
   firebaseId?: string
   firebaseID?: string
+  firebaseUid?: string
+  uid?: string
+  userId?: string
   name: string
   age: number
   gender: 'Male' | 'Female'

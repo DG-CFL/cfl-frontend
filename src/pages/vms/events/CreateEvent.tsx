@@ -25,6 +25,10 @@ import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui_custom/DatePicker'
 import { useCreateEvent } from '@/operations/events'
 import { useGetVolunteers } from '@/operations/volunteers'
+import {
+  getVolunteerTrainerId,
+  isVolunteerSelected,
+} from '@/utils/volunteerTrainer'
 
 type EventCreateFormData = {
   name: string
@@ -37,11 +41,6 @@ type EventCreateFormData = {
   trainers: Array<{
     id: string
   }>
-}
-
-function getVolunteerTrainerId(volunteer: Volunteer): string {
-  const candidate = volunteer.firebaseId ?? volunteer.firebaseID ?? volunteer.id
-  return typeof candidate === 'string' ? candidate : String(candidate ?? '')
 }
 
 async function fileToDataUrl(file: File): Promise<string> {
@@ -464,11 +463,7 @@ export default function CreateEvent() {
                     onClick={() => addVolunteerCoordinator(volunteer)}
                   >
                     <span>{volunteer.name}</span>
-                    {selectedVolunteers.some(
-                      (selected) =>
-                        getVolunteerTrainerId(selected) ===
-                        getVolunteerTrainerId(volunteer),
-                    ) && (
+                    {isVolunteerSelected(volunteer, selectedVolunteers) && (
                       <span className="text-xs font-semibold text-slate-500">
                         Added
                       </span>
