@@ -195,61 +195,50 @@ export default function AnalyticsPdfPreviewPage() {
   const exportPdf = async () => {
     if (!reportRef.current) return
 
-    // Clone the report root
+    const hiddenContainer = document.createElement('div')
+    hiddenContainer.style.position = 'fixed'
+    hiddenContainer.style.top = '-9999px'
+    hiddenContainer.style.left = '-9999px'
+    hiddenContainer.style.width = `${reportRef.current.offsetWidth}px`
+    hiddenContainer.style.height = `${reportRef.current.offsetHeight}px`
+    hiddenContainer.style.overflow = 'visible'
+    document.body.appendChild(hiddenContainer)
+
     const clone = reportRef.current.cloneNode(true) as HTMLElement
+    hiddenContainer.appendChild(clone)
 
-    // Convert any unsupported oklch colors to rgb
-    const fixColors = (el: HTMLElement) => {
-      const style = getComputedStyle(el)
-      for (let i = 0; i < style.length; i++) {
-        const prop = style[i]
-        const value = style.getPropertyValue(prop)
-        if (value.includes('oklch')) {
-          try {
-            const temp = document.createElement('div')
-            temp.style.color = value
-            document.body.appendChild(temp)
-            const rgb = getComputedStyle(temp).color
-            el.style.setProperty(prop, rgb)
-            document.body.removeChild(temp)
-          } catch {}
-        }
-      }
-      el.childNodes.forEach((child) => {
-        if (child instanceof HTMLElement) fixColors(child)
+    try {
+      const canvas = await html2canvas(clone, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        scrollY: -window.scrollY,
       })
-    }
-    fixColors(clone)
 
-    // Render the clone directly (no iframe)
-    const canvas = await html2canvas(clone, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      scrollY: -window.scrollY,
-    })
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new jsPDF('p', 'mm', 'a4')
+      const pageWidth = 210
+      const pageHeight = 297
+      const imgProps = pdf.getImageProperties(imgData)
+      const pdfHeight = (imgProps.height * pageWidth) / imgProps.width
 
-    const imgData = canvas.toDataURL('image/png')
-    const pdf = new jsPDF('p', 'mm', 'a4')
-    const pageWidth = 210
-    const pageHeight = 297
-    const imgProps = pdf.getImageProperties(imgData)
-    const pdfHeight = (imgProps.height * pageWidth) / imgProps.width
+      let heightLeft = pdfHeight
+      let position = 0
 
-    let heightLeft = pdfHeight
-    let position = 0
-
-    pdf.addImage(imgData, 'PNG', 0, position, pageWidth, pdfHeight)
-    heightLeft -= pageHeight
-
-    while (heightLeft > 0) {
-      pdf.addPage()
-      position = heightLeft - pdfHeight
       pdf.addImage(imgData, 'PNG', 0, position, pageWidth, pdfHeight)
       heightLeft -= pageHeight
-    }
 
-    pdf.save(fileName)
+      while (heightLeft > 0) {
+        pdf.addPage()
+        position = heightLeft - pdfHeight
+        pdf.addImage(imgData, 'PNG', 0, position, pageWidth, pdfHeight)
+        heightLeft -= pageHeight
+      }
+
+      pdf.save(fileName)
+    } finally {
+      hiddenContainer.remove()
+    }
   }
 
   return (
@@ -584,4 +573,3 @@ export default function AnalyticsPdfPreviewPage() {
     </div>
   )
 }
-
