@@ -4,7 +4,7 @@ import { format } from 'date-fns'
 import { ArrowLeft, Download, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AnalyticsReportPdf } from './AnalyticsReportPdf'
-import { PDFDownloadLink } from '@react-pdf/renderer'
+import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
 import { useGetAnalyticsSummary } from '@/operations/analytics'
 import { getAnalyticsDateRange } from '@/utils/analyticsDateRange'
 
@@ -85,25 +85,27 @@ export default function AnalyticsPdfPreviewPage() {
       </div>
 
       <div className="mt-6 rounded-lg bg-white p-6 shadow-md">
-        <AnalyticsReportPdf
-          metrics={{
-            totalTrainingSessions: data.totalTrainingSessions,
-            peopleTrained: data.intPeopleTrained,
-            newlyCertifiedMembers: data.newlyCertifiedMembers,
-            certifiedMembers: data.certifiedMembers,
-            averageAttendance: data.averageAttendance,
-            volunteerEngagement: data.volunteerEngagement,
-          }}
-          trainingOverview={data.trainingOverview}
-          certifications={{
-            totalMembers: data.totalMembers,
-            certifiedMembers: data.certifiedMembers,
-          }}
-          reportTitle={reportTitle}
-          periodLine={periodLine}
-          generatedLabel={generatedLabel}
-          watermark={watermark}
-        />
+        <PDFViewer style={{ width: '100%', height: '800px' }}>
+          <AnalyticsReportPdf
+            metrics={{
+              totalTrainingSessions: data.totalTrainingSessions,
+              peopleTrained: data.intPeopleTrained,
+              newlyCertifiedMembers: data.newlyCertifiedMembers,
+              certifiedMembers: data.certifiedMembers,
+              averageAttendance: data.averageAttendance,
+              volunteerEngagement: data.volunteerEngagement,
+            }}
+            trainingOverview={data.trainingOverview}
+            certifications={{
+              totalMembers: data.totalMembers,
+              certifiedMembers: data.certifiedMembers,
+            }}
+            reportTitle={reportTitle}
+            periodLine={periodLine}
+            generatedLabel={generatedLabel}
+            watermark={watermark}
+          />
+        </PDFViewer>
       </div>
     </div>
   )
