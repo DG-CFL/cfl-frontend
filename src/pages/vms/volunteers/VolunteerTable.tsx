@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from '@tanstack/react-router'
+import { CirclePlus, Funnel, Trash } from 'lucide-react'
 import {
   flexRender,
   getCoreRowModel,
@@ -15,7 +16,10 @@ import type {
   SortingState,
   VisibilityState,
 } from '@tanstack/react-table'
-import { Funnel, CirclePlus, Trash, ChevronRight } from 'lucide-react'
+import type { Dispatch, SetStateAction } from 'react'
+
+import type { Volunteer } from '@/types/volunteers'
+import { useGetVolunteers } from '@/operations/volunteers'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -35,14 +39,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import type { Volunteer } from '@/types/volunteers'
-import { volunteerListData } from '@/data/vms'
-import { useGetVolunteers } from '@/operations/volunteers'
 
 const columnFilter = <T,>(
-  column: Column<T, any>,
+  column: Column<T, unknown>,
   columnName: string,
-  options: string[],
+  options: Array<string>,
 ) => {
   return (
     <DropdownMenu>
@@ -56,15 +57,16 @@ const columnFilter = <T,>(
         {options.map((x) => {
           return (
             <DropdownMenuCheckboxItem
+              key={x}
               checked={(
-                (column?.getFilterValue() as string[] | undefined) ?? []
+                (column.getFilterValue() as Array<string> | undefined) ?? []
               ).includes(x)}
               onCheckedChange={() => {
                 const current =
-                  (column?.getFilterValue() as string[] | undefined) ?? []
+                  (column.getFilterValue() as Array<string> | undefined) ?? []
                 column.setFilterValue(
                   current.includes(x)
-                    ? current.filter((v) => v !== x) // remove if already selected
+                    ? current.filter((v) => v !== x)
                     : [...current, x],
                 )
               }}
@@ -78,20 +80,18 @@ const columnFilter = <T,>(
   )
 }
 
-const toStringArray = (value: unknown): Array<string> => {
-  if (!Array.isArray(value)) {
-    return []
-  }
-
-  return value.filter((entry): entry is string => typeof entry === 'string')
+function capitalizeGender(value: unknown): string {
+  const g = typeof value === 'string' ? value : ''
+  if (!g) return '—'
+  return g.charAt(0).toUpperCase() + g.slice(1).toLowerCase()
 }
 
-export const columns: ColumnDef<Volunteer>[] = [
+const columns: Array<ColumnDef<Volunteer>> = [
   {
     id: 'select',
     header: ({ table }) => (
       <Checkbox
-        className="shadow-sm m-2 border-black w-5 h-5"
+        className="m-2 h-5 w-5 border-black shadow-sm"
         checked={
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && 'indeterminate')
@@ -101,9 +101,14 @@ export const columns: ColumnDef<Volunteer>[] = [
       />
     ),
     cell: ({ row }) => (
-      <div className="flex justify-center">
+      <div
+        className="flex justify-center"
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
+        role="presentation"
+      >
         <Checkbox
-          className="shadow-sm m-2 border-black w-5 h-5 "
+          className="m-2 h-5 w-5 border-black shadow-sm"
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
@@ -116,169 +121,116 @@ export const columns: ColumnDef<Volunteer>[] = [
   {
     accessorKey: 'name',
     header: 'Name',
-    size: 500,
+    filterFn: (row, columnId, filterValue) => {
+      const q = String(filterValue ?? '').trim().toLowerCase()
+      if (!q) return true
+      const name = String(row.getValue(columnId) ?? '').toLowerCase()
+      return name.includes(q)
+    },
     cell: ({ row }) => (
-      <div className="capitalize text-center">{row.getValue('name')}</div>
+      <div className="text-center font-medium">{row.getValue('name')}</div>
     ),
   },
   {
     accessorKey: 'age',
-    size: 50,
-    header: ({ column }) => {
-      return (
-        <Button
-          className="text-sm "
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Age
-          <Funnel />
-        </Button>
-      )
-    },
-    cell: ({ row }) => <div className="text-center">{row.getValue('age')}</div>,
+    size: 80,
+    header: ({ column }) => (
+      <Button
+        className="text-sm"
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        Age
+        <Funnel />
+      </Button>
+    ),
+    cell: ({ row }) => (
+      <div className="text-center tabular-nums">{row.getValue('age')}</div>
+    ),
   },
   {
     accessorKey: 'gender',
     filterFn: (row, columnId, value) => {
-      // If no filter value is applied, show all rows
-      if (value.length === 0) return true
-      return value.includes(row.getValue(columnId)) // Check if gender matches filter
+      const selected = (value as Array<string> | undefined) ?? []
+      if (selected.length === 0) return true
+      return selected.includes(String(row.getValue(columnId) ?? ''))
     },
-    header: ({ column }) => {
-      return columnFilter(column, 'Gender', ['Male', 'Female'])
-    },
+    header: ({ column }) =>
+      columnFilter(column, 'Gender', ['male', 'female']),
     cell: ({ row }) => (
-      <div className="capitalize text-center">{row.getValue('gender')}</div>
+      <div className="text-center">{capitalizeGender(row.getValue('gender'))}</div>
     ),
   },
   {
-    accessorKey: 'language',
-    filterFn: (row, columnId, value) => {
-      // If no filter value is applied, show all rows
-      if (value.length === 0) return true
-
-      const selectedLanguages = toStringArray(row.getValue(columnId))
-      return (
-        value.filter((x: string) => !selectedLanguages.includes(x)).length === 0
-      )
-    },
-    header: ({ column }) => {
-      return columnFilter(column, 'Language', ['English', 'Chinese', 'Malay'])
-    },
-    cell: ({ row }) => (
-      <div className="text-center">{toStringArray(row.getValue('language')).join(', ')}</div>
+    accessorKey: 'eventsAttended',
+    header: ({ column }) => (
+      <Button
+        className="text-sm"
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        No. of activities attended
+        <Funnel />
+      </Button>
     ),
-  },
-  {
-    accessorKey: 'activities',
-    size: 50,
-    header: ({ column }) => {
-      return (
-        <Button
-          className="text-sm "
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          No. of activities attended
-          <Funnel />
-        </Button>
-      )
-    },
     cell: ({ row }) => (
-      <div className="text-center">{row.getValue('activities')}</div>
-    ),
-  },
-  {
-    accessorKey: 'trainings',
-    size: 50,
-    header: ({ column }) => {
-      return (
-        <Button
-          className="text-sm "
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          No. of training sessions attended
-          <Funnel />
-        </Button>
-      )
-    },
-    cell: ({ row }) => (
-      <div className="text-center">{row.getValue('trainings')}</div>
-    ),
-  },
-  {
-    accessorKey: 'optin',
-    filterFn: (row, columnId, value) => {
-      // If no filter value is applied, show all rows
-      if (value.length === 0) return true
-      return value.includes(row.getValue(columnId) ? 'Yes' : 'No') // Check if gender matches filter
-    },
-    header: ({ column }) => {
-      return columnFilter(column, 'Email Notification Opt-In', ['Yes', 'No'])
-    },
-    cell: ({ row }) => (
-      <div className="capitalize text-center">
-        {row.getValue('optin') ? 'Yes' : 'No'}
+      <div className="text-center tabular-nums">
+        {row.getValue('eventsAttended') ?? '—'}
       </div>
     ),
   },
   {
-    accessorKey: 'certifications',
-    filterFn: (row, columnId, value) => {
-      if (value.length === 0) return true
-
-      const certifications = toStringArray(row.getValue(columnId))
-      return (
-        value.filter((x: string) => !certifications.includes(x)).length === 0
-      )
-    },
-    header: ({ column }) => {
-      return columnFilter(column, 'Certifications', ['First Aid', '-'])
-    },
+    accessorKey: 'trainingSessionsAttended',
+    header: ({ column }) => (
+      <Button
+        className="text-sm"
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        No. of training sessions attended
+        <Funnel />
+      </Button>
+    ),
     cell: ({ row }) => (
-      <div className="text-center">{row.getValue('certifications')}</div>
+      <div className="text-center tabular-nums">
+        {row.getValue('trainingSessionsAttended') ?? '—'}
+      </div>
     ),
   },
   {
-    accessorKey: 'volunteerHistory',
-    header: () => {
-      return (
-        <Button className="text-sm" variant="ghost">
-          Volunteer History
-        </Button>
-      )
+    accessorKey: 'emailOptIn',
+    filterFn: (row, columnId, value) => {
+      const selected = (value as Array<string> | undefined) ?? []
+      if (selected.length === 0) return true
+      const yn = row.getValue(columnId) ? 'Yes' : 'No'
+      return selected.includes(yn)
     },
+    header: ({ column }) =>
+      columnFilter(column, 'Email Notification Opt-In', ['Yes', 'No']),
     cell: ({ row }) => (
-      <div className="flex justify-between items-center w-full">
-        <div className="flex-grow text-center">
-          {' '}
-          {row.getValue('volunteerHistory')}{' '}
+      <div className="text-center">
+        {row.getValue('emailOptIn') ? 'Yes' : 'No'}
+      </div>
+    ),
+  },
+  {
+    id: 'certificate',
+    accessorFn: (row) => row.certificate,
+    header: 'Certificate',
+    cell: ({ row }) => {
+      const c = row.original.certificate
+      const has = c !== null && c !== undefined && typeof c === 'object'
+      return (
+        <div className="text-center text-sm">
+          {has ? 'Yes' : '—'}
         </div>
-        <ChevronRight />
-      </div>
-    ),
+      )
+    },
   },
 ]
 
-type actionButtonProps = {
-  children: React.ReactNode
-}
-
-function ActionButton({ children }: actionButtonProps) {
-  return (
-    <Button
-      variant="outline"
-      className="rounded-full text-sm h-8 bg-gray-500 text-white mx-3"
-    >
-      {children}
-    </Button>
-  )
-}
-
 type VolunteerTableProps = {
-  setClickedRow: React.Dispatch<React.SetStateAction<Volunteer | null>>
+  setClickedRow: Dispatch<SetStateAction<Volunteer | null>>
 }
 
 export function VolunteerTable({ setClickedRow }: VolunteerTableProps) {
@@ -287,13 +239,13 @@ export function VolunteerTable({ setClickedRow }: VolunteerTableProps) {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
 
-  const { data: volunteers } = useGetVolunteers()
-  console.log('volunteers:', volunteers);
+  const { data: volunteers, isLoading, isError } = useGetVolunteers()
   const data = useMemo(() => volunteers ?? [], [volunteers])
 
   const table = useReactTable({
     data,
     columns,
+    getRowId: (row) => row.volunteerId ?? row.id ?? row.name,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -309,24 +261,49 @@ export function VolunteerTable({ setClickedRow }: VolunteerTableProps) {
       rowSelection,
     },
   })
+
   const handleRowClick = (row: Volunteer) => {
     setClickedRow(row)
   }
 
+  if (isError) {
+    return (
+      <p className="text-sm text-red-600">
+        Could not load volunteers. Check that you are signed in and try again.
+      </p>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="rounded-md border bg-white p-12 text-center text-slate-600">
+        Loading volunteers…
+      </div>
+    )
+  }
+
   return (
     <div className="w-full">
-      <div className="flex justify-between py-4">
-        <div className="flex  items-end">
+      <div className="flex flex-col justify-between gap-4 py-4 sm:flex-row sm:items-end">
+        <div className="flex flex-wrap items-end gap-2">
           <Link to="/volunteers/email">
-            <ActionButton>
-              <CirclePlus />
+            <Button
+              type="button"
+              variant="outline"
+              className="h-8 rounded-full bg-gray-500 px-3 text-sm text-white hover:bg-gray-600"
+            >
+              <CirclePlus className="mr-1 inline h-4 w-4" />
               Send Email
-            </ActionButton>
+            </Button>
           </Link>
-          <ActionButton>
-            <Trash />
+          <Button
+            type="button"
+            variant="outline"
+            className="h-8 rounded-full bg-gray-500 px-3 text-sm text-white hover:bg-gray-600"
+          >
+            <Trash className="mr-1 inline h-4 w-4" />
             Delete
-          </ActionButton>
+          </Button>
         </div>
 
         <div>
@@ -338,20 +315,24 @@ export function VolunteerTable({ setClickedRow }: VolunteerTableProps) {
           </Label>
           <Input
             id="searchbar"
-            placeholder="Search"
-            value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-            onChange={(event) =>
-              table.getColumn('name')?.setFilterValue(event.target.value)
+            placeholder="Search by name"
+            value={
+              (table.getColumn('name')?.getFilterValue() as string | undefined) ||
+              ''
             }
-            className="max-w-sm h-8"
+            onChange={(event) => {
+              const col = table.getColumn('name')
+              if (col) col.setFilterValue(event.target.value)
+            }}
+            className="h-8 max-w-sm"
           />
         </div>
       </div>
-      <div className="overflow-hidden rounded-md border">
+      <div className="overflow-hidden rounded-md border bg-white">
         <Table>
           <TableHeader className="text-center">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="">
+              <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead className="text-center" key={header.id}>
@@ -368,10 +349,11 @@ export function VolunteerTable({ setClickedRow }: VolunteerTableProps) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
+                  className="cursor-pointer hover:bg-slate-50"
                   data-state={row.getIsSelected() && 'selected'}
                   onClick={() => handleRowClick(row.original)}
                 >
@@ -391,7 +373,7 @@ export function VolunteerTable({ setClickedRow }: VolunteerTableProps) {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  No volunteers found.
                 </TableCell>
               </TableRow>
             )}
@@ -399,7 +381,7 @@ export function VolunteerTable({ setClickedRow }: VolunteerTableProps) {
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="text-muted-foreground flex-1 text-sm">
+        <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{' '}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>

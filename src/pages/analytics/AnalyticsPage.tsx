@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Download, Plus } from "lucide-react";
+
+import type { AnalyticsTimePeriod } from "@/utils/analyticsDateRange";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,12 +18,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useGetAnalytics } from "@/operations/analytics";
 import { AnalyticsReportContent } from "@/pages/analytics/AnalyticsReportContent";
 
 export default function AnalyticsPage() {
   const navigate = useNavigate();
-  const [timePeriod, setTimePeriod] = useState("this-year");
+  const [timePeriod, setTimePeriod] = useState<AnalyticsTimePeriod>("this-year");
   const [exportOpen, setExportOpen] = useState(false);
 
   return (
@@ -29,7 +31,10 @@ export default function AnalyticsPage() {
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-4xl font-bold text-gray-900">Analytics</h1>
         <div className="flex flex-wrap items-center gap-3">
-          <Select value={timePeriod} onValueChange={setTimePeriod}>
+          <Select
+            value={timePeriod}
+            onValueChange={(v) => setTimePeriod(v as AnalyticsTimePeriod)}
+          >
             <SelectTrigger
               size="sm"
               className="!w-[140px] !h-9 !bg-white !border !border-gray-300 !text-gray-600 hover:!bg-gray-50 !rounded-lg !px-3 !text-sm !shadow-none data-[size=sm]:!h-9 data-[size=default]:!h-9"
@@ -95,7 +100,7 @@ export default function AnalyticsPage() {
         </DialogContent>
       </Dialog>
 
-      <AnalyticsReportContent />
+      <AnalyticsReportContent timePeriod={timePeriod} />
     </div>
   );
 }

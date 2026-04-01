@@ -1,14 +1,25 @@
+/** Certificate from GET /volunteers/{volunteer_id} detail response */
+export type VolunteerCertificate = {
+  link: string
+  date: string
+}
 export type Volunteer = {
-  id: string
+  volunteerId?: string
+  id?: string
   name: string
   age: number
-  gender: 'Male' | 'Female'
-  language: string[]
-  activities: number
-  trainings: number
-  optin: boolean
-  certifications: string[]
-  volunteerHistory: string
+  gender: string
+  emailOptIn?: boolean
+  eventsAttended?: number
+  trainingSessionsAttended?: number
+  certificate?: VolunteerCertificate | null
+  /** Legacy / mock-only fields */
+  language?: string[]
+  activities?: number
+  trainings?: number
+  optin?: boolean
+  certifications?: string[]
+  volunteerHistory?: string
 }
 
 export type VolunteerEvent = {

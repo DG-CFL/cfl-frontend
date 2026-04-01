@@ -21,7 +21,7 @@ export function useGetVolunteers() {
 /**
  * Returns a volunteer
  */
-export function useGetVolunteer(volunteerId: number) {
+export function useGetVolunteer(volunteerId: string) {
   return useQuery({
     queryKey: ['volunteers', volunteerId],
     queryFn: () => getVolunteer(volunteerId),
@@ -31,7 +31,7 @@ export function useGetVolunteer(volunteerId: number) {
 /**
  * Returns the list of the volunteer's certifications
  */
-export function useGetVolunteerCertifications(volunteerId: number) {
+export function useGetVolunteerCertifications(volunteerId: string) {
   return useQuery({
     queryKey: ['volunteers', volunteerId, 'certifications'],
     queryFn: () => getVolunteerCertifications(volunteerId),
@@ -41,7 +41,7 @@ export function useGetVolunteerCertifications(volunteerId: number) {
 /**
  * Returns the list of events attended by the volunteer
  */
-export function useGetVolunteerHistory(volunteerId: number) {
+export function useGetVolunteerHistory(volunteerId: string) {
   return useQuery({
     queryKey: ['volunteers', volunteerId, 'history'],
     queryFn: () => getVolunteerHistory(volunteerId),

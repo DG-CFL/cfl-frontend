@@ -3,7 +3,7 @@ import { AlertCircle, ChevronLeft, CloudUpload, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import type { SubmitHandler } from 'react-hook-form'
-import type { EventPostData } from '@/types/events'
+import type { EventPostData, EventTrainerAssignment } from '@/types/events'
 import type { Volunteer } from '@/types/volunteers'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -25,6 +25,10 @@ import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui_custom/DatePicker'
 import { useCreateEvent } from '@/operations/events'
 import { useGetVolunteers } from '@/operations/volunteers'
+import {
+  getVolunteerTrainerId,
+  isVolunteerSelected,
+} from '@/utils/volunteerTrainer'
 
 type EventCreateFormData = {
   name: string
@@ -109,17 +113,24 @@ export default function CreateEvent() {
   }, [volunteers, volunteerSearch])
 
   const addVolunteerCoordinator = (volunteer: Volunteer) => {
+    const volunteerTrainerId = getVolunteerTrainerId(volunteer)
+    if (!volunteerTrainerId) return
+
     setSelectedVolunteers((current) => {
-      if (current.some((entry) => entry.id === volunteer.id)) {
+      if (
+        current.some(
+          (entry) => getVolunteerTrainerId(entry) === volunteerTrainerId,
+        )
+      ) {
         return current
       }
       return [...current, volunteer]
     })
   }
 
-  const removeVolunteerCoordinator = (volunteerId: string) => {
+  const removeVolunteerCoordinator = (trainerId: string) => {
     setSelectedVolunteers((current) =>
-      current.filter((entry) => entry.id !== volunteerId),
+      current.filter((entry) => getVolunteerTrainerId(entry) !== trainerId),
     )
   }
 
@@ -136,10 +147,12 @@ export default function CreateEvent() {
         coverImage: coverImage?.[0]
           ? await fileToDataUrl(coverImage[0])
           : undefined,
-        trainers: selectedVolunteers.map((volunteer) => ({
-          id: volunteer.id,
-          role: 'Volunteer Coordinator',
-        })),
+        trainers: selectedVolunteers
+          .map((volunteer) => {
+            const id = getVolunteerTrainerId(volunteer)
+            return id ? { id, role: 'public' } : null
+          })
+          .filter((entry): entry is EventTrainerAssignment => entry !== null),
       }
 
       await createEvent.mutateAsync(eventPayload)
@@ -404,7 +417,7 @@ export default function CreateEvent() {
               ) : (
                 selectedVolunteers.map((volunteer) => (
                   <div
-                    key={volunteer.id}
+                    key={getVolunteerTrainerId(volunteer) || volunteer.name}
                     className="flex items-center justify-between rounded-md border border-slate-300 px-4 py-3"
                   >
                     <p className="text-base text-slate-700">{volunteer.name}</p>
@@ -413,7 +426,9 @@ export default function CreateEvent() {
                       variant="ghost"
                       size="icon"
                       className="size-10 text-red-500 hover:bg-red-50 hover:text-red-700"
-                      onClick={() => removeVolunteerCoordinator(volunteer.id)}
+                      onClick={() =>
+                        removeVolunteerCoordinator(getVolunteerTrainerId(volunteer))
+                      }
                     >
                       <Trash2 className="size-5" />
                     </Button>
@@ -445,15 +460,13 @@ export default function CreateEvent() {
               ) : (
                 filteredVolunteers.map((volunteer) => (
                   <button
-                    key={volunteer.id}
+                    key={getVolunteerTrainerId(volunteer) || volunteer.name}
                     type="button"
                     className="flex w-full items-center justify-between border-b border-slate-200 px-4 py-3 text-left last:border-b-0 hover:bg-slate-50"
                     onClick={() => addVolunteerCoordinator(volunteer)}
                   >
                     <span>{volunteer.name}</span>
-                    {selectedVolunteers.some(
-                      (selected) => selected.id === volunteer.id,
-                    ) && (
+                    {isVolunteerSelected(volunteer, selectedVolunteers) && (
                       <span className="text-xs font-semibold text-slate-500">
                         Added
                       </span>

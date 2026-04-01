@@ -1,19 +1,68 @@
+import { useMemo, useState } from 'react'
+import { useQueries } from '@tanstack/react-query'
+import { Link, useParams } from '@tanstack/react-router'
+import {
+  CalendarDays,
+  ChevronRight,
+  ImageIcon,
+  MapPin,
+  SquarePen,
+} from 'lucide-react'
+
+import type { EventParticipantEntry } from '@/types/events'
+import type { Volunteer } from '@/types/volunteers'
+
+import { getVolunteer } from '@/api/volunteers'
+import { useCurrentUser } from '@/auth/AuthProvider'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ErrorAlert } from '@/components/ui_custom/ErrorAlert'
 import { useGetEvent } from '@/operations/events'
-import type { Person } from '@/types/events'
-import { Link, useParams } from '@tanstack/react-router'
-import { CalendarDays, ImageIcon, MapPin, SquarePen } from 'lucide-react'
 import LoadingSkeleton from '@/pages/LoadingSkeleton'
-import { useCurrentUser } from '@/auth/AuthProvider'
+import { VolunteerProfileModal } from '@/pages/vms/events/VolunteerProfileModal'
 
 export default function ViewEvent() {
   const { eventId } = useParams({ strict: false })
+  const eventIdNum = Number(eventId!)
 
-  const { data, isLoading, isError } = useGetEvent(Number(eventId!))
-
+  const { data, isLoading, isError } = useGetEvent(eventIdNum)
   const currentUser = useCurrentUser()
+  const canOpenVolunteerProfile =
+    currentUser != null && currentUser.role !== 'public'
+
+  const coordinatorIds = useMemo(
+    () => collectFirebaseIds(data?.volunteerCoordinators),
+    [data?.volunteerCoordinators],
+  )
+  const participantIds = useMemo(
+    () => collectFirebaseIds(data?.volunteers),
+    [data?.volunteers],
+  )
+
+  const uniqueIds = useMemo(() => {
+    return [...new Set([...coordinatorIds, ...participantIds])]
+  }, [coordinatorIds, participantIds])
+
+  const volunteerQueries = useQueries({
+    queries: uniqueIds.map((id) => ({
+      queryKey: ['volunteers', id] as const,
+      queryFn: () => getVolunteer(id),
+      staleTime: 5 * 60 * 1000,
+    })),
+  })
+
+  const volunteerById = useMemo(() => {
+    const map = new Map<string, Volunteer>()
+    uniqueIds.forEach((id, index) => {
+      const result = volunteerQueries[index]?.data
+      if (result) map.set(id, result)
+    })
+    return map
+  }, [uniqueIds, volunteerQueries])
+
+  const [profileVolunteerId, setProfileVolunteerId] = useState<string | null>(
+    null,
+  )
 
   if (isLoading) {
     return <LoadingSkeleton />
@@ -36,7 +85,7 @@ export default function ViewEvent() {
           </Link>
         )}
         {currentUser?.role === 'public' && (
-          <Link to='/events/$eventId/register' params={{ eventId: eventId!}}>
+          <Link to="/events/$eventId/register" params={{ eventId: eventId! }}>
             <Button className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold">
               Sign Up Now!
             </Button>
@@ -52,7 +101,6 @@ export default function ViewEvent() {
         </CardHeader>
         <CardContent className="flex-1 overflow-y-auto px-8 pb-8 pt-0">
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {/* Row 1: Status, Location, Cover Image */}
             <div className="space-y-3">
               <p className="text-xl leading-7 text-muted-foreground">Status</p>
               <Button
@@ -89,7 +137,6 @@ export default function ViewEvent() {
               </div>
             </div>
 
-            {/* Row 2: Start Date & End Date (left) | Description (right, spanning 2 cols) */}
             <div className="space-y-6">
               <div className="space-y-3">
                 <p className="text-xl leading-7 text-muted-foreground">
@@ -132,42 +179,135 @@ export default function ViewEvent() {
         <CardContent className="grid max-h-[600px] gap-10 overflow-y-auto px-8 py-8 lg:grid-cols-2">
           <div className="space-y-6">
             <h2>Volunteer Coordinators</h2>
-            <div className="space-y-5">
-              {data.volunteerCoordinators.map((person) => (
-                <PersonListItem key={person.role} person={person} />
-              ))}
+            <div className="space-y-3">
+              {data.volunteerCoordinators.length === 0 ? (
+                <p className="text-sm text-muted-foreground">None listed.</p>
+              ) : (
+                data.volunteerCoordinators.map((entry, index) => (
+                  <PersonListItem
+                    key={`coord-${typeof entry === 'string' ? entry : entry.name}-${index}`}
+                    entry={entry}
+                    defaultRole="Volunteer Coordinator"
+                    volunteerById={volunteerById}
+                    queryLoading={volunteerQueries.some((q) => q.isLoading)}
+                    interactive={canOpenVolunteerProfile}
+                    onOpenProfile={(id) => setProfileVolunteerId(id)}
+                  />
+                ))
+              )}
             </div>
           </div>
 
           <div className="space-y-6">
             <h2>Volunteers</h2>
-            <div className="space-y-5">
-              {data.volunteers.map((person, index) => (
-                <PersonListItem
-                  key={`${person.name}-${index}`}
-                  person={person}
-                />
-              ))}
+            <div className="space-y-3">
+              {data.volunteers.length === 0 ? (
+                <p className="text-sm text-muted-foreground">None listed.</p>
+              ) : (
+                data.volunteers.map((entry, index) => (
+                  <PersonListItem
+                    key={`vol-${typeof entry === 'string' ? entry : entry.name}-${index}`}
+                    entry={entry}
+                    defaultRole="Volunteer"
+                    volunteerById={volunteerById}
+                    queryLoading={volunteerQueries.some((q) => q.isLoading)}
+                    interactive={canOpenVolunteerProfile}
+                    onOpenProfile={(id) => setProfileVolunteerId(id)}
+                  />
+                ))
+              )}
             </div>
           </div>
         </CardContent>
       </Card>
+
+      {canOpenVolunteerProfile && (
+        <VolunteerProfileModal
+          volunteerId={profileVolunteerId}
+          open={profileVolunteerId !== null}
+          onOpenChange={(open) => {
+            if (!open) setProfileVolunteerId(null)
+          }}
+        />
+      )}
     </div>
   )
 }
 
-function PersonListItem({ person }: { person: Person | string }) {
-  const isStringEntry = typeof person === 'string'
-  const displayName = isStringEntry ? person : person.name
-  const displayRole = isStringEntry ? 'Volunteer' : person.role
+function collectFirebaseIds(
+  entries: Array<EventParticipantEntry> | undefined,
+): Array<string> {
+  if (!entries?.length) return []
+  return entries.filter((e): e is string => typeof e === 'string')
+}
+
+function PersonListItem({
+  entry,
+  defaultRole,
+  volunteerById,
+  queryLoading,
+  interactive,
+  onOpenProfile,
+}: {
+  entry: EventParticipantEntry
+  defaultRole: string
+  volunteerById: Map<string, Volunteer>
+  queryLoading: boolean
+  interactive: boolean
+  onOpenProfile: (volunteerId: string) => void
+}) {
+  if (typeof entry === 'string') {
+    const resolved = volunteerById.get(entry)
+    const displayName =
+      resolved?.name ?? (queryLoading ? 'Loading…' : entry)
+
+    const body = (
+      <>
+        <div className="flex items-center gap-4">
+          <div
+            className="size-12 shrink-0 rounded-full bg-gradient-to-br from-[#545F71] to-[#6b7280] ring-2 ring-white shadow"
+            aria-hidden="true"
+          />
+          <div className="space-y-0.5">
+            <h3 className="text-lg font-semibold text-slate-900">{displayName}</h3>
+            <p className="text-base text-muted-foreground">{defaultRole}</p>
+          </div>
+        </div>
+        {interactive ? (
+          <ChevronRight
+            className="size-5 shrink-0 text-slate-400 transition group-hover:text-[#545F71]"
+            aria-hidden
+          />
+        ) : null}
+      </>
+    )
+
+    if (!interactive) {
+      return (
+        <div className="flex w-full items-center gap-4 rounded-xl px-3 py-2">
+          {body}
+        </div>
+      )
+    }
+
+    return (
+      <button
+        type="button"
+        onClick={() => onOpenProfile(entry)}
+        className="group flex w-full items-center justify-between gap-4 rounded-xl border border-transparent px-3 py-2 text-left transition hover:border-slate-200 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#545F71]"
+      >
+        {body}
+      </button>
+    )
+  }
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-4 rounded-xl px-3 py-2">
       <div className="size-12 rounded-full bg-muted" aria-hidden="true" />
       <div className="space-y-1">
-        <h3>{displayName}</h3>
+        <h3>{entry.name}</h3>
         <p className="text-base leading-7 text-muted-foreground">
-          {displayRole}
+          {entry.role || defaultRole}
         </p>
       </div>
     </div>
