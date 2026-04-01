@@ -52,7 +52,7 @@ export default function AnalyticsPdfPreviewPage() {
               <AnalyticsReportPdf
                 metrics={{
                   totalTrainingSessions: data.totalTrainingSessions,
-                  intPeopleTrained: data.intPeopleTrained,
+                  peopleTrained: data.intPeopleTrained,
                   newlyCertifiedMembers: data.newlyCertifiedMembers,
                   certifiedMembers: data.certifiedMembers,
                   averageAttendance: data.averageAttendance,
@@ -88,7 +88,7 @@ export default function AnalyticsPdfPreviewPage() {
         <AnalyticsReportPdf
           metrics={{
             totalTrainingSessions: data.totalTrainingSessions,
-            intPeopleTrained: data.intPeopleTrained,
+            peopleTrained: data.intPeopleTrained,
             newlyCertifiedMembers: data.newlyCertifiedMembers,
             certifiedMembers: data.certifiedMembers,
             averageAttendance: data.averageAttendance,

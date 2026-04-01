@@ -11,7 +11,7 @@ import type { TrainingOverviewDataPoint } from '@/types/analytics'
 
 type Metrics = {
   totalTrainingSessions: number
-  intPeopleTrained: number
+  peopleTrained: number
   newlyCertifiedMembers: number
   certifiedMembers: number
   averageAttendance: number
@@ -48,7 +48,11 @@ const styles = StyleSheet.create({
     transform: 'rotate(-30deg)',
   },
   section: { marginBottom: 20 },
-  metricsRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 },
+  metricsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 5,
+  },
   chartImage: { width: '100%', height: 200, marginVertical: 10 },
 })
 
@@ -98,7 +102,13 @@ function generateCertificationsImage(cert: CertificationsData) {
   // certified
   const percent = totalMembers ? certifiedMembers / totalMembers : 0
   ctx.beginPath()
-  ctx.arc(center, center, radius, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * percent)
+  ctx.arc(
+    center,
+    center,
+    radius,
+    -Math.PI / 2,
+    -Math.PI / 2 + 2 * Math.PI * percent,
+  )
   ctx.strokeStyle = '#059669'
   ctx.lineWidth = 20
   ctx.stroke()
@@ -115,8 +125,14 @@ export const AnalyticsReportPdf: FC<Props> = ({
   generatedLabel,
   watermark,
 }) => {
-  const trainingImg = useMemo(() => generateTrainingOverviewImage(trainingOverview), [trainingOverview])
-  const certificationsImg = useMemo(() => generateCertificationsImage(certifications), [certifications])
+  const trainingImg = useMemo(
+    () => generateTrainingOverviewImage(trainingOverview),
+    [trainingOverview],
+  )
+  const certificationsImg = useMemo(
+    () => generateCertificationsImage(certifications),
+    [certifications],
+  )
 
   return (
     <Document>
@@ -124,16 +140,29 @@ export const AnalyticsReportPdf: FC<Props> = ({
         {watermark && <Text style={styles.watermark}>Draft</Text>}
         <View style={styles.header}>
           <Text style={styles.title}>{reportTitle}</Text>
-          <Text style={styles.period}>{periodLine} • Generated on {generatedLabel}</Text>
+          <Text style={styles.period}>
+            {periodLine} • Generated on {generatedLabel}
+          </Text>
         </View>
 
         <View style={styles.section}>
-          {Object.entries(metrics).map(([key, value]) => (
-            <View key={key} style={styles.metricsRow}>
-              <Text>{key.replace(/([A-Z])/g, ' $1')}</Text>
-              <Text>{value}</Text>
-            </View>
-          ))}
+          {Object.entries(metrics).map(([key, value]) => {
+            if (value === 0 || value === undefined || value === null) {
+              return (
+                <View key={key} style={styles.metricsRow}>
+                  <Text>{formatMetric(key)}</Text>
+                  <Text>—</Text>
+                </View>
+              )
+            }
+
+            return (
+              <View key={key} style={styles.metricsRow}>
+                <Text>{formatMetric(key)}</Text>
+                <Text>{formatNumber(value)}</Text>
+              </View>
+            )
+          })}
         </View>
 
         <View style={styles.section}>
@@ -143,9 +172,27 @@ export const AnalyticsReportPdf: FC<Props> = ({
 
         <View style={styles.section}>
           <Text>Certifications</Text>
-          {certificationsImg && <Image src={certificationsImg} style={styles.chartImage} />}
+          {certificationsImg && (
+            <Image src={certificationsImg} style={styles.chartImage} />
+          )}
         </View>
       </Page>
     </Document>
   )
+}
+
+function formatMetric(key: string) {
+  const map: Record<string, string> = {
+    totalTrainingSessions: 'Total Training Sessions',
+    peopleTrained: 'People Trained',
+    newlyCertifiedMembers: 'Newly Certified Members',
+    certifiedMembers: 'Certified Members',
+    averageAttendance: 'Average Attendance',
+    volunteerEngagement: 'Volunteer Engagement',
+  }
+  return map[key] ?? key.replace(/([A-Z])/g, ' $1')
+}
+
+function formatNumber(value: number) {
+  return value.toLocaleString(undefined, { maximumFractionDigits: 1 })
 }
