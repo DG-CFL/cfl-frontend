@@ -193,56 +193,47 @@ export default function AnalyticsPdfPreviewPage() {
   }
 
   const exportPdf = async () => {
-    if (!reportRef.current) return;
+    if (!reportRef.current) return
 
-    const input = reportRef.current;
+    // Wait a tick to ensure React has rendered all dynamic content
+    await new Promise((resolve) => setTimeout(resolve, 100))
 
-    // Clone the node to override colors for PDF export
-    const clone = input.cloneNode(true) as HTMLElement;
+    const input = reportRef.current
 
-    // Apply standard colors for background and text to avoid oklch issues
-    clone.style.backgroundColor = '#FFFFFF'; // override white bg
-    clone.querySelectorAll<HTMLElement>('*').forEach((el) => {
-      const bg = window.getComputedStyle(el).backgroundColor;
-      const color = window.getComputedStyle(el).color;
-
-      // Only allow standard CSS colors
-      if (bg && bg.includes('oklch')) el.style.backgroundColor = '#FFFFFF';
-      if (color && color.includes('oklch')) el.style.color = '#000000';
-    });
-
-    // Render with html2canvas
-    const canvas = await html2canvas(clone, {
+    // Use html2canvas with proper options for Tailwind/SVG support
+    const canvas = await html2canvas(input, {
       scale: 2,
       useCORS: true,
       allowTaint: true,
       scrollY: -window.scrollY,
-    });
+      backgroundColor: null, // preserve transparent backgrounds if needed
+      logging: false,
+    })
 
-    const imgData = canvas.toDataURL('image/png');
+    const imgData = canvas.toDataURL('image/png')
 
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pageWidth = 210;
-    const pageHeight = 297;
+    const pdf = new jsPDF('p', 'mm', 'a4')
+    const pageWidth = 210
+    const pageHeight = 297
 
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfHeight = (imgProps.height * pageWidth) / imgProps.width;
+    const imgProps = pdf.getImageProperties(imgData)
+    const pdfHeight = (imgProps.height * pageWidth) / imgProps.width
 
-    let heightLeft = pdfHeight;
-    let position = 0;
+    let heightLeft = pdfHeight
+    let position = 0
 
-    pdf.addImage(imgData, 'PNG', 0, position, pageWidth, pdfHeight);
-    heightLeft -= pageHeight;
+    pdf.addImage(imgData, 'PNG', 0, position, pageWidth, pdfHeight)
+    heightLeft -= pageHeight
 
     while (heightLeft > 0) {
-      pdf.addPage();
-      position = heightLeft - pdfHeight;
-      pdf.addImage(imgData, 'PNG', 0, position, pageWidth, pdfHeight);
-      heightLeft -= pageHeight;
+      pdf.addPage()
+      position = heightLeft - pdfHeight
+      pdf.addImage(imgData, 'PNG', 0, position, pageWidth, pdfHeight)
+      heightLeft -= pageHeight
     }
 
-    pdf.save(fileName);
-  };
+    pdf.save(fileName)
+  }
 
   return (
     <div className="min-h-screen w-full bg-[#F7F7F7] p-6">
