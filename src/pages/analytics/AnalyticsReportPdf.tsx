@@ -146,23 +146,12 @@ export const AnalyticsReportPdf: FC<Props> = ({
         </View>
 
         <View style={styles.section}>
-          {Object.entries(metrics).map(([key, value]) => {
-            if (value === 0 || value === undefined || value === null) {
-              return (
-                <View key={key} style={styles.metricsRow}>
-                  <Text>{formatMetric(key)}</Text>
-                  <Text>—</Text>
-                </View>
-              )
-            }
-
-            return (
-              <View key={key} style={styles.metricsRow}>
-                <Text>{formatMetric(key)}</Text>
-                <Text>{formatNumber(value)}</Text>
-              </View>
-            )
-          })}
+          {Object.entries(metrics).map(([key, value]) => (
+            <View key={key} style={styles.metricsRow}>
+              <Text>{formatMetric(key)}</Text>
+              <Text>{value.toLocaleString()}</Text>
+            </View>
+          ))}
         </View>
 
         <View style={styles.section}>
