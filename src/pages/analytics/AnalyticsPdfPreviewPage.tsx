@@ -195,10 +195,34 @@ export default function AnalyticsPdfPreviewPage() {
   const exportPdf = async () => {
     if (!reportRef.current) return
 
-    // clone DOM and fix oklch colors
-    const fixedReport = cloneAndFixColors(reportRef.current)
+    // Clone the report root
+    const clone = reportRef.current.cloneNode(true) as HTMLElement
 
-    const canvas = await html2canvas(fixedReport, {
+    // Convert any unsupported oklch colors to rgb
+    const fixColors = (el: HTMLElement) => {
+      const style = getComputedStyle(el)
+      for (let i = 0; i < style.length; i++) {
+        const prop = style[i]
+        const value = style.getPropertyValue(prop)
+        if (value.includes('oklch')) {
+          try {
+            const temp = document.createElement('div')
+            temp.style.color = value
+            document.body.appendChild(temp)
+            const rgb = getComputedStyle(temp).color
+            el.style.setProperty(prop, rgb)
+            document.body.removeChild(temp)
+          } catch {}
+        }
+      }
+      el.childNodes.forEach((child) => {
+        if (child instanceof HTMLElement) fixColors(child)
+      })
+    }
+    fixColors(clone)
+
+    // Render the clone directly (no iframe)
+    const canvas = await html2canvas(clone, {
       scale: 2,
       useCORS: true,
       allowTaint: true,
@@ -209,7 +233,6 @@ export default function AnalyticsPdfPreviewPage() {
     const pdf = new jsPDF('p', 'mm', 'a4')
     const pageWidth = 210
     const pageHeight = 297
-
     const imgProps = pdf.getImageProperties(imgData)
     const pdfHeight = (imgProps.height * pageWidth) / imgProps.width
 
@@ -562,35 +585,3 @@ export default function AnalyticsPdfPreviewPage() {
   )
 }
 
-function cloneAndFixColors(element: HTMLElement): HTMLElement {
-  const clone = element.cloneNode(true) as HTMLElement
-
-  const traverse = (el: HTMLElement) => {
-    const style = getComputedStyle(el)
-    for (let i = 0; i < style.length; i++) {
-      const prop = style[i] as string
-      const value = style.getPropertyValue(prop)
-      if (value.includes('oklch')) {
-        try {
-          // Create temporary element to convert color
-          const temp = document.createElement('div')
-          temp.style.color = value
-          document.body.appendChild(temp)
-          const rgb = getComputedStyle(temp).color
-          el.style.setProperty(prop, rgb)
-          document.body.removeChild(temp)
-        } catch {
-          // ignore conversion errors
-        }
-      }
-    }
-
-    // recursively fix children
-    el.childNodes.forEach((child) => {
-      if (child instanceof HTMLElement) traverse(child)
-    })
-  }
-
-  traverse(clone)
-  return clone
-}
