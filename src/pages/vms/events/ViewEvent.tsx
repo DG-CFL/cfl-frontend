@@ -27,6 +27,8 @@ export default function ViewEvent() {
 
   const { data, isLoading, isError } = useGetEvent(eventIdNum)
   const currentUser = useCurrentUser()
+  const canOpenVolunteerProfile =
+    currentUser != null && currentUser.role !== 'public'
 
   const coordinatorIds = useMemo(
     () => collectFirebaseIds(data?.volunteerCoordinators),
@@ -188,6 +190,7 @@ export default function ViewEvent() {
                     defaultRole="Volunteer Coordinator"
                     volunteerById={volunteerById}
                     queryLoading={volunteerQueries.some((q) => q.isLoading)}
+                    interactive={canOpenVolunteerProfile}
                     onOpenProfile={(id) => setProfileVolunteerId(id)}
                   />
                 ))
@@ -208,6 +211,7 @@ export default function ViewEvent() {
                     defaultRole="Volunteer"
                     volunteerById={volunteerById}
                     queryLoading={volunteerQueries.some((q) => q.isLoading)}
+                    interactive={canOpenVolunteerProfile}
                     onOpenProfile={(id) => setProfileVolunteerId(id)}
                   />
                 ))
@@ -217,13 +221,15 @@ export default function ViewEvent() {
         </CardContent>
       </Card>
 
-      <VolunteerProfileModal
-        volunteerId={profileVolunteerId}
-        open={profileVolunteerId !== null}
-        onOpenChange={(open) => {
-          if (!open) setProfileVolunteerId(null)
-        }}
-      />
+      {canOpenVolunteerProfile && (
+        <VolunteerProfileModal
+          volunteerId={profileVolunteerId}
+          open={profileVolunteerId !== null}
+          onOpenChange={(open) => {
+            if (!open) setProfileVolunteerId(null)
+          }}
+        />
+      )}
     </div>
   )
 }
@@ -240,12 +246,14 @@ function PersonListItem({
   defaultRole,
   volunteerById,
   queryLoading,
+  interactive,
   onOpenProfile,
 }: {
   entry: EventParticipantEntry
   defaultRole: string
   volunteerById: Map<string, Volunteer>
   queryLoading: boolean
+  interactive: boolean
   onOpenProfile: (volunteerId: string) => void
 }) {
   if (typeof entry === 'string') {
@@ -253,12 +261,8 @@ function PersonListItem({
     const displayName =
       resolved?.name ?? (queryLoading ? 'Loading…' : entry)
 
-    return (
-      <button
-        type="button"
-        onClick={() => onOpenProfile(entry)}
-        className="group flex w-full items-center justify-between gap-4 rounded-xl border border-transparent px-3 py-2 text-left transition hover:border-slate-200 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#545F71]"
-      >
+    const body = (
+      <>
         <div className="flex items-center gap-4">
           <div
             className="size-12 shrink-0 rounded-full bg-gradient-to-br from-[#545F71] to-[#6b7280] ring-2 ring-white shadow"
@@ -269,10 +273,30 @@ function PersonListItem({
             <p className="text-base text-muted-foreground">{defaultRole}</p>
           </div>
         </div>
-        <ChevronRight
-          className="size-5 shrink-0 text-slate-400 transition group-hover:text-[#545F71]"
-          aria-hidden
-        />
+        {interactive ? (
+          <ChevronRight
+            className="size-5 shrink-0 text-slate-400 transition group-hover:text-[#545F71]"
+            aria-hidden
+          />
+        ) : null}
+      </>
+    )
+
+    if (!interactive) {
+      return (
+        <div className="flex w-full items-center gap-4 rounded-xl px-3 py-2">
+          {body}
+        </div>
+      )
+    }
+
+    return (
+      <button
+        type="button"
+        onClick={() => onOpenProfile(entry)}
+        className="group flex w-full items-center justify-between gap-4 rounded-xl border border-transparent px-3 py-2 text-left transition hover:border-slate-200 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#545F71]"
+      >
+        {body}
       </button>
     )
   }

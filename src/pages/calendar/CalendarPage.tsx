@@ -1,6 +1,7 @@
 import { addDays, addWeeks, format, subDays, subWeeks } from 'date-fns'
 import { Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from '@tanstack/react-router'
 
 import LoadingSkeleton from '../LoadingSkeleton'
 import CalendarDayView from './calenderViews/CalendarDayView'
@@ -16,6 +17,8 @@ import type {
 } from '@/pages/calendar/CalendarHeader'
 import type { CalendarState } from '@/components/ui/calendarpage'
 import type { CalendarCategory } from './SampleCalendarData'
+
+import { useCurrentUser } from '@/auth/AuthProvider'
 import CalendarBar from '@/pages/calendar/CalendarSideBar'
 import { CalendarBarHeader } from '@/pages/calendar/CalendarHeader'
 import { useGetEvents } from '@/operations/events'
@@ -25,8 +28,6 @@ import {
   useCalendarMonth,
   useCalendarYear,
 } from '@/components/ui/calendarpage'
-import { Link } from '@tanstack/react-router'
-
 
 const CalendarPage = () => {
   const [view, setView] = useState<CalendarViewOption>('month')
@@ -38,6 +39,9 @@ const CalendarPage = () => {
 
   const [month, setMonth] = useCalendarMonth()
   const [year, setYear] = useCalendarYear()
+  const currentUser = useCurrentUser()
+  const showCreateEvent =
+    currentUser != null && currentUser.role !== 'public'
 
   useEffect(() => {
     setMonth(new Date().getMonth() as CalendarState['month'])
@@ -222,15 +226,17 @@ const CalendarPage = () => {
             </main>
           </CalendarProvider>
         </div>
-        <Button
-          asChild
-          size="icon"
-          className="fixed bottom-8 right-8 h-14 w-14 rounded-full bg-[#334155] shadow-lg hover:bg-[#1e293b]"
-        >
-          <Link to="/events/create">
-            <Plus className="h-6 w-6" />
-          </Link>
-        </Button>
+        {showCreateEvent && (
+          <Button
+            asChild
+            size="icon"
+            className="fixed bottom-8 right-8 h-14 w-14 rounded-full bg-[#334155] shadow-lg hover:bg-[#1e293b]"
+          >
+            <Link to="/events/create">
+              <Plus className="h-6 w-6" />
+            </Link>
+          </Button>
+        )}
       </div>
     </div>
   )
