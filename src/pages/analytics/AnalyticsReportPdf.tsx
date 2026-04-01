@@ -56,32 +56,79 @@ const styles = StyleSheet.create({
   chartImage: { width: '100%', height: 200, marginVertical: 10 },
 })
 
-// Helper: generate training overview SVG as PNG data URL
 function generateTrainingOverviewImage(data: TrainingOverviewDataPoint[]) {
   if (!data.length) return ''
   const canvas = document.createElement('canvas')
   canvas.width = 600
   canvas.height = 300
   const ctx = canvas.getContext('2d')!
+  const padding = 40
+
   ctx.fillStyle = '#fff'
   ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+  // Axes
+  ctx.strokeStyle = '#ccc'
+  ctx.lineWidth = 1
+  ctx.beginPath()
+  ctx.moveTo(padding, padding)
+  ctx.lineTo(padding, canvas.height - padding)
+  ctx.lineTo(canvas.width - padding, canvas.height - padding)
+  ctx.stroke()
+
+  const maxPeople = Math.max(...data.map(d => d.people), 1)
+  const xStep = (canvas.width - 2 * padding) / (data.length - 1)
+
+  // Draw grid lines and Y labels
+  ctx.fillStyle = '#000'
+  ctx.font = '10px Helvetica'
+  ctx.textAlign = 'right'
+  ctx.textBaseline = 'middle'
+  const gridSteps = 5
+  for (let i = 0; i <= gridSteps; i++) {
+    const y = padding + ((canvas.height - 2 * padding) * i) / gridSteps
+    const value = Math.round(maxPeople * (1 - i / gridSteps))
+    ctx.strokeStyle = '#eee'
+    ctx.beginPath()
+    ctx.moveTo(padding, y)
+    ctx.lineTo(canvas.width - padding, y)
+    ctx.stroke()
+    ctx.fillText(value.toString(), padding - 5, y)
+  }
+
+  // Line
   ctx.strokeStyle = '#60A5FA'
   ctx.lineWidth = 2
-
-  const maxPeople = Math.max(...data.map((d) => d.people), 1)
-  const xStep = canvas.width / (data.length - 1 || 1)
-
   ctx.beginPath()
   data.forEach((p, i) => {
-    const x = i * xStep
-    const y = canvas.height - (p.people / maxPeople) * canvas.height
+    const x = padding + i * xStep
+    const y = padding + (canvas.height - 2 * padding) * (1 - p.people / maxPeople)
     i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
   })
   ctx.stroke()
+
+  // Data points
+  ctx.fillStyle = '#2563EB'
+  data.forEach((p, i) => {
+    const x = padding + i * xStep
+    const y = padding + (canvas.height - 2 * padding) * (1 - p.people / maxPeople)
+    ctx.beginPath()
+    ctx.arc(x, y, 3, 0, 2 * Math.PI)
+    ctx.fill()
+  })
+
+  // X-axis labels
+  // ctx.fillStyle = '#000'
+  // ctx.textAlign = 'center'
+  // ctx.textBaseline = 'top'
+  // data.forEach((p, i) => {
+  //   const x = padding + i * xStep
+  //   ctx.fillText(p., x, canvas.height - padding + 5)
+  // })
+
   return canvas.toDataURL('image/png')
 }
 
-// Helper: generate certifications chart PNG
 function generateCertificationsImage(cert: CertificationsData) {
   const { totalMembers, certifiedMembers } = cert
   const radius = 80
@@ -92,26 +139,30 @@ function generateCertificationsImage(cert: CertificationsData) {
   ctx.clearRect(0, 0, canvas.width, canvas.height)
   const center = 100
 
-  // background
-  ctx.beginPath()
-  ctx.arc(center, center, radius, 0, 2 * Math.PI)
-  ctx.strokeStyle = '#D1FAE5'
-  ctx.lineWidth = 20
-  ctx.stroke()
-
-  // certified
   const percent = totalMembers ? certifiedMembers / totalMembers : 0
+
+  // Certified slice
   ctx.beginPath()
-  ctx.arc(
-    center,
-    center,
-    radius,
-    -Math.PI / 2,
-    -Math.PI / 2 + 2 * Math.PI * percent,
-  )
-  ctx.strokeStyle = '#059669'
-  ctx.lineWidth = 20
-  ctx.stroke()
+  ctx.moveTo(center, center)
+  ctx.arc(center, center, radius, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * percent)
+  ctx.closePath()
+  ctx.fillStyle = '#10B981'
+  ctx.fill()
+
+  // Uncertified slice
+  ctx.beginPath()
+  ctx.moveTo(center, center)
+  ctx.arc(center, center, radius, -Math.PI / 2 + 2 * Math.PI * percent, -Math.PI / 2 + 2 * Math.PI)
+  ctx.closePath()
+  ctx.fillStyle = '#D1FAE5'
+  ctx.fill()
+
+  // Text label
+  ctx.fillStyle = '#000'
+  ctx.font = '14px Helvetica'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(`${certifiedMembers} / ${totalMembers} Certified`, center, center)
 
   return canvas.toDataURL('image/png')
 }
