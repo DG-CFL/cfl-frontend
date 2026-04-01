@@ -11,9 +11,9 @@ import { getAnalyticsDateRange } from '@/utils/analyticsDateRange'
 export default function AnalyticsPdfPreviewPage() {
   const [watermark] = useState(false) // static since no UI
   const reportTitle = 'Analytics'
-  const periodLine = '1 November 2025 - 30 November 2025'
 
   const range = getAnalyticsDateRange('this-year')
+  const periodLine = `${format(range.begin, 'd MMMM yyyy')} - ${format(range.end, 'd MMMM yyyy')}`
   const { data, isLoading, isError } = useGetAnalyticsSummary(range)
 
   const generatedLabel = format(new Date(), 'd MMMM yyyy')
