@@ -5,6 +5,8 @@ export type Person = {
 
 export type EventCategory = 'event' | 'training'
 
+export type EventParticipantEntry = Person | string
+
 export type Event = {
   eventId: number
   name: string
@@ -15,8 +17,8 @@ export type Event = {
   startDate: Date
   endDate: Date
   description: string
-  volunteerCoordinators: Array<Person>
-  volunteers: Array<Person>
+  volunteerCoordinators: Array<EventParticipantEntry>
+  volunteers: Array<EventParticipantEntry>
 }
 
 /** Matches backend `TrainerAssignment`: Firebase UID + role (see SessionCreateUpdate). */
