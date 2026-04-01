@@ -1,56 +1,58 @@
-import { useEffect, useRef, useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { format } from "date-fns";
+import { useEffect, useRef, useState } from 'react'
+import { Link } from '@tanstack/react-router'
+import { format } from 'date-fns'
 import {
   ArrowLeft,
   CalendarDays,
   CheckCircle2,
   Download,
   Mail,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar } from "@/components/ui/calendar";
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Calendar } from '@/components/ui/calendar'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from '@/components/ui/popover'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { AnalyticsReportContent } from "@/pages/analytics/AnalyticsReportContent";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { AnalyticsReportContent } from '@/pages/analytics/AnalyticsReportContent'
+import { cn } from '@/lib/utils'
+import jsPDF from 'jspdf'
+import html2canvas from 'html2canvas'
 
-const SAGE_PANEL = "#D4E4C4";
-const SAGE_MODAL = "#C8DDB0";
+const SAGE_PANEL = '#D4E4C4'
+const SAGE_MODAL = '#C8DDB0'
 
-const REPORT_FILE_BASE = "CFL_Impact_Report";
+const REPORT_FILE_BASE = 'CFL_Impact_Report'
 
 const REPORT_LANG_CODES: Record<string, string> = {
-  english: "en",
-  malay: "ms",
-  chinese: "zh",
-  tamil: "ta",
-};
+  english: 'en',
+  malay: 'ms',
+  chinese: 'zh',
+  tamil: 'ta',
+}
 
 function CflLogoMark({ className }: { className?: string }) {
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn('flex items-center gap-2', className)}>
       <svg
         width="36"
         height="36"
@@ -74,15 +76,15 @@ function CflLogoMark({ className }: { className?: string }) {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 function WatermarkSwitch({
   enabled,
   onChange,
 }: {
-  enabled: boolean;
-  onChange: (v: boolean) => void;
+  enabled: boolean
+  onChange: (v: boolean) => void
 }) {
   return (
     <div className="flex items-center gap-3">
@@ -92,20 +94,20 @@ function WatermarkSwitch({
         aria-checked={enabled}
         onClick={() => onChange(!enabled)}
         className={cn(
-          "relative h-7 w-12 shrink-0 rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
-          enabled ? "bg-[#6B7C3F]" : "bg-gray-400"
+          'relative h-7 w-12 shrink-0 rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
+          enabled ? 'bg-[#6B7C3F]' : 'bg-gray-400',
         )}
       >
         <span
           className={cn(
-            "absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform",
-            enabled && "translate-x-5"
+            'absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform',
+            enabled && 'translate-x-5',
           )}
         />
       </button>
       <span className="text-sm text-gray-700">Toggle watermark</span>
     </div>
-  );
+  )
 }
 
 function DateField({
@@ -114,13 +116,13 @@ function DateField({
   onSelect,
   placeholder,
 }: {
-  label: string;
-  date: Date | undefined;
-  onSelect: (d: Date | undefined) => void;
-  placeholder: string;
+  label: string
+  date: Date | undefined
+  onSelect: (d: Date | undefined) => void
+  placeholder: string
 }) {
-  const [open, setOpen] = useState(false);
-  const display = date ? format(date, "EEEE dd/MM/yyyy") : placeholder;
+  const [open, setOpen] = useState(false)
+  const display = date ? format(date, 'EEEE dd/MM/yyyy') : placeholder
 
   return (
     <div className="space-y-1.5">
@@ -133,7 +135,7 @@ function DateField({
             className="h-10 w-full justify-start rounded-lg border-gray-200 bg-white text-left text-sm font-normal text-gray-800 shadow-none"
           >
             <CalendarDays className="mr-2 h-4 w-4 text-[#6B7C3F]" />
-            <span className={cn(!date && "text-gray-400")}>{display}</span>
+            <span className={cn(!date && 'text-gray-400')}>{display}</span>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
@@ -141,58 +143,91 @@ function DateField({
             mode="single"
             selected={date}
             onSelect={(d) => {
-              onSelect(d);
-              setOpen(false);
+              onSelect(d)
+              setOpen(false)
             }}
           />
         </PopoverContent>
       </Popover>
     </div>
-  );
+  )
 }
 
 export default function AnalyticsPdfPreviewPage() {
-  const reportRef = useRef<HTMLDivElement>(null);
-  const [reportLanguage, setReportLanguage] = useState("english");
-  const [watermark, setWatermark] = useState(false);
-  const [reportTitle, setReportTitle] = useState("Analytics");
+  const reportRef = useRef<HTMLDivElement>(null)
+  const [reportLanguage, setReportLanguage] = useState('english')
+  const [watermark, setWatermark] = useState(false)
+  const [reportTitle, setReportTitle] = useState('Analytics')
   const [periodLine, setPeriodLine] = useState(
-    "1 November 2025 - 30 November 2025"
-  );
+    '1 November 2025 - 30 November 2025',
+  )
 
-  const [emailOpen, setEmailOpen] = useState(false);
-  const [emailStep, setEmailStep] = useState<"form" | "success">("form");
-  const [toEmails, setToEmails] = useState("");
-  const [cc, setCc] = useState("");
-  const [bcc, setBcc] = useState("");
-  const [message, setMessage] = useState("");
-  const [scheduleRecur, setScheduleRecur] = useState(true);
-  const [frequency, setFrequency] = useState<"monthly" | "quarterly">(
-    "monthly"
-  );
+  const [emailOpen, setEmailOpen] = useState(false)
+  const [emailStep, setEmailStep] = useState<'form' | 'success'>('form')
+  const [toEmails, setToEmails] = useState('')
+  const [cc, setCc] = useState('')
+  const [bcc, setBcc] = useState('')
+  const [message, setMessage] = useState('')
+  const [scheduleRecur, setScheduleRecur] = useState(true)
+  const [frequency, setFrequency] = useState<'monthly' | 'quarterly'>('monthly')
   const [fromDate, setFromDate] = useState<Date | undefined>(
-    new Date(2025, 11, 15)
-  );
-  const [toDate, setToDate] = useState<Date | undefined>(
-    new Date(2026, 11, 31)
-  );
+    new Date(2025, 11, 15),
+  )
+  const [toDate, setToDate] = useState<Date | undefined>(new Date(2026, 11, 31))
 
-  const [exportPdfOpen, setExportPdfOpen] = useState(false);
+  const [exportPdfOpen, setExportPdfOpen] = useState(false)
 
-  const generatedLabel = format(new Date(), "d MMMM yyyy");
-  const fileSlug = format(new Date(), "yyyy-MM");
-  const langCode = REPORT_LANG_CODES[reportLanguage] ?? "en";
-  const fileName = `${REPORT_FILE_BASE}_${fileSlug}_${langCode}.pdf`;
+  const generatedLabel = format(new Date(), 'd MMMM yyyy')
+  const fileSlug = format(new Date(), 'yyyy-MM')
+  const langCode = REPORT_LANG_CODES[reportLanguage] ?? 'en'
+  const fileName = `${REPORT_FILE_BASE}_${fileSlug}_${langCode}.pdf`
 
   useEffect(() => {
     if (!emailOpen) {
-      setEmailStep("form");
+      setEmailStep('form')
     }
-  }, [emailOpen]);
+  }, [emailOpen])
 
   const handleDemoEmailSend = () => {
-    setEmailStep("success");
-  };
+    setEmailStep('success')
+  }
+
+  const exportPdf = async () => {
+    if (!reportRef.current) return
+
+    const input = reportRef.current
+
+    const canvas = await html2canvas(input, {
+      scale: 2,
+      useCORS: true, 
+      allowTaint: true,
+      scrollY: -window.scrollY,
+    })
+
+    const imgData = canvas.toDataURL('image/png')
+
+    const pdf = new jsPDF('p', 'mm', 'a4')
+    const pageWidth = 210
+    const pageHeight = 297
+
+    const imgProps = pdf.getImageProperties(imgData)
+    const pdfHeight = (imgProps.height * pageWidth) / imgProps.width
+
+    let heightLeft = pdfHeight
+    let position = 0
+
+    pdf.addImage(imgData, 'PNG', 0, position, pageWidth, pdfHeight)
+    heightLeft -= pageHeight
+
+    while (heightLeft > 0) {
+      pdf.addPage()
+      position = heightLeft - pdfHeight
+      pdf.addImage(imgData, 'PNG', 0, position, pageWidth, pdfHeight)
+      heightLeft -= pageHeight
+    }
+
+    pdf.save(fileName)
+  }
 
   return (
     <div className="min-h-screen w-full bg-[#F7F7F7] p-6">
@@ -290,12 +325,12 @@ export default function AnalyticsPdfPreviewPage() {
                 Generated on: {generatedLabel}
               </p>
               <p className="text-xs text-gray-500">
-                Language:{" "}
+                Language:{' '}
                 {{
-                  english: "English",
-                  malay: "Malay",
-                  chinese: "Chinese",
-                  tamil: "Tamil",
+                  english: 'English',
+                  malay: 'Malay',
+                  chinese: 'Chinese',
+                  tamil: 'Tamil',
                 }[reportLanguage] ?? reportLanguage}
               </p>
             </div>
@@ -329,10 +364,10 @@ export default function AnalyticsPdfPreviewPage() {
           <div className="grid grid-cols-2 gap-4 py-2">
             {(
               [
-                ["english", "English"],
-                ["malay", "Malay"],
-                ["chinese", "Chinese"],
-                ["tamil", "Tamil"],
+                ['english', 'English'],
+                ['malay', 'Malay'],
+                ['chinese', 'Chinese'],
+                ['tamil', 'Tamil'],
               ] as const
             ).map(([key, label]) => (
               <label
@@ -342,7 +377,7 @@ export default function AnalyticsPdfPreviewPage() {
                 <Checkbox
                   checked={reportLanguage === key}
                   onCheckedChange={(checked) => {
-                    if (checked === true) setReportLanguage(key);
+                    if (checked === true) setReportLanguage(key)
                   }}
                   className="border-gray-500 data-[state=checked]:border-[#6B7C3F] data-[state=checked]:bg-[#6B7C3F]"
                 />
@@ -352,9 +387,9 @@ export default function AnalyticsPdfPreviewPage() {
           </div>
           <div className="mt-4 flex gap-3">
             <Button
+              onClick={exportPdf}
               type="button"
-              disabled
-              className="h-10 flex-1 cursor-not-allowed rounded-xl border-0 bg-[#6B7C3F]/50 text-white shadow-none"
+              className="h-10 flex-1 rounded-xl border-0 bg-[#6B7C3F]/50 text-white shadow-none"
             >
               Export
             </Button>
@@ -386,7 +421,7 @@ export default function AnalyticsPdfPreviewPage() {
             </DialogDescription>
           </DialogHeader>
 
-          {emailStep === "success" ? (
+          {emailStep === 'success' ? (
             <div className="flex flex-col items-center gap-4 py-6 text-center">
               <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#6B7C3F] text-white">
                 <CheckCircle2 className="h-10 w-10" />
@@ -472,24 +507,24 @@ export default function AnalyticsPdfPreviewPage() {
                   <div className="flex gap-3">
                     <button
                       type="button"
-                      onClick={() => setFrequency("monthly")}
+                      onClick={() => setFrequency('monthly')}
                       className={cn(
-                        "h-12 flex-1 rounded-xl border text-sm font-medium transition-colors",
-                        frequency === "monthly"
-                          ? "border-[#6B7C3F] bg-[#6B7C3F] text-white"
-                          : "border-gray-300 bg-white text-gray-700"
+                        'h-12 flex-1 rounded-xl border text-sm font-medium transition-colors',
+                        frequency === 'monthly'
+                          ? 'border-[#6B7C3F] bg-[#6B7C3F] text-white'
+                          : 'border-gray-300 bg-white text-gray-700',
                       )}
                     >
                       Monthly
                     </button>
                     <button
                       type="button"
-                      onClick={() => setFrequency("quarterly")}
+                      onClick={() => setFrequency('quarterly')}
                       className={cn(
-                        "h-12 flex-1 rounded-xl border text-sm font-medium transition-colors",
-                        frequency === "quarterly"
-                          ? "border-[#6B7C3F] bg-[#6B7C3F] text-white"
-                          : "border-gray-300 bg-white text-gray-700"
+                        'h-12 flex-1 rounded-xl border text-sm font-medium transition-colors',
+                        frequency === 'quarterly'
+                          ? 'border-[#6B7C3F] bg-[#6B7C3F] text-white'
+                          : 'border-gray-300 bg-white text-gray-700',
                       )}
                     >
                       Quarterly
@@ -524,5 +559,5 @@ export default function AnalyticsPdfPreviewPage() {
         </DialogContent>
       </Dialog>
     </div>
-  );
+  )
 }
