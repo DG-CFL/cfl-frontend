@@ -1,22 +1,23 @@
-import { ArrowDown, ArrowUp, Download, Plus } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useGetAnalytics } from "@/operations/analytics";
-import LoadingSkeleton from "../LoadingSkeleton";
-import type { TrainingOverviewDataPoint } from "@/types/analytics";
+import { useMemo } from 'react'
+import { Download, Plus } from 'lucide-react'
 
-interface MetricCardProps {
-  title: string;
-  value: string | number;
-  change: string;
-  isPositive: boolean;
-}
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ErrorAlert } from '@/components/ui_custom/ErrorAlert'
+import { useGetAnalyticsSummary } from '@/operations/analytics'
+import type { TrainingOverviewDataPoint } from '@/types/analytics'
+import type { AnalyticsTimePeriod } from '@/utils/analyticsDateRange'
+import { getAnalyticsDateRange } from '@/utils/analyticsDateRange'
+import LoadingSkeleton from '../LoadingSkeleton'
 
 export function MetricCard({
   title,
   value,
-  change,
-  isPositive,
-}: MetricCardProps) {
+  suffix,
+}: {
+  title: string
+  value: string | number
+  suffix?: string
+}) {
   return (
     <Card className="bg-white">
       <CardHeader className="pb-3">
@@ -24,81 +25,131 @@ export function MetricCard({
           {title}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-2">
-        <div className="text-3xl font-bold text-gray-900">{value}</div>
-        <div className="flex items-center gap-2 text-sm">
-          <div
-            className={`inline-flex items-center gap-1 rounded-full px-2 py-1 ${
-              isPositive
-                ? "bg-green-100 text-green-700"
-                : "bg-red-100 text-red-700"
-            }`}
-          >
-            {isPositive ? (
-              <ArrowUp className="h-3 w-3" />
-            ) : (
-              <ArrowDown className="h-3 w-3" />
-            )}
-            <span className="font-medium">{change}</span>
-          </div>
-          <span className="text-gray-500">vs. last year</span>
+      <CardContent>
+        <div className="text-3xl font-bold text-gray-900">
+          {value}
+          {suffix ? (
+            <span className="ml-1 text-lg font-semibold text-gray-600">
+              {suffix}
+            </span>
+          ) : null}
         </div>
-        <div className="text-xs text-gray-400">2 min ago</div>
       </CardContent>
     </Card>
-  );
+  )
 }
+
+function linspace(min: number, max: number, count: number): Array<number> {
+  if (count <= 1) return [Math.round(min)]
+  const step = (max - min) / (count - 1)
+  return Array.from({ length: count }, (_, i) =>
+    Math.round(min + step * i),
+  )
+}
+
+const CHART = {
+  width: 600,
+  height: 300,
+  padding: { top: 40, right: 60, bottom: 40, left: 60 },
+} as const
 
 type TrainingOverviewChartProps = {
-  dataPoints: TrainingOverviewDataPoint[]
+  dataPoints: Array<TrainingOverviewDataPoint>
 }
 
-export function TrainingOverviewChart({dataPoints}: TrainingOverviewChartProps) {
-  const width = 600;
-  const height = 300;
-  const padding = { top: 40, right: 60, bottom: 40, left: 60 };
-  const chartWidth = width - padding.left - padding.right;
-  const chartHeight = height - padding.top - padding.bottom;
+export function TrainingOverviewChart({
+  dataPoints,
+}: TrainingOverviewChartProps) {
+  const { width, height, padding } = CHART
+  const chartWidth = width - padding.left - padding.right
+  const chartHeight = height - padding.top - padding.bottom
 
-  const scalePeople = (value: number) => {
-    const min = 50;
-    const max = 250;
-    return (
+  const chartModel = useMemo(() => {
+    const points =
+      dataPoints.length > 0
+        ? dataPoints
+        : [{ people: 0, sessions: 0 } satisfies TrainingOverviewDataPoint]
+
+    const peopleVals = points.map((p) => p.people)
+    const sessionVals = points.map((p) => p.sessions)
+
+    let peopleMin = Math.min(0, ...peopleVals)
+    let peopleMax = Math.max(1, ...peopleVals)
+    if (peopleMax <= peopleMin) peopleMax = peopleMin + 1
+
+    let sessionsMin = Math.min(0, ...sessionVals)
+    let sessionsMax = Math.max(1, ...sessionVals)
+    if (sessionsMax <= sessionsMin) sessionsMax = sessionsMin + 1
+
+    const peopleTicks = linspace(peopleMin, peopleMax, 5)
+    const sessionsTicks = linspace(sessionsMin, sessionsMax, 5)
+
+    const xStep =
+      points.length > 1 ? chartWidth / (points.length - 1) : chartWidth
+
+    const scalePeople = (value: number) =>
       padding.top +
       chartHeight -
-      ((value - min) / (max - min)) * chartHeight
-    );
-  };
+      ((value - peopleMin) / (peopleMax - peopleMin)) * chartHeight
 
-  const scaleSessions = (value: number) => {
-    const min = 3;
-    const max = 15;
-    return (
+    const scaleSessions = (value: number) =>
       padding.top +
       chartHeight -
-      ((value - min) / (max - min)) * chartHeight
-    );
-  };
+      ((value - sessionsMin) / (sessionsMax - sessionsMin)) * chartHeight
 
-  const xStep = chartWidth / (dataPoints.length - 1);
+    const peoplePath = points
+      .map(
+        (point, i) =>
+          `${i === 0 ? 'M' : 'L'} ${padding.left + i * xStep} ${scalePeople(point.people)}`,
+      )
+      .join(' ')
 
-  const peoplePath = dataPoints
-    .map(
-      (point, i) =>
-        `${i === 0 ? "M" : "L"} ${padding.left + i * xStep} ${scalePeople(
-          point.people
-        )}`
+    const sessionsPath = points
+      .map(
+        (point, i) =>
+          `${i === 0 ? 'M' : 'L'} ${padding.left + i * xStep} ${scaleSessions(point.sessions)}`,
+      )
+      .join(' ')
+
+    return {
+      points,
+      peopleTicks,
+      sessionsTicks,
+      scalePeople,
+      scaleSessions,
+      peoplePath,
+      sessionsPath,
+      xStep,
+    }
+  }, [dataPoints, chartHeight, chartWidth, padding])
+
+  if (dataPoints.length === 0) {
+    return (
+      <Card className="bg-white">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg font-semibold">
+            Training overview
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="py-8 text-center text-sm text-gray-500">
+            No training overview data for this period.
+          </p>
+        </CardContent>
+      </Card>
     )
-    .join(" ");
+  }
 
-  const sessionsPath = dataPoints
-    .map(
-      (point, i) =>
-        `${i === 0 ? "M" : "L"} ${padding.left + i * xStep} ${scaleSessions(
-          point.sessions
-        )}`
-    )
-    .join(" ");
+  const {
+    points,
+    peopleTicks,
+    sessionsTicks,
+    scalePeople,
+    scaleSessions,
+    peoplePath,
+    sessionsPath,
+    xStep,
+  } = chartModel
 
   return (
     <Card className="bg-white">
@@ -139,7 +190,7 @@ export function TrainingOverviewChart({dataPoints}: TrainingOverviewChartProps) 
         <div className="w-full overflow-x-auto">
           <svg width={width} height={height} className="min-w-full">
             {[0, 1, 2, 3, 4].map((i) => {
-              const y = padding.top + (chartHeight / 4) * i;
+              const y = padding.top + (chartHeight / 4) * i
               return (
                 <line
                   key={i}
@@ -150,12 +201,12 @@ export function TrainingOverviewChart({dataPoints}: TrainingOverviewChartProps) 
                   stroke="#E5E7EB"
                   strokeWidth={1}
                 />
-              );
+              )
             })}
 
-            {[50, 100, 150, 200, 250].map((value) => (
+            {peopleTicks.map((value) => (
               <text
-                key={value}
+                key={`p-${value}`}
                 x={padding.left - 10}
                 y={scalePeople(value) + 4}
                 textAnchor="end"
@@ -165,9 +216,9 @@ export function TrainingOverviewChart({dataPoints}: TrainingOverviewChartProps) 
               </text>
             ))}
 
-            {[3, 6, 9, 12, 15].map((value) => (
+            {sessionsTicks.map((value) => (
               <text
-                key={value}
+                key={`s-${value}`}
                 x={width - padding.right + 10}
                 y={scaleSessions(value) + 4}
                 textAnchor="start"
@@ -191,7 +242,7 @@ export function TrainingOverviewChart({dataPoints}: TrainingOverviewChartProps) 
               strokeWidth={2}
             />
 
-            {dataPoints.map((point, i) => (
+            {points.map((point, i) => (
               <circle
                 key={`people-${i}`}
                 cx={padding.left + i * xStep}
@@ -201,7 +252,7 @@ export function TrainingOverviewChart({dataPoints}: TrainingOverviewChartProps) 
               />
             ))}
 
-            {dataPoints.map((point, i) => (
+            {points.map((point, i) => (
               <circle
                 key={`sessions-${i}`}
                 cx={padding.left + i * xStep}
@@ -214,7 +265,7 @@ export function TrainingOverviewChart({dataPoints}: TrainingOverviewChartProps) 
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
 
 type CertificationChartProps = {
@@ -222,12 +273,22 @@ type CertificationChartProps = {
   certifiedCount: number
 }
 
-export function CertificationsChart({totalCount, certifiedCount}: CertificationChartProps) {
- 
-  const radius = 80;
-  const circumference = 2 * Math.PI * radius;
-  const certifiedOffset = circumference - (certifiedCount / totalCount) * circumference;
-  const certifiedPercent = Math.round((certifiedCount / totalCount) * 100)
+export function CertificationsChart({
+  totalCount,
+  certifiedCount,
+}: CertificationChartProps) {
+  const radius = 80
+  const circumference = 2 * Math.PI * radius
+
+  const certifiedPercent =
+    totalCount > 0
+      ? Math.round((certifiedCount / totalCount) * 100)
+      : 0
+
+  const certifiedOffset =
+    totalCount > 0
+      ? circumference - (certifiedCount / totalCount) * circumference
+      : circumference
 
   return (
     <Card className="bg-white">
@@ -265,7 +326,7 @@ export function CertificationsChart({totalCount, certifiedCount}: CertificationC
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <div className="text-4xl font-bold text-gray-900">
-                {certifiedPercent}%
+                {totalCount === 0 ? '—' : `${certifiedPercent}%`}
               </div>
               <div className="text-sm text-gray-600">of members</div>
               <div className="text-sm text-gray-600">certified</div>
@@ -274,25 +335,47 @@ export function CertificationsChart({totalCount, certifiedCount}: CertificationC
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <div className="h-3 w-3 rounded-full bg-green-700" />
-              <span className="text-sm text-gray-600">Certified</span>
+              <span className="text-sm text-gray-600">
+                Certified ({certifiedCount})
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <div className="h-3 w-3 rounded-full bg-green-200" />
-              <span className="text-sm text-gray-600">Uncertified</span>
+              <span className="text-sm text-gray-600">
+                Uncertified ({Math.max(0, totalCount - certifiedCount)})
+              </span>
             </div>
           </div>
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
 
-/** Same metrics + charts as the main Analytics page (for live view and PDF preview). */
-export function AnalyticsReportContent() {
-  const { data, isLoading} = useGetAnalytics()
+export type AnalyticsReportContentProps = {
+  /** Defaults to current calendar year through today (PDF preview). */
+  timePeriod?: AnalyticsTimePeriod
+}
 
-  if (isLoading || !data) {
-    return <LoadingSkeleton/>
+/** Metrics + charts from GET /v1/admin/analytics for the selected period. */
+export function AnalyticsReportContent({
+  timePeriod = 'this-year',
+}: AnalyticsReportContentProps) {
+  const range = useMemo(
+    () => getAnalyticsDateRange(timePeriod),
+    [timePeriod],
+  )
+
+  const { data, isLoading, isError } = useGetAnalyticsSummary(range)
+
+  if (isLoading) {
+    return <LoadingSkeleton />
+  }
+
+  if (isError || !data) {
+    return (
+      <ErrorAlert message="Could not load analytics summary. Check that you are signed in as an admin." />
+    )
   }
 
   return (
@@ -301,45 +384,35 @@ export function AnalyticsReportContent() {
         <MetricCard
           title="Total Training Sessions"
           value={data.totalTrainingSessions}
-          change="35%"
-          isPositive={true}
         />
         <MetricCard
           title="No. of People Trained"
-          value={data.numberPeopleTrained}
-          change="20%"
-          isPositive={true}
+          value={data.intPeopleTrained}
         />
         <MetricCard
           title="Newly Certified Volunteers"
           value={data.newlyCertifiedMembers}
-          change="14%"
-          isPositive={true}
         />
-        <MetricCard
-          title="Total Certified"
-          value={data.certifiedMembers}
-          change="5%"
-          isPositive={true}
-        />
+        <MetricCard title="Total Certified" value={data.certifiedMembers} />
         <MetricCard
           title="Average Attendance"
           value={data.averageAttendance}
-          change="35%"
-          isPositive={true}
+          suffix="%"
         />
         <MetricCard
           title="Volunteer Engagement"
           value={data.volunteerEngagement}
-          change="25%"
-          isPositive={false}
+          suffix="%"
         />
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <TrainingOverviewChart dataPoints={data.trainingOverview}/>
-        <CertificationsChart totalCount={data.totalMembers} certifiedCount={data.certifiedMembers}/>
+        <TrainingOverviewChart dataPoints={data.trainingOverview} />
+        <CertificationsChart
+          totalCount={data.totalMembers}
+          certifiedCount={data.certifiedMembers}
+        />
       </div>
     </>
-  );
+  )
 }
