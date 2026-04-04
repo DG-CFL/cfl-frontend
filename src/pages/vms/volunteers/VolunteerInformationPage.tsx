@@ -210,7 +210,7 @@ export function VolunteerInformationPage({
             <DialogTitle>Certify this volunteer?</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-slate-600">
-            This will record a level 1 certificate for{' '}
+            This will record a certificate for{' '}
             <span className="font-medium text-slate-900">
               {displayVolunteer.name}
             </span>{' '}
@@ -218,7 +218,6 @@ export function VolunteerInformationPage({
             <span className="font-mono text-xs">
               {certificateFilenameFromVolunteerName(displayVolunteer.name)}
             </span>{' '}
-            and today&apos;s date.
           </p>
           {certifyError ? (
             <p className="text-sm text-red-600">{certifyError}</p>
