@@ -7,7 +7,6 @@ import ManageEvents from '@/pages/vms/events/ManageEvents'
 import ViewEvent from '@/pages/vms/events/ViewEvent'
 import { createRoute } from '@tanstack/react-router'
 import { appLayoutRoute } from '../app'
-import RegisterEvent from '@/pages/vms/events/RegisterEvent'
 
 /**
  * Base layout for events pages
@@ -52,10 +51,4 @@ export const editEventSuccessRoute = createRoute({
   getParentRoute: () => eventsLayoutRoute,
   path: 'edit-success',
   component: EditEventSuccess,
-})
-
-export const registerEventRoute = createRoute({
-  getParentRoute: () => eventsLayoutRoute,
-  path: '$eventId/register',
-  component: RegisterEvent
 })

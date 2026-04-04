@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { QueryClient } from '@tanstack/react-query'
 import type {
+  EventCoordinatorRegistrationPostData,
   EventPostData,
   EventPutData,
   EventRegistrationPostData,
@@ -9,7 +11,8 @@ import {
   editEvent,
   getEvent,
   getEvents,
-  registerEventParticipant,
+  registerEventCoordinator,
+  registerEventVolunteer,
 } from '@/api/events'
 
 /**
@@ -19,9 +22,8 @@ export function useGetEvents() {
   return useQuery({
     queryKey: ['events'],
     queryFn: getEvents,
-    // Keep events data cached across route transitions.
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes
+    staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     refetchOnWindowFocus: false,
   })
 }
@@ -69,21 +71,38 @@ export function useEditEvent(eventId: number) {
   })
 }
 
+async function invalidateEventQueries(
+  queryClient: QueryClient,
+  eventId: number,
+) {
+  await queryClient.invalidateQueries({ queryKey: ['events', eventId] })
+  await queryClient.invalidateQueries({ queryKey: ['events'] })
+}
+
 /**
- * Registers a volunteer as a participant of an event
+ * Register as volunteer coordinator (trainer) for an event.
  */
-export function useRegisterEventParticipant(eventId: number) {
+export function useRegisterEventCoordinator(eventId: number) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (registrationData: EventRegistrationPostData) =>
-      registerEventParticipant(eventId, registrationData),
+    mutationFn: (body: EventCoordinatorRegistrationPostData) =>
+      registerEventCoordinator(eventId, body),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ['events', eventId],
-      })
-      await queryClient.invalidateQueries({
-        queryKey: ['events'],
-      })
+      await invalidateEventQueries(queryClient, eventId)
+    },
+  })
+}
+
+/**
+ * Register as volunteer (participant) for an event.
+ */
+export function useRegisterEventVolunteer(eventId: number) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (body: EventRegistrationPostData) =>
+      registerEventVolunteer(eventId, body),
+    onSuccess: async () => {
+      await invalidateEventQueries(queryClient, eventId)
     },
   })
 }

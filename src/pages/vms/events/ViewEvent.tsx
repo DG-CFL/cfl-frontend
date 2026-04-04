@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react'
 import { useQueries } from '@tanstack/react-query'
 import { Link, useParams } from '@tanstack/react-router'
+import axios from 'axios'
 import {
   CalendarDays,
+  CheckCircle2,
   ChevronRight,
   ImageIcon,
   MapPin,
@@ -17,7 +19,11 @@ import { useCurrentUser } from '@/auth/AuthProvider'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ErrorAlert } from '@/components/ui_custom/ErrorAlert'
-import { useGetEvent } from '@/operations/events'
+import {
+  useGetEvent,
+  useRegisterEventCoordinator,
+  useRegisterEventVolunteer,
+} from '@/operations/events'
 import LoadingSkeleton from '@/pages/LoadingSkeleton'
 import { VolunteerProfileModal } from '@/pages/vms/events/VolunteerProfileModal'
 
@@ -26,7 +32,11 @@ export default function ViewEvent() {
   const eventIdNum = Number(eventId!)
 
   const { data, isLoading, isError } = useGetEvent(eventIdNum)
+  const registerCoordinator = useRegisterEventCoordinator(eventIdNum)
+  const registerVolunteer = useRegisterEventVolunteer(eventIdNum)
   const currentUser = useCurrentUser()
+  const [signupSucceeded, setSignupSucceeded] = useState(false)
+  const [signupError, setSignupError] = useState<string | null>(null)
   const canOpenVolunteerProfile =
     currentUser != null && currentUser.role !== 'public'
 
@@ -72,6 +82,64 @@ export default function ViewEvent() {
     return <ErrorAlert />
   }
 
+  const signupPending =
+    registerCoordinator.isPending || registerVolunteer.isPending
+
+  const handleCoordinatorSignup = async () => {
+    setSignupError(null)
+    if (!currentUser?.userId) {
+      setSignupError('Please sign in to sign up.')
+      return
+    }
+    try {
+      await registerCoordinator.mutateAsync({
+        coordinatorId: currentUser.userId,
+      })
+      setSignupSucceeded(true)
+    } catch (err) {
+      setSignupError(apiErrorMessage(err))
+    }
+  }
+
+  const handleVolunteerSignup = async () => {
+    setSignupError(null)
+    if (!currentUser?.userId) {
+      setSignupError('Please sign in to sign up.')
+      return
+    }
+    try {
+      await registerVolunteer.mutateAsync({
+        volunteerId: currentUser.userId,
+      })
+      setSignupSucceeded(true)
+    } catch (err) {
+      setSignupError(apiErrorMessage(err))
+    }
+  }
+
+  if (signupSucceeded) {
+    return (
+      <div className="px-10 py-14">
+        <div className="mx-auto flex max-w-[950px] flex-col items-center gap-6 rounded-[10px] border border-muted-foreground/30 bg-white px-8 py-20 text-center">
+          <CheckCircle2 className="h-20 w-20 text-[#76B043]" />
+          <h1 className="text-5xl font-semibold text-[#0F172A]">
+            You have successfully signed up!
+          </h1>
+          <p className="text-xl text-muted-foreground">
+            Please check your inbox for the confirmation email.
+          </p>
+          <Button
+            variant="link"
+            className="text-base text-[#545F71]"
+            onClick={() => setSignupSucceeded(false)}
+          >
+            Back to Event Details
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="mx-auto flex w-full max-w-[1662px] flex-col gap-9 px-10 py-14">
       <div className="flex items-center gap-6">
@@ -85,13 +153,30 @@ export default function ViewEvent() {
           </Link>
         )}
         {currentUser?.role === 'public' && (
-          <Link to="/events/$eventId/register" params={{ eventId: eventId! }}>
-            <Button className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold">
-              Sign Up Now!
+          <div className="flex flex-wrap justify-end gap-3 sm:justify-center">
+            <Button
+              type="button"
+              className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold"
+              disabled={signupPending}
+              onClick={handleCoordinatorSignup}
+            >
+              Sign up as Trainer!
             </Button>
-          </Link>
+            <Button
+              type="button"
+              className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold"
+              disabled={signupPending}
+              onClick={handleVolunteerSignup}
+            >
+              Sign up as Volunteer!
+            </Button>
+          </div>
         )}
       </div>
+
+      {currentUser?.role === 'public' && signupError ? (
+        <ErrorAlert message={signupError} />
+      ) : null}
 
       <Card className="h-[455px] gap-0 rounded-[10px] border-muted-foreground/30 py-0">
         <CardHeader className="px-8 pb-6 pt-8">
@@ -232,6 +317,31 @@ export default function ViewEvent() {
       )}
     </div>
   )
+}
+
+function apiErrorMessage(err: unknown): string {
+  if (axios.isAxiosError(err)) {
+    const data = err.response?.data as { detail?: unknown } | undefined
+    if (typeof data?.detail === 'string') {
+      return data.detail
+    }
+    if (Array.isArray(data?.detail)) {
+      return data.detail
+        .map((item) =>
+          typeof item === 'object' &&
+          item !== null &&
+          'msg' in item &&
+          typeof (item as { msg: unknown }).msg === 'string'
+            ? (item as { msg: string }).msg
+            : JSON.stringify(item),
+        )
+        .join(' ')
+    }
+  }
+  if (err instanceof Error) {
+    return err.message
+  }
+  return 'Something went wrong'
 }
 
 function collectFirebaseIds(

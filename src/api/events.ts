@@ -1,6 +1,7 @@
 import { api } from './baseApi'
 import type {
   Event,
+  EventCoordinatorRegistrationPostData,
   EventPostData,
   EventPutData,
   EventRegistrationPostData,
@@ -82,15 +83,29 @@ export async function editEvent(
 }
 
 /**
- * Registers a volunteer as a participant of an event
+ * Register current user as a volunteer coordinator (trainer) for an event.
+ * Expects 204 No Content on success.
  */
-export async function registerEventParticipant(
+export async function registerEventCoordinator(
   eventId: number,
-  registrationData: EventRegistrationPostData,
+  body: EventCoordinatorRegistrationPostData,
 ): Promise<void> {
-  const res = await api.post(
-    `${baseUrl}/sessions/events/${eventId}/register`,
-    registrationData,
+  await api.post(
+    `${baseUrl}/sessions/events/${eventId}/coordinator/register`,
+    body,
   )
-  return res.data
+}
+
+/**
+ * Register current user as a volunteer (participant) for an event.
+ * Expects 204 No Content on success.
+ */
+export async function registerEventVolunteer(
+  eventId: number,
+  body: EventRegistrationPostData,
+): Promise<void> {
+  await api.post(
+    `${baseUrl}/sessions/events/${eventId}/volunteer/register`,
+    body,
+  )
 }
