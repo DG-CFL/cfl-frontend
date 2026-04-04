@@ -94,7 +94,7 @@ export function useRegisterEventCoordinator(eventId: number) {
 }
 
 /**
- * Register as volunteer (participant) for an event.
+ * Register as volunteer for an event.
  */
 export function useRegisterEventVolunteer(eventId: number) {
   const queryClient = useQueryClient()
