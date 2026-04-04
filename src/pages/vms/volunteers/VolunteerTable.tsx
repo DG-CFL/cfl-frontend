@@ -19,6 +19,7 @@ import type {
 import type { Dispatch, SetStateAction } from 'react'
 
 import type { Volunteer } from '@/types/volunteers'
+import { volunteerHasCertificate } from '@/lib/volunteerUtils'
 import { useGetVolunteers } from '@/operations/volunteers'
 
 import { Button } from '@/components/ui/button'
@@ -218,11 +219,10 @@ const columns: Array<ColumnDef<Volunteer>> = [
     accessorFn: (row) => row.certificate,
     header: 'Certificate',
     cell: ({ row }) => {
-      const c = row.original.certificate
-      const has = c !== null && c !== undefined && typeof c === 'object'
+      const certified = volunteerHasCertificate(row.original.certificate)
       return (
         <div className="text-center text-sm">
-          {has ? 'Yes' : '—'}
+          {certified ? 'Yes' : 'No'}
         </div>
       )
     },

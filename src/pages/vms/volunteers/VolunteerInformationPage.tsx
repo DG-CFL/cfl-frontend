@@ -13,6 +13,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  getVolunteerFirebaseId,
+  volunteerHasCertificate,
+} from '@/lib/volunteerUtils'
 import { useGetVolunteer, useUpdateVolunteer } from '@/operations/volunteers'
 
 type VolunteerInformationPageProps = {
@@ -22,14 +26,6 @@ type VolunteerInformationPageProps = {
 function capitalizeGender(g: string): string {
   if (!g) return '—'
   return g.charAt(0).toUpperCase() + g.slice(1).toLowerCase()
-}
-
-function hasVolunteerCertificate(
-  cert: Volunteer['certificate'],
-): cert is NonNullable<Volunteer['certificate']> & { link: string } {
-  return Boolean(
-    cert && typeof cert === 'object' && 'link' in cert && cert.link,
-  )
 }
 
 /** e.g. "Tarin Pairor" → "tarin_pairor_lvl1.pdf" */
@@ -66,11 +62,12 @@ function apiErrorMessage(err: unknown): string {
 export function VolunteerInformationPage({
   volunteer: volunteerFromList,
 }: VolunteerInformationPageProps) {
-  const volunteerId =
-    volunteerFromList.volunteerId ?? volunteerFromList.id ?? ''
+  const volunteerId = getVolunteerFirebaseId(volunteerFromList)
 
-  const { data: volunteerDetail } = useGetVolunteer(volunteerId)
+  const { data: volunteerDetail, isLoading: detailLoading } =
+    useGetVolunteer(volunteerId)
   const displayVolunteer = volunteerDetail ?? volunteerFromList
+  const resolvingDetail = Boolean(volunteerId) && detailLoading
 
   const certifyMutation = useUpdateVolunteer(volunteerId)
 
@@ -83,7 +80,7 @@ export function VolunteerInformationPage({
   const trainingSessionsAttended =
     displayVolunteer.trainingSessionsAttended ?? 0
   const cert = displayVolunteer.certificate
-  const activeCert = hasVolunteerCertificate(cert) ? cert : null
+  const activeCert = volunteerHasCertificate(cert) ? cert : null
 
   useEffect(() => {
     if (!confirmOpen) {
@@ -159,7 +156,11 @@ export function VolunteerInformationPage({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 pb-6 pt-0">
-          {activeCert ? (
+          {resolvingDetail ? (
+            <p className="text-base text-slate-600">
+              Loading certification status…
+            </p>
+          ) : activeCert ? (
             <div className="space-y-2 text-base text-slate-800">
               <a
                 href={activeCert.link}
