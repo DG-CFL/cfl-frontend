@@ -291,6 +291,7 @@ export function VolunteerTable({ setClickedRow }: VolunteerTableProps) {
               type="button"
               variant="outline"
               className="h-8 rounded-full bg-gray-500 px-3 text-sm text-white hover:bg-gray-600"
+              disabled
             >
               <CirclePlus className="mr-1 inline h-4 w-4" />
               Send Email
