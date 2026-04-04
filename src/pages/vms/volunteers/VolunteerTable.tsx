@@ -286,7 +286,7 @@ export function VolunteerTable({ setClickedRow }: VolunteerTableProps) {
     <div className="w-full">
       <div className="flex flex-col justify-between gap-4 py-4 sm:flex-row sm:items-end">
         <div className="flex flex-wrap items-end gap-2">
-          <Link to="/volunteers/email">
+          {/* <Link to="/volunteers/email"> */}
             <Button
               type="button"
               variant="outline"
@@ -296,7 +296,7 @@ export function VolunteerTable({ setClickedRow }: VolunteerTableProps) {
               <CirclePlus className="mr-1 inline h-4 w-4" />
               Send Email
             </Button>
-          </Link>
+          {/* </Link> */}
           <Button
             type="button"
             variant="outline"
