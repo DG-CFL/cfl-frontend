@@ -1,95 +1,58 @@
-import { Sheet } from '@/components/ui/sheet'
+import { CalendarDays, Users } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 
+import { Sheet } from '@/components/ui/sheet'
+
+const cards = [
+  {
+    to: '/volunteers',
+    title: 'Manage Volunteers',
+    description:
+      'Oversee your volunteer base, manage profiles, and track engagement',
+    Icon: Users,
+    iconLabel: 'Volunteers',
+  },
+  {
+    to: '/events',
+    title: 'Manage Events',
+    description:
+      'Organise and schedule events, assign tasks, and track participation',
+    Icon: CalendarDays,
+    iconLabel: 'Events',
+  },
+] as const
+
 export default function VmsLandingPage() {
-  const volunteerIconUrl = null; 
   return (
     <div className="mx-auto w-full space-y-12 px-10 py-14">
-      <div className="flex flex-col text-center items-center justify-center p-10  ">
+      <div className="flex flex-col items-center justify-center p-10 text-center">
         <h1>Welcome to the Volunteer Management System!</h1>
-        <p className='m-4'> Select an action to get started and manage your initiatives </p>
+        <p className="m-4">
+          Select an action to get started and manage your initiatives
+        </p>
 
-        <div className='w-3/4 flex flex-row p-10 justify-around items-center'>
-          <Link to="/volunteers">
-            <Sheet>    
-              <div className="w-90 h-80 rounded-md bg-[#DADBDD] flex flex-col justify-center items-center ">
-                <div className='h-25 w-25 border-4 border-gray-500 p-0 m-0'> 
-                  {volunteerIconUrl ? (
-                    <img
-                      src={volunteerIconUrl}
-                      className="h-full w-full object-cover"
+        <div className="flex w-3/4 flex-row items-center justify-around p-10">
+          {cards.map(({ to, title, description, Icon, iconLabel }) => (
+            <Link key={to} to={to}>
+              <Sheet>
+                <div className="flex h-80 w-90 flex-col items-center justify-center rounded-md bg-[#DADBDD]">
+                  <div
+                    className="flex size-24 shrink-0 items-center justify-center rounded-xl bg-white/90 shadow-sm ring-1 ring-slate-400/35"
+                    role="img"
+                    aria-label={iconLabel}
+                  >
+                    <Icon
+                      className="size-12 text-[#545F71]"
+                      strokeWidth={1.5}
+                      aria-hidden
                     />
-                  ) : (
-                    <svg
-                      viewBox="0 0 100 100"
-                      className="size-full text-muted-foreground/30"
-                      preserveAspectRatio="none"
-                      aria-hidden="true"
-                    >
-                      <line
-                        x1="10"
-                        y1="10"
-                        x2="90"
-                        y2="90"
-                        stroke="currentColor"
-                        strokeWidth="1"
-                      />
-                      <line
-                        x1="90"
-                        y1="10"
-                        x2="10"
-                        y2="90"
-                        stroke="currentColor"
-                        strokeWidth="1"
-                      />
-                    </svg>
-                  )}
                   </div>
-                  <h3 className='m-5'>Manage Volunteers</h3>
-                  <p>Oversee your volunteer base, manage profiles, and track engagement</p>
-              </div>
-            </Sheet>
-          </Link>
-          <Link to="/events">
-            <Sheet>    
-              <div className="w-90 h-80 rounded-md bg-[#DADBDD] flex flex-col justify-center items-center ">
-                <div className='h-25 w-25 border-4 border-gray-500 p-0 m-0'> 
-                  {volunteerIconUrl ? (
-                    <img
-                      src={volunteerIconUrl}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <svg
-                      viewBox="0 0 100 100"
-                      className="size-full text-muted-foreground/30"
-                      preserveAspectRatio="none"
-                      aria-hidden="true"
-                    >
-                      <line
-                        x1="10"
-                        y1="10"
-                        x2="90"
-                        y2="90"
-                        stroke="currentColor"
-                        strokeWidth="1"
-                      />
-                      <line
-                        x1="90"
-                        y1="10"
-                        x2="10"
-                        y2="90"
-                        stroke="currentColor"
-                        strokeWidth="1"
-                      />
-                    </svg>
-                  )}
-                  </div>
-                  <h3 className='m-5'>Manage Events</h3>
-                  <p className='px-4'>Organise and schedule events, assign tasks, and track participation</p>
-              </div>
-            </Sheet>
-          </Link>
+                  <h3 className="m-5">{title}</h3>
+                  <p className="max-w-xs px-4">{description}</p>
+                </div>
+              </Sheet>
+            </Link>
+          ))}
         </div>
       </div>
     </div>
