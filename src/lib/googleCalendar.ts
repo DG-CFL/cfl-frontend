@@ -7,10 +7,15 @@ function toDate(value: Date | string): Date {
   return value instanceof Date ? value : new Date(value)
 }
 
+/** URLSearchParams stringifies `undefined` as "undefined"; use empty string for empty fields. */
+function calendarText(value: string | null | undefined): string {
+  return value ?? ''
+}
+
 export function buildGoogleCalendarEventUrl(params: {
-  title: string
-  details: string
-  location: string
+  title: string | null | undefined
+  details: string | null | undefined
+  location: string | null | undefined
   start: Date | string
   end: Date | string
 }): string {
@@ -23,9 +28,9 @@ export function buildGoogleCalendarEventUrl(params: {
   const dates = `${formatDateUtcForGoogleCalendar(start)}/${formatDateUtcForGoogleCalendar(end)}`
   const search = new URLSearchParams({
     action: 'TEMPLATE',
-    text: params.title,
-    details: params.details,
-    location: params.location,
+    text: calendarText(params.title),
+    details: calendarText(params.details),
+    location: calendarText(params.location),
     dates,
   })
   return `https://calendar.google.com/calendar/render?${search.toString()}`
