@@ -4,6 +4,7 @@ import { Link, useParams } from '@tanstack/react-router'
 import axios from 'axios'
 import {
   CalendarDays,
+  CalendarPlus,
   CheckCircle2,
   ChevronRight,
   ImageIcon,
@@ -24,6 +25,7 @@ import {
   useRegisterEventCoordinator,
   useRegisterEventVolunteer,
 } from '@/operations/events'
+import { buildGoogleCalendarEventUrl } from '@/lib/googleCalendar'
 import LoadingSkeleton from '@/pages/LoadingSkeleton'
 import { VolunteerProfileModal } from '@/pages/vms/events/VolunteerProfileModal'
 
@@ -73,6 +75,17 @@ export default function ViewEvent() {
   const [profileVolunteerId, setProfileVolunteerId] = useState<string | null>(
     null,
   )
+
+  const googleCalendarUrl = useMemo(() => {
+    if (!data) return ''
+    return buildGoogleCalendarEventUrl({
+      title: data.name,
+      details: data.description,
+      location: data.location,
+      start: data.startDate,
+      end: data.endDate,
+    })
+  }, [data])
 
   if (isLoading) {
     return <LoadingSkeleton />
@@ -142,36 +155,52 @@ export default function ViewEvent() {
 
   return (
     <div className="mx-auto flex w-full max-w-[1662px] flex-col gap-9 px-10 py-14">
-      <div className="flex items-center gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-6">
         <h1>{data.name}</h1>
-        {currentUser?.role === 'admin' && (
-          <Link to="/events/$eventId/edit" params={{ eventId: eventId! }}>
-            <Button className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold">
-              <SquarePen className="size-5" aria-hidden="true" />
-              Edit Event Details
-            </Button>
-          </Link>
-        )}
-        {currentUser?.role === 'public' && (
-          <div className="flex flex-wrap justify-end gap-3 sm:justify-center">
-            <Button
-              type="button"
-              className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold"
-              disabled={signupPending}
-              onClick={handleCoordinatorSignup}
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            variant="outline"
+            className="h-11 gap-2 rounded-lg border-muted-foreground/30 px-5 text-base font-semibold"
+            asChild
+          >
+            <a
+              href={googleCalendarUrl}
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              Sign up as Trainer!
-            </Button>
-            <Button
-              type="button"
-              className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold"
-              disabled={signupPending}
-              onClick={handleVolunteerSignup}
-            >
-              Sign up as Volunteer!
-            </Button>
-          </div>
-        )}
+              <CalendarPlus className="size-5" aria-hidden="true" />
+              Add to Google Calendar
+            </a>
+          </Button>
+          {currentUser?.role === 'admin' && (
+            <Link to="/events/$eventId/edit" params={{ eventId: eventId! }}>
+              <Button className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold">
+                <SquarePen className="size-5" aria-hidden="true" />
+                Edit Event Details
+              </Button>
+            </Link>
+          )}
+          {currentUser?.role === 'public' && (
+            <>
+              <Button
+                type="button"
+                className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold"
+                disabled={signupPending}
+                onClick={handleCoordinatorSignup}
+              >
+                Sign up as Trainer!
+              </Button>
+              <Button
+                type="button"
+                className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold"
+                disabled={signupPending}
+                onClick={handleVolunteerSignup}
+              >
+                Sign up as Volunteer!
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
       {currentUser?.role === 'public' && signupError ? (
