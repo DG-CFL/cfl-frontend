@@ -131,7 +131,7 @@ export default function Home() {
           </div>
         </div>
 
-        <a
+        {/* <a
           href="tel:+6567891234"
           className="mt-8 flex flex-col items-center justify-between gap-4 rounded-2xl border border-[#c5cfba] bg-linear-to-br from-[#5a6d38] to-[#3d4a2e] px-6 py-5 text-white shadow-lg sm:flex-row sm:px-8"
         >
@@ -150,7 +150,7 @@ export default function Home() {
             <Heart className="h-4 w-4 shrink-0" aria-hidden />
             Tap to call
           </span>
-        </a>
+        </a> */}
 
         <div className="mt-12">
           <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
