@@ -19,6 +19,7 @@ import type {
 import type { Dispatch, SetStateAction } from 'react'
 
 import type { Volunteer } from '@/types/volunteers'
+import { volunteerHasCertificate } from '@/lib/volunteerUtils'
 import { useGetVolunteers } from '@/operations/volunteers'
 
 import { Button } from '@/components/ui/button'
@@ -218,11 +219,10 @@ const columns: Array<ColumnDef<Volunteer>> = [
     accessorFn: (row) => row.certificate,
     header: 'Certificate',
     cell: ({ row }) => {
-      const c = row.original.certificate
-      const has = c !== null && c !== undefined && typeof c === 'object'
+      const certified = volunteerHasCertificate(row.original.certificate)
       return (
         <div className="text-center text-sm">
-          {has ? 'Yes' : '—'}
+          {certified ? 'Yes' : 'No'}
         </div>
       )
     },
@@ -286,16 +286,17 @@ export function VolunteerTable({ setClickedRow }: VolunteerTableProps) {
     <div className="w-full">
       <div className="flex flex-col justify-between gap-4 py-4 sm:flex-row sm:items-end">
         <div className="flex flex-wrap items-end gap-2">
-          <Link to="/volunteers/email">
+          {/* <Link to="/volunteers/email"> */}
             <Button
               type="button"
               variant="outline"
               className="h-8 rounded-full bg-gray-500 px-3 text-sm text-white hover:bg-gray-600"
+              disabled
             >
               <CirclePlus className="mr-1 inline h-4 w-4" />
               Send Email
             </Button>
-          </Link>
+          {/* </Link> */}
           <Button
             type="button"
             variant="outline"

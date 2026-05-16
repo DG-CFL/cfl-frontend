@@ -1,4 +1,4 @@
-import { useState, useEffect, type CSSProperties } from "react"
+import { useState, useEffect, useMemo, type CSSProperties } from "react"
 import { Link, useNavigate } from "@tanstack/react-router"
 import {
   BarChart2,
@@ -14,6 +14,8 @@ import {
 } from "lucide-react"
 import { getAuth, signOut } from "firebase/auth"
 
+import { useAuth, useCurrentUser } from "@/auth/AuthProvider"
+
 type Item = {
   label: string
   to: string
@@ -28,6 +30,8 @@ const TOP: Item[] = [
   { label: "Analytics", to: "/analytics", icon: TrendingUp },
 ]
 
+const ADMIN_ONLY_TOP_ROUTES = new Set(["/vms", "/events", "/analytics"])
+
 const BOTTOM: Item[] = [
   { label: "Profile", to: "/profile", icon: UserIcon },
   { label: "Settings", to: "/settings", icon: Settings },
@@ -38,7 +42,17 @@ export default function Sidebar() {
   const [expanded, setExpanded] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
   const collapsed = !expanded || isMobile
-    const navigate = useNavigate()
+  const navigate = useNavigate()
+  const currentUser = useCurrentUser()
+  const { authLoading } = useAuth()
+
+  const topNavItems = useMemo(() => {
+    const isAdmin = !authLoading && currentUser?.role === "admin"
+    if (isAdmin) {
+      return TOP
+    }
+    return TOP.filter((it) => !ADMIN_ONLY_TOP_ROUTES.has(it.to))
+  }, [authLoading, currentUser?.role])
 
   const handleLogout = async () => {
     try {
@@ -114,7 +128,11 @@ export default function Sidebar() {
         }}
       >
         <nav style={{ paddingTop: 4, flex: "1 1 0", overflowY: "auto", minHeight: 0 }}>
-          {collapsed ? <CollapsedTop items={TOP} /> : <ExpandedTop items={TOP} />}
+          {collapsed ? (
+            <CollapsedTop items={topNavItems} />
+          ) : (
+            <ExpandedTop items={topNavItems} />
+          )}
         </nav>
 
         <div style={{ paddingTop: 10, flexShrink: 0, marginTop: "auto" }}>

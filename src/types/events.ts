@@ -43,3 +43,7 @@ export type EventPutData = EventPostData
 export type EventRegistrationPostData = {
   volunteerId: string
 }
+
+export type EventCoordinatorRegistrationPostData = {
+  coordinatorId: string
+}

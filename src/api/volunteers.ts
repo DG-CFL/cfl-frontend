@@ -1,11 +1,11 @@
-import type { Volunteer, VolunteerCertification, VolunteerEvent } from '@/types/volunteers'
 import { api } from './baseApi'
+import type { Volunteer, VolunteerCertification, VolunteerEvent } from '@/types/volunteers'
 
 const baseUrl = '/v1/admin/vms'
 
 // Returns a list of volunteers
 // TODO: Accept params for filtering, sorting and pagination
-export async function getVolunteers(): Promise<Volunteer[]> {
+export async function getVolunteers(): Promise<Array<Volunteer>> {
   const res = await api.get(`${baseUrl}/volunteers`)
   return res.data
 }
@@ -37,8 +37,29 @@ export async function getVolunteerHistory(
 }
 
 // Deletes all volunteers specified by the list of volunteerIds
-export async function deleteVolunteers(volunteerIds: number[]) {
+export async function deleteVolunteers(volunteerIds: Array<number>) {
   await api.delete(`${baseUrl}/volunteers`, {
     data: { ids: volunteerIds },
   })
+}
+
+export type UpdateVolunteerParams = {
+  certificate?: string
+  certificationDate?: string
+}
+
+/**
+ * PUT /v1/admin/vms/volunteers/update/{volunteer_id}
+ * Query params are converted to snake_case by the API client (e.g. certificationDate → certification_date).
+ */
+export async function updateVolunteer(
+  volunteerId: string,
+  params: UpdateVolunteerParams,
+): Promise<Volunteer> {
+  const res = await api.put(
+    `${baseUrl}/volunteers/update/${encodeURIComponent(volunteerId)}`,
+    null,
+    { params },
+  )
+  return res.data
 }
