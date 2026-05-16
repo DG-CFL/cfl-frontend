@@ -152,46 +152,48 @@ export default function Home() {
           </span>
         </a> */}
 
-        <div className="mt-12">
-          <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="flex items-center gap-2 text-xl font-semibold text-[#2a3320]">
-                <Sparkles className="h-5 w-5 text-[#6B7C3F]" aria-hidden />
-                Your workspace
-              </h2>
-              <p className="mt-1 text-sm text-[#5c6654]">
-                Shortcuts to the areas you use most.
-              </p>
+        {user?.role !== 'public' && (
+          <div className="mt-12">
+            <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="flex items-center gap-2 text-xl font-semibold text-[#2a3320]">
+                  <Sparkles className="h-5 w-5 text-[#6B7C3F]" aria-hidden />
+                  Your workspace
+                </h2>
+                <p className="mt-1 text-sm text-[#5c6654]">
+                  Shortcuts to the areas you use most.
+                </p>
+              </div>
+            </div>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {quickLinks.map(({ title, description, to, icon: Icon }) => (
+                <Link key={to} to={to} className="group block h-full">
+                  <Card className="h-full border-[#d4dcc8] bg-white/95 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#b8c4a8] hover:shadow-md">
+                    <CardHeader className="flex flex-row items-start gap-4 space-y-0 pb-2">
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#6B7C3F]/12 text-[#4d5c3a] transition-colors group-hover:bg-[#6B7C3F]/20">
+                        <Icon className="h-5 w-5" strokeWidth={2} aria-hidden />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <CardTitle className="text-lg text-[#2a3320]">
+                          {title}
+                        </CardTitle>
+                        <CardDescription className="mt-1.5 text-[#5c6654]">
+                          {description}
+                        </CardDescription>
+                      </div>
+                      <ArrowRight className="h-5 w-5 shrink-0 text-[#9aaa8c] transition-transform group-hover:translate-x-0.5 group-hover:text-[#5a6d38]" />
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <span className="text-sm font-medium text-[#6B7C3F]">
+                        Go to {title.toLowerCase()}
+                      </span>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
             </div>
           </div>
-          <div className="grid gap-5 sm:grid-cols-2">
-            {quickLinks.map(({ title, description, to, icon: Icon }) => (
-              <Link key={to} to={to} className="group block h-full">
-                <Card className="h-full border-[#d4dcc8] bg-white/95 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#b8c4a8] hover:shadow-md">
-                  <CardHeader className="flex flex-row items-start gap-4 space-y-0 pb-2">
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#6B7C3F]/12 text-[#4d5c3a] transition-colors group-hover:bg-[#6B7C3F]/20">
-                      <Icon className="h-5 w-5" strokeWidth={2} aria-hidden />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <CardTitle className="text-lg text-[#2a3320]">
-                        {title}
-                      </CardTitle>
-                      <CardDescription className="mt-1.5 text-[#5c6654]">
-                        {description}
-                      </CardDescription>
-                    </div>
-                    <ArrowRight className="h-5 w-5 shrink-0 text-[#9aaa8c] transition-transform group-hover:translate-x-0.5 group-hover:text-[#5a6d38]" />
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <span className="text-sm font-medium text-[#6B7C3F]">
-                      Go to {title.toLowerCase()}
-                    </span>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </div>
+        )}
 
         <footer className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-[#d4dcc8] pt-10 text-center sm:flex-row sm:text-left">
           <div className="flex items-center gap-3 text-[#5c6654]">
