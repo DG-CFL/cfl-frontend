@@ -35,28 +35,9 @@ export async function signIn(
   email: string,
   password: string,
   rememberMe?: boolean,
+  acknowledgedTermsOfUse?: boolean,
 ) {
   await signInWithEmailAndPassword(auth, email, password)
-
-  // let user = null
-
-  // // Temp login logic
-  // if (
-  //   email === ADMIN_CRENDENTIALS.email &&
-  //   password === ADMIN_CRENDENTIALS.password
-  // ) {
-  //   user = { email, role: 'admin' }
-  // } else if (
-  //   email === VOLUNTEER_CREDENTIALS.email &&
-  //   password === VOLUNTEER_CREDENTIALS.password
-  // ) {
-  //   user = { email, role: 'volunteer' }
-  // } else {
-  //   throw new Error('Invalid login credentials')
-  // }
-
-  // sessionStorage.setItem('user', JSON.stringify(user))
-  // return user
 }
 
 /**

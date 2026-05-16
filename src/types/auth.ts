@@ -9,8 +9,6 @@ export type SignUpFormData = {
   dateOfBirth: Date
   contactNumber: string
   marketingEmailPref: boolean
-  
-  acknowledgedTermsOfUse: boolean // Must be true for form to be submitted
 }
 
 export type SignUpPostData = {
