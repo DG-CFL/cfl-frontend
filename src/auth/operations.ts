@@ -65,7 +65,7 @@ export async function signIn(
 export async function sendResetPasswordEmail(email: string) {
   await sendPasswordResetEmail(auth, email, {
     // Email will contain a link to the reset password page
-    url: `${import.meta.env.BASE_URL}/reset-password`,
+    url: `${window.location.origin}/reset-password`,
   })
 }
 
