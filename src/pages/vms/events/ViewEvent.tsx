@@ -345,7 +345,7 @@ export default function ViewEvent() {
 }
 
 function getFormattedDate(d: Date) {
-  return d.toLocaleDateString('en-GB', {
+  return new Date(d).toLocaleDateString('en-GB', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -353,7 +353,7 @@ function getFormattedDate(d: Date) {
 }
 
 function getFormattedTime(d: Date) {
-  return d.toLocaleTimeString('en-GB', {
+  return new Date(d).toLocaleTimeString('en-GB', {
     hour: '2-digit',
     minute: '2-digit',
   })
