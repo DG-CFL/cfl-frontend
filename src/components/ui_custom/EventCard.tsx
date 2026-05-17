@@ -3,6 +3,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle } from '@/components/ui/card'
+import { useCurrentUser } from '@/auth/AuthProvider'
 
 export type EventCardProps = {
   id: number
@@ -19,7 +20,7 @@ export function EventCard({
   dateRange,
   imageUrl,
 }: EventCardProps) {
-  const navigate = useNavigate()
+  const user = useCurrentUser()
 
   return (
     <Card className="flex h-[425px] w-full max-w-[403px] flex-col overflow-hidden rounded-2xl border border-muted-foreground/20 p-0 shadow-sm transition-shadow hover:shadow-lg">
@@ -81,7 +82,7 @@ export function EventCard({
               variant="outline"
               className="h-11 w-full rounded-lg border border-muted-foreground/30 px-4 text-sm font-medium hover:bg-muted/50"
             >
-              View/Edit Details
+              {user?.role === 'public' ? "View Details" : "View/Edit Details"}
             </Button>
           </Link>
         </div>
