@@ -181,16 +181,14 @@ export default function ViewEvent() {
             </Link>
           )}
           {currentUser?.role === 'public' && (
-            
-              <Button
-                type="button"
-                className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold"
-                disabled={signupPending}
-                onClick={handleVolunteerSignup}
-              >
-                Sign up as Trainer!
-              </Button>
-            
+            <Button
+              type="button"
+              className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold"
+              disabled={signupPending}
+              onClick={handleVolunteerSignup}
+            >
+              Sign up as Trainer!
+            </Button>
           )}
         </div>
       </div>
@@ -253,7 +251,10 @@ export default function ViewEvent() {
                     className="size-5 text-muted-foreground"
                     aria-hidden="true"
                   />
-                  <h4>{data.startDate.toLocaleString()}</h4>
+                  <div className="flex flex-col gap-1">
+                    <h4>{getFormattedDate(data.startDate)}</h4>
+                    <h4>{getFormattedTime(data.startDate)}</h4>
+                  </div>
                 </div>
               </div>
 
@@ -266,7 +267,10 @@ export default function ViewEvent() {
                     className="size-5 text-muted-foreground"
                     aria-hidden="true"
                   />
-                  <h4>{data.endDate.toLocaleString()}</h4>
+                  <div className="flex flex-col gap-1">
+                    <h4>{getFormattedDate(data.endDate)}</h4>
+                    <h4>{getFormattedTime(data.endDate)}</h4>
+                  </div>
                 </div>
               </div>
             </div>
@@ -340,6 +344,21 @@ export default function ViewEvent() {
   )
 }
 
+function getFormattedDate(d: Date) {
+  return d.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
+function getFormattedTime(d: Date) {
+  return d.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
 function apiErrorMessage(err: unknown): string {
   if (axios.isAxiosError(err)) {
     const data = err.response?.data as { detail?: unknown } | undefined
@@ -389,8 +408,7 @@ function PersonListItem({
 }) {
   if (typeof entry === 'string') {
     const resolved = volunteerById.get(entry)
-    const displayName =
-      resolved?.name ?? (queryLoading ? 'Loading…' : entry)
+    const displayName = resolved?.name ?? (queryLoading ? 'Loading…' : entry)
 
     const body = (
       <>
@@ -400,7 +418,9 @@ function PersonListItem({
             aria-hidden="true"
           />
           <div className="space-y-0.5">
-            <h3 className="text-lg font-semibold text-slate-900">{displayName}</h3>
+            <h3 className="text-lg font-semibold text-slate-900">
+              {displayName}
+            </h3>
             <p className="text-base text-muted-foreground">{defaultRole}</p>
           </div>
         </div>
