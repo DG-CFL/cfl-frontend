@@ -181,24 +181,16 @@ export default function ViewEvent() {
             </Link>
           )}
           {currentUser?.role === 'public' && (
-            <>
-              <Button
-                type="button"
-                className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold"
-                disabled={signupPending}
-                onClick={handleCoordinatorSignup}
-              >
-                Sign up as Trainer!
-              </Button>
+            
               <Button
                 type="button"
                 className="h-11 gap-2 rounded-lg bg-[#545F71] px-5 text-base font-semibold"
                 disabled={signupPending}
                 onClick={handleVolunteerSignup}
               >
-                Sign up as Volunteer!
+                Sign up as Trainer!
               </Button>
-            </>
+            
           )}
         </div>
       </div>
@@ -292,7 +284,7 @@ export default function ViewEvent() {
       <Card className="gap-0 rounded-[10px] border-muted-foreground/30">
         <CardContent className="grid max-h-[600px] gap-10 overflow-y-auto px-8 py-8 lg:grid-cols-2">
           <div className="space-y-6">
-            <h2>Volunteer Coordinators</h2>
+            <h2>Staff IC</h2>
             <div className="space-y-3">
               {data.volunteerCoordinators.length === 0 ? (
                 <p className="text-sm text-muted-foreground">None listed.</p>
