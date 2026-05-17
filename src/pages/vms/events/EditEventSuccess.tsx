@@ -1,6 +1,17 @@
 import checkIcon from '@/assets/check-icon.svg'
+import { useNavigate } from '@tanstack/react-router'
+import { useEffect } from 'react'
 
 export default function EditEventSuccess() {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      navigate({ to: '/' })
+    }, 2000)
+    return () => clearTimeout(timeout)
+  }, [])
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4">
       <img src={checkIcon} alt="Success" />
