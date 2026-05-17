@@ -177,7 +177,7 @@ export default function SignUp() {
             htmlFor="year-of-birth"
             className="text-sm font-medium text-foreground"
           >
-            Date of Birth
+            Year of Birth
           </FieldLabel>
           <Input
             id="year-of-birth"
