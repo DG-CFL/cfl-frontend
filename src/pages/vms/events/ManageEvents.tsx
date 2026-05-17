@@ -11,8 +11,7 @@ import LoadingSkeleton from '@/pages/LoadingSkeleton'
 export default function ManageEvents() {
   const { data: events, isLoading, isError } = useGetEvents()
   const currentUser = useCurrentUser()
-  const showCreateEvent =
-    currentUser != null && currentUser.role !== 'public'
+  const showCreateEvent = currentUser != null && currentUser.role !== 'public'
 
   return (
     <div className="mx-auto w-full space-y-12 px-10 py-14 md:max-w-[calc(403px*2+24px)] xl:max-w-[calc(403px*3+24px*2)]">
@@ -48,6 +47,7 @@ export default function ManageEvents() {
               name={event.name}
               location={event.location}
               dateRange={`${event.startDate} – ${event.endDate}`}
+              expired={new Date(event.endDate).getTime() < Date.now()}
             />
           ))
         )}

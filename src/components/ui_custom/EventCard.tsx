@@ -11,6 +11,7 @@ export type EventCardProps = {
   location: string
   dateRange: string
   imageUrl?: string
+  expired?: boolean
 }
 
 export function EventCard({
@@ -19,6 +20,7 @@ export function EventCard({
   location,
   dateRange,
   imageUrl,
+  expired,
 }: EventCardProps) {
   const user = useCurrentUser()
 
@@ -76,13 +78,17 @@ export function EventCard({
           </div>
         </div>
 
+        {expired && (
+          <div className="text-red-600 border-red-600 w-full">Expired</div>
+        )}
+
         <div className="pt-4">
           <Link to="/events/$eventId/view" params={{ eventId: id.toString() }}>
             <Button
               variant="outline"
               className="h-11 w-full rounded-lg border border-muted-foreground/30 px-4 text-sm font-medium hover:bg-muted/50"
             >
-              {user?.role === 'public' ? "View Details" : "View/Edit Details"}
+              {user?.role === 'public' ? 'View Details' : 'View/Edit Details'}
             </Button>
           </Link>
         </div>
