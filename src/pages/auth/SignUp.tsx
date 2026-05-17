@@ -1,8 +1,8 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import { Controller,  useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import type { SignUpFormData } from '@/types/auth'
-import type {SubmitHandler} from 'react-hook-form';
+import type { SubmitHandler } from 'react-hook-form'
 import { signUp } from '@/auth/operations'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -31,10 +31,9 @@ const AUTH_SELECT_COUNTRY =
 const AUTH_BTN =
   'h-14 w-full rounded-md border-0 bg-[#6B7E45] text-base font-medium text-white shadow-none hover:bg-[#5d6d3b] focus-visible:ring-2 focus-visible:ring-[#6B7E45]/50'
 
-type SignUpFormValues = Omit<SignUpFormData, 'contactNumber' | 'dateOfBirth'> & {
+type SignUpFormValues = Omit<SignUpFormData, 'contactNumber'> & {
   countryDialCode: string
   phoneLocal: string
-  dateOfBirth?: Date
 }
 
 const DIAL_OPTIONS = [{ value: '+65', label: '🇸🇬 +65' }] as const
@@ -67,7 +66,7 @@ export default function SignUp() {
       password: data.password,
       fullName: data.fullName,
       gender: data.gender,
-      dateOfBirth: data.dateOfBirth!,
+      yearOfBirth: data.yearOfBirth,
       contactNumber: `${data.countryDialCode}${data.phoneLocal.replace(/\D/g, '')}`,
       marketingEmailPref: data.marketingEmailPref,
     }
@@ -94,7 +93,10 @@ export default function SignUp() {
 
       <FieldGroup className="grid w-full grid-cols-1 gap-x-14 gap-y-8 text-left lg:grid-cols-2">
         <Field className="gap-2">
-          <FieldLabel htmlFor="email" className="text-sm font-medium text-foreground">
+          <FieldLabel
+            htmlFor="email"
+            className="text-sm font-medium text-foreground"
+          >
             Email Address
           </FieldLabel>
           <Input
@@ -108,7 +110,10 @@ export default function SignUp() {
         </Field>
 
         <Field className="gap-2">
-          <FieldLabel htmlFor="password" className="text-sm font-medium text-foreground">
+          <FieldLabel
+            htmlFor="password"
+            className="text-sm font-medium text-foreground"
+          >
             Password
           </FieldLabel>
           <MaskableInput
@@ -124,7 +129,10 @@ export default function SignUp() {
         </Field>
 
         <Field className="gap-2">
-          <FieldLabel htmlFor="full-name" className="text-sm font-medium text-foreground">
+          <FieldLabel
+            htmlFor="full-name"
+            className="text-sm font-medium text-foreground"
+          >
             Full Name (as on NRIC)
           </FieldLabel>
           <Input
@@ -137,7 +145,10 @@ export default function SignUp() {
         </Field>
 
         <Field className="gap-2">
-          <FieldLabel htmlFor="gender" className="text-sm font-medium text-foreground">
+          <FieldLabel
+            htmlFor="gender"
+            className="text-sm font-medium text-foreground"
+          >
             Gender
           </FieldLabel>
           <Controller
@@ -162,28 +173,32 @@ export default function SignUp() {
         </Field>
 
         <Field className="gap-2">
-          <FieldLabel htmlFor="date-of-birth" className="text-sm font-medium text-foreground">
+          <FieldLabel
+            htmlFor="year-of-birth"
+            className="text-sm font-medium text-foreground"
+          >
             Date of Birth
           </FieldLabel>
-          <Controller
-            name="dateOfBirth"
-            control={control}
-            rules={{
-              required: 'Date of birth is required',
-            }}
-            render={({ field }) => (
-              <DatePicker
-                id="date-of-birth"
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="MM / DD / YYYY"
-                inputClassName={cn(AUTH_INPUT, 'h-14 pr-12')}
-              />
-            )}
+          <Input
+            id="year-of-birth"
+            type="tel"
+            inputMode="numeric"
+            placeholder="YYYY"
+            className={cn(AUTH_INPUT, 'min-w-0 flex-1')}
+            {...register('yearOfBirth', {
+              required: 'Year of birth is required',
+              validate: (v) => {
+                const year = Number(v)
+                const currentYear = new Date().getFullYear()
+                return (
+                  (Number.isInteger(year) &&
+                    year >= 1900 &&
+                    year <= currentYear) ||
+                  'Enter a valid birth year'
+                )
+              },
+            })}
           />
-          {errors.dateOfBirth && (
-            <ErrorAlert message={errors.dateOfBirth.message} />
-          )}
         </Field>
 
         <Field className="gap-2">
@@ -261,8 +276,6 @@ export default function SignUp() {
             </Label>
           </div>
         </div>
-        
-        
       </div>
 
       {error && <ErrorAlert message={error} />}

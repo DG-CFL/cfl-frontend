@@ -26,7 +26,7 @@ export async function signUp(signUpData: SignUpFormData): Promise<UserAccount> {
   // Backend endpoint for additional user data not handled by firebase
   const user = await signUpUser({
     ...signUpData,
-    dateOfBirth: serializeDateWithoutTime(signUpData.dateOfBirth),
+    dateOfBirth: serializeDateWithoutTime(signUpData.yearOfBirth),
   })
   return user
 }

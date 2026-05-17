@@ -6,7 +6,7 @@ export type SignUpFormData = {
 
   fullName: string
   gender: string
-  dateOfBirth: Date
+  yearOfBirth: string
   contactNumber: string
   marketingEmailPref: boolean
 }
