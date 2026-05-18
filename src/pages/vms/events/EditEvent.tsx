@@ -48,8 +48,7 @@ function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => resolve(String(reader.result))
-    reader.onerror = () =>
-      reject(new Error('Failed to read cover image'))
+    reader.onerror = () => reject(new Error('Failed to read cover image'))
     reader.readAsDataURL(file)
   })
 }
@@ -71,10 +70,7 @@ function extractCoordinatorIds(eventData: any): Array<string> {
   if (!Array.isArray(raw)) return []
   if (typeof raw[0] === 'string') return raw
   return raw
-    .map(
-      (x) =>
-        x?.volunteerId ?? x?.volunteer_id ?? x?.id ?? x?.trainer,
-    )
+    .map((x) => x?.volunteerId ?? x?.volunteer_id ?? x?.id ?? x?.trainer)
     .filter((v): v is string => typeof v === 'string')
 }
 
@@ -97,14 +93,15 @@ export default function EditEvent() {
 
   const [showVolunteerPicker, setShowVolunteerPicker] = useState(false)
   const [volunteerSearch, setVolunteerSearch] = useState('')
-  const [selectedVolunteers, setSelectedVolunteers] = useState<Array<Volunteer>>(
-    [],
-  )
+  const [selectedVolunteers, setSelectedVolunteers] = useState<
+    Array<Volunteer>
+  >([])
 
   const {
     register,
     handleSubmit,
     control,
+    watch,
     reset,
     formState: { isDirty, errors },
   } = useForm<EventEditFormData>({
@@ -121,6 +118,9 @@ export default function EditEvent() {
       trainers: [],
     },
   })
+
+  const startDate = watch('startDate')
+  const startTime = watch('startTime')
 
   const errorMessages = Object.values(errors)
     .map((e: any) => e?.message)
@@ -162,7 +162,10 @@ export default function EditEvent() {
 
     const start = new Date(eventData.startDate)
     const end = new Date(eventData.endDate)
-    const eventDataWithVenue = eventData as { venue?: string; coverImage?: string }
+    const eventDataWithVenue = eventData as {
+      venue?: string
+      coverImage?: string
+    }
     const venueValue = eventDataWithVenue.venue || eventData.location
 
     reset({
@@ -183,7 +186,9 @@ export default function EditEvent() {
     if (!eventData || !volunteers) return
     const coordinatorIds = extractCoordinatorIds(eventData)
     setSelectedVolunteers(
-      volunteers.filter((v) => coordinatorIds.includes(getVolunteerTrainerId(v))),
+      volunteers.filter((v) =>
+        coordinatorIds.includes(getVolunteerTrainerId(v)),
+      ),
     )
   }, [eventData, volunteers])
 
@@ -249,8 +254,7 @@ export default function EditEvent() {
             onClick={() => {
               if (isDirty) setShowExitDialog(true)
               else navigate({ to: '/events' })
-              }
-            }
+            }}
           >
             Cancel
           </Button>
@@ -350,7 +354,9 @@ export default function EditEvent() {
                 </Label>
                 <div className="grid grid-cols-[1fr_140px] gap-3">
                   <Controller
-                    {...register('endDate', { required: 'End date is required' })}
+                    {...register('endDate', {
+                      required: 'End date is required',
+                    })}
                     control={control}
                     render={({ field }) => (
                       <DatePicker
@@ -365,6 +371,14 @@ export default function EditEvent() {
                     type="time"
                     {...register('endTime', {
                       required: 'End time is required',
+                      validate: (val) => {
+                        const start = combineDateAndTime(startDate, startTime)
+                        const end = combineDateAndTime(watch('endDate'), val)
+                        return (
+                          new Date(end) >= new Date(start) ||
+                          'End date/time must be after start date/time'
+                        )
+                      },
                     })}
                     className="h-12 rounded-md border-slate-500"
                   />
@@ -449,16 +463,16 @@ export default function EditEvent() {
                     key={getVolunteerTrainerId(volunteer) || volunteer.name}
                     className="flex items-center justify-between rounded-md border border-slate-300 px-4 py-3"
                   >
-                    <p className="text-base text-slate-700">
-                      {volunteer.name}
-                    </p>
+                    <p className="text-base text-slate-700">{volunteer.name}</p>
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
                       className="size-10 text-red-500 hover:bg-red-50 hover:text-red-700"
                       onClick={() =>
-                        removeVolunteerCoordinator(getVolunteerTrainerId(volunteer))
+                        removeVolunteerCoordinator(
+                          getVolunteerTrainerId(volunteer),
+                        )
                       }
                     >
                       <Trash2 className="size-5" />
@@ -471,10 +485,7 @@ export default function EditEvent() {
         </Card>
       </form>
 
-      <Dialog
-        open={showVolunteerPicker}
-        onOpenChange={setShowVolunteerPicker}
-      >
+      <Dialog open={showVolunteerPicker} onOpenChange={setShowVolunteerPicker}>
         <DialogContent className="max-w-2xl border-slate-300">
           <DialogHeader className="text-left">
             <h2>Select Volunteer Coordinators</h2>
@@ -514,10 +525,7 @@ export default function EditEvent() {
           </div>
 
           <DialogFooter>
-            <Button
-              type="button"
-              onClick={() => setShowVolunteerPicker(false)}
-            >
+            <Button type="button" onClick={() => setShowVolunteerPicker(false)}>
               Done
             </Button>
           </DialogFooter>
