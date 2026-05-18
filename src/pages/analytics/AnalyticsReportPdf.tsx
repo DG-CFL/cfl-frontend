@@ -76,7 +76,7 @@ function generateTrainingOverviewImage(data: TrainingOverviewDataPoint[]) {
   ctx.lineTo(canvas.width - padding, canvas.height - padding)
   ctx.stroke()
 
-  const maxPeople = Math.max(...data.map(d => d.people), 1)
+  const maxPeople = Math.max(...data.map((d) => d.people), 1)
   const xStep = (canvas.width - 2 * padding) / (data.length - 1)
 
   // Draw grid lines and Y labels
@@ -102,7 +102,8 @@ function generateTrainingOverviewImage(data: TrainingOverviewDataPoint[]) {
   ctx.beginPath()
   data.forEach((p, i) => {
     const x = padding + i * xStep
-    const y = padding + (canvas.height - 2 * padding) * (1 - p.people / maxPeople)
+    const y =
+      padding + (canvas.height - 2 * padding) * (1 - p.people / maxPeople)
     i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
   })
   ctx.stroke()
@@ -111,7 +112,8 @@ function generateTrainingOverviewImage(data: TrainingOverviewDataPoint[]) {
   ctx.fillStyle = '#2563EB'
   data.forEach((p, i) => {
     const x = padding + i * xStep
-    const y = padding + (canvas.height - 2 * padding) * (1 - p.people / maxPeople)
+    const y =
+      padding + (canvas.height - 2 * padding) * (1 - p.people / maxPeople)
     ctx.beginPath()
     ctx.arc(x, y, 3, 0, 2 * Math.PI)
     ctx.fill()
@@ -144,7 +146,13 @@ function generateCertificationsImage(cert: CertificationsData) {
   // Certified slice
   ctx.beginPath()
   ctx.moveTo(center, center)
-  ctx.arc(center, center, radius, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * percent)
+  ctx.arc(
+    center,
+    center,
+    radius,
+    -Math.PI / 2,
+    -Math.PI / 2 + 2 * Math.PI * percent,
+  )
   ctx.closePath()
   ctx.fillStyle = '#10B981'
   ctx.fill()
@@ -152,7 +160,13 @@ function generateCertificationsImage(cert: CertificationsData) {
   // Uncertified slice
   ctx.beginPath()
   ctx.moveTo(center, center)
-  ctx.arc(center, center, radius, -Math.PI / 2 + 2 * Math.PI * percent, -Math.PI / 2 + 2 * Math.PI)
+  ctx.arc(
+    center,
+    center,
+    radius,
+    -Math.PI / 2 + 2 * Math.PI * percent,
+    -Math.PI / 2 + 2 * Math.PI,
+  )
   ctx.closePath()
   ctx.fillStyle = '#D1FAE5'
   ctx.fill()
@@ -162,7 +176,11 @@ function generateCertificationsImage(cert: CertificationsData) {
   ctx.font = '14px Helvetica'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.fillText(`${certifiedMembers} / ${totalMembers} Certified`, center, center)
+  ctx.fillText(
+    `${certifiedMembers} / ${totalMembers} Certified`,
+    center,
+    center,
+  )
 
   return canvas.toDataURL('image/png')
 }
@@ -180,10 +198,12 @@ export const AnalyticsReportPdf: FC<Props> = ({
     () => generateTrainingOverviewImage(trainingOverview),
     [trainingOverview],
   )
-  const certificationsImg = useMemo(
-    () => generateCertificationsImage(certifications),
-    [certifications],
-  )
+  const certifiedPercent =
+    certifications.certifiedMembers > 0
+      ? Math.round(
+          (certifications.certifiedMembers / certifications.totalMembers) * 100,
+        )
+      : 0
 
   return (
     <Document>
@@ -211,10 +231,7 @@ export const AnalyticsReportPdf: FC<Props> = ({
         </View>
 
         <View style={styles.section}>
-          <Text>Certifications</Text>
-          {certificationsImg && (
-            <Image src={certificationsImg} style={styles.chartImage} />
-          )}
+          <Text>Certified %: {certifiedPercent}% of members certified</Text>
         </View>
       </Page>
     </Document>
