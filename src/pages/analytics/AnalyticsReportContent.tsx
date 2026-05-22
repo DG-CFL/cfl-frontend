@@ -232,8 +232,18 @@ export function TrainingOverviewChart({
               d={peoplePath}
               fill="none"
               stroke="#60A5FA"
-              strokeWidth={2}
+              strokeWidth={4}
             />
+
+            {points.map((point, i) => (
+              <circle
+                key={`people-${i}`}
+                cx={padding.left + i * xStep}
+                cy={scalePeople(point.people)}
+                r={8}
+                fill="#60A5FA"
+              />
+            ))}
 
             <path
               d={sessionsPath}
@@ -244,23 +254,14 @@ export function TrainingOverviewChart({
 
             {points.map((point, i) => (
               <circle
-                key={`people-${i}`}
-                cx={padding.left + i * xStep}
-                cy={scalePeople(point.people)}
-                r={4}
-                fill="#60A5FA"
-              />
-            ))}
-
-            {points.map((point, i) => (
-              <circle
                 key={`sessions-${i}`}
                 cx={padding.left + i * xStep}
                 cy={scaleSessions(point.sessions)}
-                r={4}
+                r={6}
                 fill="#10B981"
               />
             ))}
+
           </svg>
         </div>
       </CardContent>
@@ -386,14 +387,14 @@ export function AnalyticsReportContent({
           value={data.totalTrainingSessions}
         />
         <MetricCard
-          title="No. of People Trained"
+          title="No. of People Trained in LIFE Training (General Public)"
           value={data.intPeopleTrained}
         />
         <MetricCard
           title="Newly Certified Volunteers"
           value={data.newlyCertifiedMembers}
         />
-        <MetricCard title="Total Certified" value={data.certifiedMembers} />
+        <MetricCard title="Total Certified Volunteers" value={data.certifiedMembers} />
         <MetricCard
           title="Average Attendance"
           value={data.averageAttendance}
