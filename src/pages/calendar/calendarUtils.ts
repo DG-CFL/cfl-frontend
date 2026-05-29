@@ -1,7 +1,6 @@
 import { getHours, getMinutes, isSameDay } from 'date-fns'
 import {
-  getEventColor,
-  type CalendarCategory,
+  getCalendarEventColor,
   type CalendarCategoryColors,
 } from '@/pages/calendar/SampleCalendarData'
 import type { Event } from '@/types/events'
@@ -78,7 +77,7 @@ export const getDayEventsLayout = (
       const widthPercent = 100 / numCols
       const leftPercent = ev.colIndex * widthPercent
 
-      const color = getEventColor(ev.original.category)
+      const color = getCalendarEventColor(ev.original)
       results.push({
         event: ev.original,
         style: {

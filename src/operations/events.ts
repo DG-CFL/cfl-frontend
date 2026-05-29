@@ -12,6 +12,7 @@ import {
   editEvent,
   getEvent,
   getEvents,
+  getSessionEvents,
   registerEventCoordinator,
   registerEventVolunteer,
 } from '@/api/events'
@@ -23,6 +24,19 @@ export function useGetEvents() {
   return useQuery({
     queryKey: ['events'],
     queryFn: getEvents,
+    staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  })
+}
+
+/**
+ * Returns session events for calendar views.
+ */
+export function useGetSessionEvents() {
+  return useQuery({
+    queryKey: ['sessions', 'events'],
+    queryFn: getSessionEvents,
     staleTime: 10 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     refetchOnWindowFocus: false,

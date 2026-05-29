@@ -96,7 +96,7 @@ const normalizeCalendarEvent = (value: unknown): Event | null => {
     eventId: Number.isNaN(eventId) ? 0 : eventId,
     name: event.name ?? '',
     status: event.status ?? 'Active',
-    category: event.category === 'training' ? 'training' : 'event',
+    category: event.category === 'event' ? 'event' : 'training',
     location: resolvedLocation,
     coverImage: event.coverImage ?? undefined,
     startDate,

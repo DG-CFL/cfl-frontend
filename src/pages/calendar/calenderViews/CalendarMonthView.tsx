@@ -1,6 +1,5 @@
 import {
-  getEventColor,
-  type CalendarCategory,
+  getCalendarEventColor,
   type CalendarCategoryColors,
 } from '../SampleCalendarData'
 import { CalendarBody, CalendarHeader } from '@/components/ui/calendarpage'
@@ -24,7 +23,7 @@ const CalendarMonthView = ({
       <CalendarHeader className="border-t border-muted-foreground/20 bg-white" />
       <CalendarBody events={events} selectedDate={selectedDate}>
         {({ event }) => {
-          const color = getEventColor(event.category)
+          const color = getCalendarEventColor(event)
 
           return (
             <Link

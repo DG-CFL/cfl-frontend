@@ -19,6 +19,7 @@ export type Event = {
   description: string
   volunteerCoordinators: Array<EventParticipantEntry>
   volunteers: Array<EventParticipantEntry>
+  isCurrentUserInvolved?: boolean
 }
 
 /** Matches backend `TrainerAssignment`: Firebase UID + role (see SessionCreateUpdate). */

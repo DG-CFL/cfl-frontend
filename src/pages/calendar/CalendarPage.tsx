@@ -10,18 +10,18 @@ import CalendarMonthView from './calenderViews/CalendarMonthView'
 import CalendarWeekView from './calenderViews/CalendarWeekView'
 import CalendarYearView from './calenderViews/CalendarYearView'
 import { parseCalendarEvents } from './CalendarParser'
-import { CALENDAR_FILTERS, STATUS_COLORS } from './SampleCalendarData'
+import { STATUS_COLORS } from './SampleCalendarData'
 import type {
   CalendarDisplayMode,
   CalendarViewOption,
 } from '@/pages/calendar/CalendarHeader'
 import type { CalendarState } from '@/components/ui/calendarpage'
-import type { CalendarCategory } from './SampleCalendarData'
+import type { EventParticipantEntry } from '@/types/events'
 
 import { useCurrentUser } from '@/auth/AuthProvider'
 import CalendarBar from '@/pages/calendar/CalendarSideBar'
 import { CalendarBarHeader } from '@/pages/calendar/CalendarHeader'
-import { useGetEvents } from '@/operations/events'
+import { useGetSessionEvents } from '@/operations/events'
 import { Button } from '@/components/ui/button'
 import {
   CalendarProvider,
@@ -29,13 +29,25 @@ import {
   useCalendarYear,
 } from '@/components/ui/calendarpage'
 
+function normalizeName(value: string) {
+  return value.trim().toLowerCase()
+}
+
+function participantNameMatches(
+  participant: EventParticipantEntry,
+  currentUserName: string,
+) {
+  if (typeof participant === 'string') {
+    return normalizeName(participant) === currentUserName
+  }
+
+  return normalizeName(participant.name) === currentUserName
+}
+
 const CalendarPage = () => {
   const [view, setView] = useState<CalendarViewOption>('month')
   const [mode, setMode] = useState<CalendarDisplayMode>('grid')
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
-  const [activeFilters, setActiveFilters] = useState<Array<CalendarCategory>>(
-    CALENDAR_FILTERS.map((filter) => filter.id),
-  )
 
   const [month, setMonth] = useCalendarMonth()
   const [year, setYear] = useCalendarYear()
@@ -66,19 +78,25 @@ const CalendarPage = () => {
     [month, year],
   )
 
-  const { data: eventsData, isLoading, isError } = useGetEvents()
+  const { data: eventsData, isLoading, isError } = useGetSessionEvents()
 
   const normalizedEvents = useMemo(() => {
     if (isError) {
       return []
     }
 
-    return parseCalendarEvents(eventsData as unknown)
-  }, [eventsData, isError])
+    const currentUserName = normalizeName(currentUser?.name ?? '')
 
-  const filteredEvents = normalizedEvents.filter((event) =>
-    activeFilters.includes(event.category),
-  )
+    return parseCalendarEvents(eventsData as unknown).map((event) => ({
+      ...event,
+      isCurrentUserInvolved:
+        currentUserName.length > 0 &&
+        [...event.volunteerCoordinators, ...event.volunteers].some(
+          (participant) =>
+            participantNameMatches(participant, currentUserName),
+        ),
+    }))
+  }, [eventsData, isError, currentUser?.name])
 
   const handleSelectDate = (date: Date) => {
     setSelectedDate(date)
@@ -94,18 +112,6 @@ const CalendarPage = () => {
 
   const handleToday = () => {
     handleSelectDate(new Date())
-  }
-
-  const toggleFilter = (filterId: CalendarCategory) => {
-    setActiveFilters((current) =>
-      current.includes(filterId)
-        ? current.filter((id) => id !== filterId)
-        : [...current, filterId],
-    )
-  }
-
-  const resetFilters = () => {
-    setActiveFilters([])
   }
 
   const handleNext = () => {
@@ -134,7 +140,7 @@ const CalendarPage = () => {
     if (mode === 'list') {
       return (
         <CalendarListView
-          events={filteredEvents}
+          events={normalizedEvents}
           colors={STATUS_COLORS}
           selectedDate={selectedDate}
         />
@@ -145,7 +151,7 @@ const CalendarPage = () => {
       case 'month':
         return (
           <CalendarMonthView
-            events={filteredEvents}
+            events={normalizedEvents}
             colors={STATUS_COLORS}
             selectedDate={selectedDate}
           />
@@ -153,7 +159,7 @@ const CalendarPage = () => {
       case 'week':
         return (
           <CalendarWeekView
-            events={filteredEvents}
+            events={normalizedEvents}
             colors={STATUS_COLORS}
             selectedDate={selectedDate}
           />
@@ -161,7 +167,7 @@ const CalendarPage = () => {
       case 'day':
         return (
           <CalendarDayView
-            events={filteredEvents}
+            events={normalizedEvents}
             colors={STATUS_COLORS}
             selectedDate={selectedDate}
           />
@@ -171,7 +177,7 @@ const CalendarPage = () => {
       default:
         return (
           <CalendarMonthView
-            events={filteredEvents}
+            events={normalizedEvents}
             colors={STATUS_COLORS}
             selectedDate={selectedDate}
           />
@@ -190,11 +196,6 @@ const CalendarPage = () => {
           sidebarTitle={sidebarTitle}
           selectedDate={selectedDate}
           onSelectDate={handleMiniCalendarSelect}
-          filters={CALENDAR_FILTERS}
-          activeFilters={activeFilters}
-          toggleFilter={toggleFilter}
-          resetFilters={resetFilters}
-          statusColors={STATUS_COLORS}
         />
       )}
       <div className="relative flex-1 overflow-hidden">

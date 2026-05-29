@@ -52,6 +52,14 @@ export async function getEvents(): Promise<Array<Event>> {
 }
 
 /**
+ * Returns session events used by calendar views.
+ */
+export async function getSessionEvents(): Promise<Array<unknown>> {
+  const res = await api.get(`${baseUrl}/sessions/events`)
+  return res.data
+}
+
+/**
  * Returns an event
  */
 export async function getEvent(eventId: number): Promise<Event> {
