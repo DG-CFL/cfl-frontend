@@ -229,18 +229,31 @@ export function TrainingOverviewChart({
             ))}
 
             <path
-              d={peoplePath}
-              fill="none"
-              stroke="#60A5FA"
-              strokeWidth={2}
-            />
-
-            <path
               d={sessionsPath}
               fill="none"
               stroke="#10B981"
-              strokeWidth={2}
+              strokeWidth={3}
             />
+
+            <path
+              d={peoplePath}
+              fill="none"
+              stroke="#60A5FA"
+              strokeWidth={3}
+              strokeDasharray="8 5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+
+            {points.map((point, i) => (
+              <circle
+                key={`sessions-${i}`}
+                cx={padding.left + i * xStep}
+                cy={scaleSessions(point.sessions)}
+                r={5}
+                fill="#10B981"
+              />
+            ))}
 
             {points.map((point, i) => (
               <circle
@@ -249,16 +262,8 @@ export function TrainingOverviewChart({
                 cy={scalePeople(point.people)}
                 r={4}
                 fill="#60A5FA"
-              />
-            ))}
-
-            {points.map((point, i) => (
-              <circle
-                key={`sessions-${i}`}
-                cx={padding.left + i * xStep}
-                cy={scaleSessions(point.sessions)}
-                r={4}
-                fill="#10B981"
+                stroke="#FFFFFF"
+                strokeWidth={1.5}
               />
             ))}
           </svg>
