@@ -29,7 +29,7 @@ import {
 import { calendarPageRoute } from './calendar'
 import { analyticsPageRoute, analyticsPdfPreviewRoute } from './analytics'
 import { createCustomReportRoute } from './createCustomReport'
-import { landingPageRoute } from './vms'
+import { landingPageRoute } from './vms/index'
 
 export const rootRoute = createRootRoute({
   component: () => (
