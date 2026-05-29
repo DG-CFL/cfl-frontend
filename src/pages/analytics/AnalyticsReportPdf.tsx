@@ -241,9 +241,9 @@ export const AnalyticsReportPdf: FC<Props> = ({
 function formatMetric(key: string) {
   const map: Record<string, string> = {
     totalTrainingSessions: 'Total Training Sessions',
-    peopleTrained: 'People Trained',
+    peopleTrained: 'No. of Trained in LIFE',
     newlyCertifiedMembers: 'Newly Certified Members',
-    certifiedMembers: 'Certified Members',
+    certifiedMembers: 'Total Certified Volunteers',
     averageAttendance: 'Average Attendance',
     volunteerEngagement: 'Volunteer Engagement',
   }
