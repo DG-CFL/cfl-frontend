@@ -8,6 +8,20 @@ import { ErrorAlert } from '@/components/ui_custom/ErrorAlert'
 import { useGetEvents } from '@/operations/events'
 import LoadingSkeleton from '@/pages/LoadingSkeleton'
 
+function formatEventStartDate(value: Date | string) {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return ''
+
+  return date.toLocaleString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  })
+}
+
 export default function ManageEvents() {
   const { data: events, isLoading, isError } = useGetEvents()
   const currentUser = useCurrentUser()
@@ -46,7 +60,7 @@ export default function ManageEvents() {
               id={event.eventId}
               name={event.name}
               location={event.location}
-              dateRange={`${event.startDate} – ${event.endDate}`}
+              dateRange={formatEventStartDate(event.startDate)}
               expired={new Date(event.endDate).getTime() < Date.now()}
             />
           ))
