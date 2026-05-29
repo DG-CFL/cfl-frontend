@@ -1,5 +1,5 @@
 import { Outlet } from '@tanstack/react-router'
-import logo from '@/assets/b0bcc1e094e7d036a3aeff9e780dc240edc44799.png'
+import logo from '@/assets/cfl-logo.png'
 
 export default function AuthSplitLayout() {
   return (
@@ -7,8 +7,11 @@ export default function AuthSplitLayout() {
       <div className="w-1/2">
         <Outlet />
       </div>
-      <div className="w-1/2 flex justify-center items-center">
-        <img src={logo} width={400}/>
+      <div className="w-1/2 flex flex-col justify-center items-center gap-6">
+        <img src={logo} width={220} alt="Caring for Life logo" />
+        <p className="max-w-sm text-center text-2xl font-semibold text-[#6B7C3F]">
+          Suicide prevention is everyone&apos;s business
+        </p>
       </div>
     </div>
   )
