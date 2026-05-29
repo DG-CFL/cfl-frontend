@@ -8,6 +8,7 @@ import type {
 } from '@/types/events'
 import {
   createEvent,
+  deleteEvent,
   editEvent,
   getEvent,
   getEvents,
@@ -64,6 +65,22 @@ export function useEditEvent(eventId: number) {
       await queryClient.invalidateQueries({
         queryKey: ['events', eventId],
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['events'],
+      })
+    },
+  })
+}
+
+/**
+ * Deletes an event.
+ */
+export function useDeleteEvent(eventId: number) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => deleteEvent(eventId),
+    onSuccess: async () => {
+      await queryClient.removeQueries({ queryKey: ['events', eventId] })
       await queryClient.invalidateQueries({
         queryKey: ['events'],
       })

@@ -83,6 +83,13 @@ export async function editEvent(
 }
 
 /**
+ * Deletes an event and associated session data.
+ */
+export async function deleteEvent(eventId: number): Promise<void> {
+  await api.delete(`${baseUrl}/sessions/events/${eventId}`)
+}
+
+/**
  * Register current user as a volunteer coordinator (trainer) for an event.
  * Expects 204 No Content on success.
  */

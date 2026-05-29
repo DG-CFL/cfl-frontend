@@ -29,7 +29,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui_custom/DatePicker'
-import { useEditEvent, useGetEvent } from '@/operations/events'
+import { useDeleteEvent, useEditEvent, useGetEvent } from '@/operations/events'
 import { useGetVolunteers } from '@/operations/volunteers'
 import LoadingSkeleton from '@/pages/LoadingSkeleton'
 
@@ -80,10 +80,12 @@ export default function EditEvent() {
   const eventIdNum = Number(eventId!)
 
   const editEvent = useEditEvent(eventIdNum)
+  const deleteEvent = useDeleteEvent(eventIdNum)
   const { data: eventData, isLoading } = useGetEvent(eventIdNum)
   const { data: volunteers } = useGetVolunteers()
 
   const [showExitDialog, setShowExitDialog] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [coverImage, setCoverImage] = useState<Array<File> | undefined>(
     undefined,
   )
@@ -219,6 +221,15 @@ export default function EditEvent() {
     }
   }
 
+  const handleDeleteEvent = async () => {
+    try {
+      await deleteEvent.mutateAsync()
+      navigate({ to: '/events' })
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   if (isLoading) return <LoadingSkeleton />
 
   return (
@@ -247,6 +258,18 @@ export default function EditEvent() {
         </div>
 
         <div className="flex gap-[10px] pt-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="size-10 rounded-md !border-red-500 text-red-500 hover:bg-red-50 hover:text-red-700"
+            disabled={deleteEvent.isPending}
+            aria-label="Delete event"
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            <Trash2 className="size-5" />
+          </Button>
+
           <Button
             type="button"
             variant="outline"
@@ -527,6 +550,35 @@ export default function EditEvent() {
           <DialogFooter>
             <Button type="button" onClick={() => setShowVolunteerPicker(false)}>
               Done
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="border-red-200 bg-white">
+          <DialogHeader className="text-center sm:text-center">
+            <h2>Delete event?</h2>
+            <p>
+              This will remove the event and all associated trainers,
+              participants, and venue data if unused.
+            </p>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-center gap-[10px]">
+            <Button
+              variant="outline"
+              className="h-10 w-34 rounded-md border border-slate-500 bg-transparent text-base font-semibold text-slate-600 hover:bg-slate-100"
+              disabled={deleteEvent.isPending}
+              onClick={() => setShowDeleteDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="h-10 w-34 rounded-md bg-red-600 text-base font-semibold text-white hover:bg-red-700"
+              disabled={deleteEvent.isPending}
+              onClick={handleDeleteEvent}
+            >
+              {deleteEvent.isPending ? 'Deleting...' : 'Delete'}
             </Button>
           </DialogFooter>
         </DialogContent>
