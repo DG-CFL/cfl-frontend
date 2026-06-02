@@ -38,9 +38,8 @@ type EventCreateFormData = {
   endDate: Date
   endTime: string
   venue: string
-  trainers: Array<{
-    id: string
-  }>
+  trainers: Array<{ id: string }>
+  volunteers: Array<string>
 }
 
 async function fileToDataUrl(file: File): Promise<string> {
@@ -67,8 +66,11 @@ export default function CreateEvent() {
   const [coverImage, setCoverImage] = useState<Array<File> | undefined>(
     undefined,
   )
+  const [showStaffPicker, setShowStaffPicker] = useState(false)
   const [showVolunteerPicker, setShowVolunteerPicker] = useState(false)
+  const [staffSearch, setStaffSearch] = useState('')
   const [volunteerSearch, setVolunteerSearch] = useState('')
+  const [selectedStaffIC, setSelectedStaffIC] = useState<Array<Volunteer>>([])
   const [selectedVolunteers, setSelectedVolunteers] = useState<
     Array<Volunteer>
   >([])
@@ -90,6 +92,7 @@ export default function CreateEvent() {
       endTime: '17:00',
       description: '',
       trainers: [],
+      volunteers: [],
     },
   })
 
@@ -98,6 +101,19 @@ export default function CreateEvent() {
     .filter((msg): msg is string => typeof msg === 'string')
 
   const [showExitDialog, setShowExitDialog] = useState(false)
+
+  const filteredStaff = useMemo(() => {
+    const volunteerList = volunteers ?? []
+    const searchTerm = staffSearch.trim().toLowerCase()
+
+    if (!searchTerm) {
+      return volunteerList
+    }
+
+    return volunteerList.filter((volunteer) =>
+      volunteer.name.toLowerCase().includes(searchTerm),
+    )
+  }, [volunteers, staffSearch])
 
   const filteredVolunteers = useMemo(() => {
     const volunteerList = volunteers ?? []
@@ -112,11 +128,11 @@ export default function CreateEvent() {
     )
   }, [volunteers, volunteerSearch])
 
-  const addVolunteerCoordinator = (volunteer: Volunteer) => {
+  const addStaffIC = (volunteer: Volunteer) => {
     const volunteerTrainerId = getVolunteerTrainerId(volunteer)
     if (!volunteerTrainerId) return
 
-    setSelectedVolunteers((current) => {
+    setSelectedStaffIC((current) => {
       if (
         current.some(
           (entry) => getVolunteerTrainerId(entry) === volunteerTrainerId,
@@ -128,9 +144,29 @@ export default function CreateEvent() {
     })
   }
 
-  const removeVolunteerCoordinator = (trainerId: string) => {
-    setSelectedVolunteers((current) =>
+  const removeStaffIC = (trainerId: string) => {
+    setSelectedStaffIC((current) =>
       current.filter((entry) => getVolunteerTrainerId(entry) !== trainerId),
+    )
+  }
+
+  const addVolunteer = (volunteer: Volunteer) => {
+    const volunteerId = getVolunteerTrainerId(volunteer)
+    if (!volunteerId) return
+
+    setSelectedVolunteers((current) => {
+      if (
+        current.some((entry) => getVolunteerTrainerId(entry) === volunteerId)
+      ) {
+        return current
+      }
+      return [...current, volunteer]
+    })
+  }
+
+  const removeVolunteer = (volunteerId: string) => {
+    setSelectedVolunteers((current) =>
+      current.filter((entry) => getVolunteerTrainerId(entry) !== volunteerId),
     )
   }
 
@@ -147,12 +183,15 @@ export default function CreateEvent() {
         coverImage: coverImage?.[0]
           ? await fileToDataUrl(coverImage[0])
           : undefined,
-        trainers: selectedVolunteers
+        trainers: selectedStaffIC
           .map((volunteer) => {
             const id = getVolunteerTrainerId(volunteer)
             return id ? { id, role: 'public' } : null
           })
           .filter((entry): entry is EventTrainerAssignment => entry !== null),
+        volunteers: selectedVolunteers
+          .map((volunteer) => getVolunteerTrainerId(volunteer))
+          .filter((id): id is string => id.length > 0),
       }
 
       await createEvent.mutateAsync(eventPayload)
@@ -168,21 +207,23 @@ export default function CreateEvent() {
       {/* Header row */}
       <div className="flex items-start justify-between gap-8">
         <div className="flex items-start gap-4">
-            <Button variant="ghost" size="icon" className="size-10" 
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-10"
             onClick={() => {
               if (isDirty) {
                 setShowExitDialog(true)
               } else {
                 navigate({ to: '/events' })
               }
-            }}>
-              <ChevronLeft className="size-8" />
-            </Button>
+            }}
+          >
+            <ChevronLeft className="size-8" />
+          </Button>
 
           <div className="flex flex-col gap-2">
-            <h1>
-              Create New Event
-            </h1>
+            <h1>Create New Event</h1>
             <p className="text-xl leading-7 text-muted-foreground">
               Ensure all details are filled
             </p>
@@ -237,19 +278,14 @@ export default function CreateEvent() {
         <Card className="rounded-xl border border-slate-300 p-0 gap-0">
           {/* green section header */}
           <div className="h-16 rounded-t-xl bg-[rgba(101,163,13,0.43)] px-8 flex items-center">
-            <h3>
-              Event Details
-            </h3>
+            <h3>Event Details</h3>
           </div>
 
           <CardContent className="px-8 py-6">
             <div className="grid grid-cols-2 gap-x-10 gap-y-5">
               {/* Event Name */}
               <div className="col-span-2 space-y-2">
-                <Label
-                  htmlFor="eventName"
-                  className="text-sm text-slate-600"
-                >
+                <Label htmlFor="eventName" className="text-sm text-slate-600">
                   Event Name
                 </Label>
                 <Input
@@ -263,10 +299,7 @@ export default function CreateEvent() {
 
               {/* Location */}
               <div className="col-span-2 space-y-2">
-                <Label
-                  htmlFor="location"
-                  className="text-sm text-slate-600"
-                >
+                <Label htmlFor="location" className="text-sm text-slate-600">
                   Location
                 </Label>
                 <Input
@@ -278,10 +311,7 @@ export default function CreateEvent() {
 
               {/* Start Date & Time */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="startDate"
-                  className="text-sm text-slate-600"
-                >
+                <Label htmlFor="startDate" className="text-sm text-slate-600">
                   Start Date &amp; Time
                 </Label>
                 <div className="grid grid-cols-[1fr_140px] gap-3">
@@ -311,15 +341,14 @@ export default function CreateEvent() {
 
               {/* End Date & Time */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="endDate"
-                  className="text-sm text-slate-600"
-                >
+                <Label htmlFor="endDate" className="text-sm text-slate-600">
                   End Date &amp; Time
                 </Label>
                 <div className="grid grid-cols-[1fr_140px] gap-3">
                   <Controller
-                    {...register('endDate', { required: 'End date is required' })}
+                    {...register('endDate', {
+                      required: 'End date is required',
+                    })}
                     control={control}
                     render={({ field }) => (
                       <DatePicker
@@ -367,7 +396,9 @@ export default function CreateEvent() {
                   maxFiles={1}
                   src={coverImage}
                   onDrop={(acceptedFiles) =>
-                    setCoverImage(acceptedFiles.length ? acceptedFiles : undefined)
+                    setCoverImage(
+                      acceptedFiles.length ? acceptedFiles : undefined,
+                    )
                   }
                   className="h-40 rounded-md border-[3px] border-transparent !bg-[#969696]"
                   style={{
@@ -383,7 +414,8 @@ export default function CreateEvent() {
                   <DropzoneContent className="gap-2">
                     <CloudUpload className="size-10 text-white/80" />
                     <p className="truncate text-sm leading-6 text-slate-50">
-                      {coverImage?.[0]?.name ?? 'Click to upload or drag and drop'}
+                      {coverImage?.[0]?.name ??
+                        'Click to upload or drag and drop'}
                     </p>
                     <p className="text-xs text-white/70">Click to replace</p>
                   </DropzoneContent>
@@ -393,12 +425,53 @@ export default function CreateEvent() {
           </CardContent>
         </Card>
 
-        {/* Volunteer Coordinators Section */}
+        {/* Staff IC Section */}
         <Card className="gap-0 rounded-xl border border-slate-300 p-0">
           <div className="flex h-16 items-center justify-between rounded-t-xl bg-[rgba(101,163,13,0.43)] px-8">
-            <h3>
-              Volunteer Coordinators
-            </h3>
+            <h3>Staff IC</h3>
+            <Button
+              type="button"
+              className="h-9 w-auto rounded-md bg-[#5f733c] px-4 py-3 text-base font-semibold hover:bg-[#4d5e30]"
+              onClick={() => setShowStaffPicker(true)}
+            >
+              + Add Volunteer
+            </Button>
+          </div>
+
+          <CardContent className="px-8 py-6">
+            <div className="flex flex-col gap-6">
+              {selectedStaffIC.length === 0 ? (
+                <p className="text-sm text-slate-500">
+                  No Staff IC selected yet.
+                </p>
+              ) : (
+                selectedStaffIC.map((volunteer) => (
+                  <div
+                    key={getVolunteerTrainerId(volunteer) || volunteer.name}
+                    className="flex items-center justify-between rounded-md border border-slate-300 px-4 py-3"
+                  >
+                    <p className="text-base text-slate-700">{volunteer.name}</p>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-10 text-red-500 hover:bg-red-50 hover:text-red-700"
+                      onClick={() =>
+                        removeStaffIC(getVolunteerTrainerId(volunteer))
+                      }
+                    >
+                      <Trash2 className="size-5" />
+                    </Button>
+                  </div>
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="gap-0 rounded-xl border border-slate-300 p-0">
+          <div className="flex h-16 items-center justify-between rounded-t-xl bg-[rgba(101,163,13,0.43)] px-8">
+            <h3>Volunteers</h3>
             <Button
               type="button"
               className="h-9 w-auto rounded-md bg-[#5f733c] px-4 py-3 text-base font-semibold hover:bg-[#4d5e30]"
@@ -412,7 +485,7 @@ export default function CreateEvent() {
             <div className="flex flex-col gap-6">
               {selectedVolunteers.length === 0 ? (
                 <p className="text-sm text-slate-500">
-                  No volunteer coordinators selected yet.
+                  No volunteers selected yet.
                 </p>
               ) : (
                 selectedVolunteers.map((volunteer) => (
@@ -427,7 +500,7 @@ export default function CreateEvent() {
                       size="icon"
                       className="size-10 text-red-500 hover:bg-red-50 hover:text-red-700"
                       onClick={() =>
-                        removeVolunteerCoordinator(getVolunteerTrainerId(volunteer))
+                        removeVolunteer(getVolunteerTrainerId(volunteer))
                       }
                     >
                       <Trash2 className="size-5" />
@@ -440,10 +513,54 @@ export default function CreateEvent() {
         </Card>
       </form>
 
+      <Dialog open={showStaffPicker} onOpenChange={setShowStaffPicker}>
+        <DialogContent className="max-w-2xl border-slate-300">
+          <DialogHeader className="text-left">
+            <h2>Select Staff IC</h2>
+            <p>Search by name and click a volunteer to add.</p>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Input
+              placeholder="Search volunteers"
+              value={staffSearch}
+              onChange={(event) => setStaffSearch(event.target.value)}
+            />
+            <div className="max-h-80 overflow-y-auto rounded-md border border-slate-300">
+              {filteredStaff.length === 0 ? (
+                <p className="px-4 py-3 text-sm text-slate-500">
+                  No volunteers found.
+                </p>
+              ) : (
+                filteredStaff.map((volunteer) => (
+                  <button
+                    key={getVolunteerTrainerId(volunteer) || volunteer.name}
+                    type="button"
+                    className="flex w-full items-center justify-between border-b border-slate-200 px-4 py-3 text-left last:border-b-0 hover:bg-slate-50"
+                    onClick={() => addStaffIC(volunteer)}
+                  >
+                    <span>{volunteer.name}</span>
+                    {isVolunteerSelected(volunteer, selectedStaffIC) && (
+                      <span className="text-xs font-semibold text-slate-500">
+                        Added
+                      </span>
+                    )}
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="button" onClick={() => setShowStaffPicker(false)}>
+              Done
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={showVolunteerPicker} onOpenChange={setShowVolunteerPicker}>
         <DialogContent className="max-w-2xl border-slate-300">
           <DialogHeader className="text-left">
-            <h2>Select Volunteer Coordinators</h2>
+            <h2>Select Volunteers</h2>
             <p>Search by name and click a volunteer to add.</p>
           </DialogHeader>
           <div className="space-y-4">
@@ -463,7 +580,7 @@ export default function CreateEvent() {
                     key={getVolunteerTrainerId(volunteer) || volunteer.name}
                     type="button"
                     className="flex w-full items-center justify-between border-b border-slate-200 px-4 py-3 text-left last:border-b-0 hover:bg-slate-50"
-                    onClick={() => addVolunteerCoordinator(volunteer)}
+                    onClick={() => addVolunteer(volunteer)}
                   >
                     <span>{volunteer.name}</span>
                     {isVolunteerSelected(volunteer, selectedVolunteers) && (
@@ -488,9 +605,7 @@ export default function CreateEvent() {
         <DialogContent className="bg-[#BDD797] border-slate-600">
           <DialogHeader className="text-center sm:text-center">
             <h2>Are you sure?</h2>
-            <p>
-              You have unsaved changes. Are you sure you want to leave?
-            </p>
+            <p>You have unsaved changes. Are you sure you want to leave?</p>
           </DialogHeader>
           <DialogFooter className="sm:justify-center gap-[10px]">
             <Button

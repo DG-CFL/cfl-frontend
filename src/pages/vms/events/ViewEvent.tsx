@@ -297,7 +297,7 @@ export default function ViewEvent() {
                   <PersonListItem
                     key={`coord-${typeof entry === 'string' ? entry : entry.name}-${index}`}
                     entry={entry}
-                    defaultRole="Volunteer Coordinator"
+                    defaultRole="Staff IC"
                     volunteerById={volunteerById}
                     queryLoading={volunteerQueries.some((q) => q.isLoading)}
                     interactive={canOpenVolunteerProfile}

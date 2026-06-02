@@ -37,9 +37,10 @@ export type EventPostData = {
   postalCode?: number
   coverImage?: string
   trainers: Array<EventTrainerAssignment>
+  volunteers: Array<string>
 }
 
-export type EventPutData = EventPostData 
+export type EventPutData = EventPostData
 
 export type EventRegistrationPostData = {
   volunteerId: string

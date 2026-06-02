@@ -42,6 +42,7 @@ type EventEditFormData = {
   endTime: string
   venue: string
   trainers: Array<{ id: string }>
+  volunteers: Array<string>
 }
 
 function fileToDataUrl(file: File): Promise<string> {
@@ -64,13 +65,25 @@ function toTimeValue(date: Date): string {
   return format(date, 'HH:mm')
 }
 
-function extractCoordinatorIds(eventData: any): Array<string> {
+function extractStaffIds(eventData: any): Array<string> {
   const raw =
-    eventData?.volunteer_coordinators ?? eventData?.volunteerCoordinators ?? []
+    eventData?.trainers ??
+    eventData?.volunteer_coordinators ??
+    eventData?.volunteerCoordinators ??
+    []
   if (!Array.isArray(raw)) return []
   if (typeof raw[0] === 'string') return raw
   return raw
     .map((x) => x?.volunteerId ?? x?.volunteer_id ?? x?.id ?? x?.trainer)
+    .filter((v): v is string => typeof v === 'string')
+}
+
+function extractVolunteerIds(eventData: any): Array<string> {
+  const raw = eventData?.volunteers ?? []
+  if (!Array.isArray(raw)) return []
+  if (typeof raw[0] === 'string') return raw
+  return raw
+    .map((x) => x?.volunteerId ?? x?.volunteer_id ?? x?.id)
     .filter((v): v is string => typeof v === 'string')
 }
 
@@ -93,8 +106,11 @@ export default function EditEvent() {
     string | undefined
   >(undefined)
 
+  const [showStaffPicker, setShowStaffPicker] = useState(false)
   const [showVolunteerPicker, setShowVolunteerPicker] = useState(false)
+  const [staffSearch, setStaffSearch] = useState('')
   const [volunteerSearch, setVolunteerSearch] = useState('')
+  const [selectedStaffIC, setSelectedStaffIC] = useState<Array<Volunteer>>([])
   const [selectedVolunteers, setSelectedVolunteers] = useState<
     Array<Volunteer>
   >([])
@@ -118,6 +134,7 @@ export default function EditEvent() {
       endTime: '17:00',
       description: '',
       trainers: [],
+      volunteers: [],
     },
   })
 
@@ -128,6 +145,15 @@ export default function EditEvent() {
     .map((e: any) => e?.message)
     .filter((msg): msg is string => typeof msg === 'string')
 
+  const filteredStaff = useMemo(() => {
+    const list = volunteers ?? []
+    const searchTerm = staffSearch.trim().toLowerCase()
+    if (!searchTerm) return list
+    return list.filter((volunteer) =>
+      volunteer.name.toLowerCase().includes(searchTerm),
+    )
+  }, [volunteers, staffSearch])
+
   const filteredVolunteers = useMemo(() => {
     const list = volunteers ?? []
     const searchTerm = volunteerSearch.trim().toLowerCase()
@@ -137,11 +163,11 @@ export default function EditEvent() {
     )
   }, [volunteers, volunteerSearch])
 
-  const addVolunteerCoordinator = (volunteer: Volunteer) => {
+  const addStaffIC = (volunteer: Volunteer) => {
     const volunteerTrainerId = getVolunteerTrainerId(volunteer)
     if (!volunteerTrainerId) return
 
-    setSelectedVolunteers((current) => {
+    setSelectedStaffIC((current) => {
       if (
         current.some(
           (entry) => getVolunteerTrainerId(entry) === volunteerTrainerId,
@@ -153,9 +179,29 @@ export default function EditEvent() {
     })
   }
 
-  const removeVolunteerCoordinator = (trainerId: string) => {
-    setSelectedVolunteers((current) =>
+  const removeStaffIC = (trainerId: string) => {
+    setSelectedStaffIC((current) =>
       current.filter((entry) => getVolunteerTrainerId(entry) !== trainerId),
+    )
+  }
+
+  const addVolunteer = (volunteer: Volunteer) => {
+    const volunteerId = getVolunteerTrainerId(volunteer)
+    if (!volunteerId) return
+
+    setSelectedVolunteers((current) => {
+      if (
+        current.some((entry) => getVolunteerTrainerId(entry) === volunteerId)
+      ) {
+        return current
+      }
+      return [...current, volunteer]
+    })
+  }
+
+  const removeVolunteer = (volunteerId: string) => {
+    setSelectedVolunteers((current) =>
+      current.filter((entry) => getVolunteerTrainerId(entry) !== volunteerId),
     )
   }
 
@@ -179,6 +225,7 @@ export default function EditEvent() {
       endTime: toTimeValue(end),
       description: eventData.description,
       trainers: [],
+      volunteers: [],
     })
 
     setExistingCoverImage(eventDataWithVenue.coverImage)
@@ -186,11 +233,17 @@ export default function EditEvent() {
 
   useEffect(() => {
     if (!eventData || !volunteers) return
-    const coordinatorIds = extractCoordinatorIds(eventData)
+    const staffIds = extractStaffIds(eventData)
+    setSelectedStaffIC(
+      volunteers.filter((v) => staffIds.includes(getVolunteerTrainerId(v))),
+    )
+  }, [eventData, volunteers])
+
+  useEffect(() => {
+    if (!eventData || !volunteers) return
+    const volunteerIds = extractVolunteerIds(eventData)
     setSelectedVolunteers(
-      volunteers.filter((v) =>
-        coordinatorIds.includes(getVolunteerTrainerId(v)),
-      ),
+      volunteers.filter((v) => volunteerIds.includes(getVolunteerTrainerId(v))),
     )
   }, [eventData, volunteers])
 
@@ -206,12 +259,15 @@ export default function EditEvent() {
         coverImage: coverImage?.[0]
           ? await fileToDataUrl(coverImage[0])
           : existingCoverImage,
-        trainers: selectedVolunteers
+        trainers: selectedStaffIC
           .map((volunteer) => {
             const id = getVolunteerTrainerId(volunteer)
             return id ? { id, role: 'public' } : null
           })
           .filter((entry): entry is EventTrainerAssignment => entry !== null),
+        volunteers: selectedVolunteers
+          .map((volunteer) => getVolunteerTrainerId(volunteer))
+          .filter((id): id is string => id.length > 0),
       }
 
       await editEvent.mutateAsync(payload)
@@ -464,7 +520,50 @@ export default function EditEvent() {
 
         <Card className="gap-0 rounded-xl border border-slate-300 p-0">
           <div className="flex h-16 items-center justify-between rounded-t-xl bg-[rgba(101,163,13,0.43)] px-8">
-            <h3>Volunteer Coordinators</h3>
+            <h3>Staff IC</h3>
+            <Button
+              type="button"
+              className="h-9 w-auto rounded-md bg-[#5f733c] px-4 py-3 text-base font-semibold hover:bg-[#4d5e30]"
+              onClick={() => setShowStaffPicker(true)}
+            >
+              + Add Volunteer
+            </Button>
+          </div>
+
+          <CardContent className="px-8 py-6">
+            <div className="flex flex-col gap-6">
+              {selectedStaffIC.length === 0 ? (
+                <p className="text-sm text-slate-500">
+                  No Staff IC selected yet.
+                </p>
+              ) : (
+                selectedStaffIC.map((volunteer) => (
+                  <div
+                    key={getVolunteerTrainerId(volunteer) || volunteer.name}
+                    className="flex items-center justify-between rounded-md border border-slate-300 px-4 py-3"
+                  >
+                    <p className="text-base text-slate-700">{volunteer.name}</p>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-10 text-red-500 hover:bg-red-50 hover:text-red-700"
+                      onClick={() =>
+                        removeStaffIC(getVolunteerTrainerId(volunteer))
+                      }
+                    >
+                      <Trash2 className="size-5" />
+                    </Button>
+                  </div>
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="gap-0 rounded-xl border border-slate-300 p-0">
+          <div className="flex h-16 items-center justify-between rounded-t-xl bg-[rgba(101,163,13,0.43)] px-8">
+            <h3>Volunteers</h3>
             <Button
               type="button"
               className="h-9 w-auto rounded-md bg-[#5f733c] px-4 py-3 text-base font-semibold hover:bg-[#4d5e30]"
@@ -478,7 +577,7 @@ export default function EditEvent() {
             <div className="flex flex-col gap-6">
               {selectedVolunteers.length === 0 ? (
                 <p className="text-sm text-slate-500">
-                  No volunteer coordinators selected yet.
+                  No volunteers selected yet.
                 </p>
               ) : (
                 selectedVolunteers.map((volunteer) => (
@@ -493,9 +592,7 @@ export default function EditEvent() {
                       size="icon"
                       className="size-10 text-red-500 hover:bg-red-50 hover:text-red-700"
                       onClick={() =>
-                        removeVolunteerCoordinator(
-                          getVolunteerTrainerId(volunteer),
-                        )
+                        removeVolunteer(getVolunteerTrainerId(volunteer))
                       }
                     >
                       <Trash2 className="size-5" />
@@ -508,10 +605,57 @@ export default function EditEvent() {
         </Card>
       </form>
 
+      <Dialog open={showStaffPicker} onOpenChange={setShowStaffPicker}>
+        <DialogContent className="max-w-2xl border-slate-300">
+          <DialogHeader className="text-left">
+            <h2>Select Staff IC</h2>
+            <p>Search by name and click a volunteer to add.</p>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <Input
+              placeholder="Search volunteers"
+              value={staffSearch}
+              onChange={(event) => setStaffSearch(event.target.value)}
+            />
+
+            <div className="max-h-80 overflow-y-auto rounded-md border border-slate-300">
+              {filteredStaff.length === 0 ? (
+                <p className="px-4 py-3 text-sm text-slate-500">
+                  No volunteers found.
+                </p>
+              ) : (
+                filteredStaff.map((volunteer) => (
+                  <button
+                    key={getVolunteerTrainerId(volunteer) || volunteer.name}
+                    type="button"
+                    className="flex w-full items-center justify-between border-b border-slate-200 px-4 py-3 text-left last:border-b-0 hover:bg-slate-50"
+                    onClick={() => addStaffIC(volunteer)}
+                  >
+                    <span>{volunteer.name}</span>
+                    {isVolunteerSelected(volunteer, selectedStaffIC) && (
+                      <span className="text-xs font-semibold text-slate-500">
+                        Added
+                      </span>
+                    )}
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" onClick={() => setShowStaffPicker(false)}>
+              Done
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={showVolunteerPicker} onOpenChange={setShowVolunteerPicker}>
         <DialogContent className="max-w-2xl border-slate-300">
           <DialogHeader className="text-left">
-            <h2>Select Volunteer Coordinators</h2>
+            <h2>Select Volunteers</h2>
             <p>Search by name and click a volunteer to add.</p>
           </DialogHeader>
 
@@ -533,7 +677,7 @@ export default function EditEvent() {
                     key={getVolunteerTrainerId(volunteer) || volunteer.name}
                     type="button"
                     className="flex w-full items-center justify-between border-b border-slate-200 px-4 py-3 text-left last:border-b-0 hover:bg-slate-50"
-                    onClick={() => addVolunteerCoordinator(volunteer)}
+                    onClick={() => addVolunteer(volunteer)}
                   >
                     <span>{volunteer.name}</span>
                     {isVolunteerSelected(volunteer, selectedVolunteers) && (

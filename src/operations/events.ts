@@ -111,7 +111,7 @@ async function invalidateEventQueries(
 }
 
 /**
- * Register as volunteer coordinator (trainer) for an event.
+ * Register as Staff IC (trainer) for an event.
  */
 export function useRegisterEventCoordinator(eventId: number) {
   const queryClient = useQueryClient()

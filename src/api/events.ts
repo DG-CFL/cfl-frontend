@@ -71,7 +71,7 @@ export async function getEvent(eventId: number): Promise<Event> {
  * Creates a new event
  */
 export async function createEvent(eventData: EventPostData): Promise<Event> {
-  const path = `${baseUrl}/events`
+  const path = `${baseUrl}/sessions/events`
   logEventRequest('POST', path, eventData)
   const res = await api.post(path, eventData)
   return res.data
@@ -98,7 +98,7 @@ export async function deleteEvent(eventId: number): Promise<void> {
 }
 
 /**
- * Register current user as a volunteer coordinator (trainer) for an event.
+ * Register current user as a Staff IC (trainer) for an event.
  * Expects 204 No Content on success.
  */
 export async function registerEventCoordinator(
