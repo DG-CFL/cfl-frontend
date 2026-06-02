@@ -19,7 +19,10 @@ import type {
 import type { Dispatch, SetStateAction } from 'react'
 
 import type { Volunteer } from '@/types/volunteers'
-import { volunteerHasCertificate } from '@/lib/volunteerUtils'
+import {
+  getVolunteerFirebaseId,
+  volunteerHasCertificate,
+} from '@/lib/volunteerUtils'
 import { useGetVolunteers } from '@/operations/volunteers'
 
 import { Button } from '@/components/ui/button'
@@ -123,7 +126,9 @@ const columns: Array<ColumnDef<Volunteer>> = [
     accessorKey: 'name',
     header: 'Name',
     filterFn: (row, columnId, filterValue) => {
-      const q = String(filterValue ?? '').trim().toLowerCase()
+      const q = String(filterValue ?? '')
+        .trim()
+        .toLowerCase()
       if (!q) return true
       const name = String(row.getValue(columnId) ?? '').toLowerCase()
       return name.includes(q)
@@ -156,10 +161,11 @@ const columns: Array<ColumnDef<Volunteer>> = [
       if (selected.length === 0) return true
       return selected.includes(String(row.getValue(columnId) ?? ''))
     },
-    header: ({ column }) =>
-      columnFilter(column, 'Gender', ['male', 'female']),
+    header: ({ column }) => columnFilter(column, 'Gender', ['male', 'female']),
     cell: ({ row }) => (
-      <div className="text-center">{capitalizeGender(row.getValue('gender'))}</div>
+      <div className="text-center">
+        {capitalizeGender(row.getValue('gender'))}
+      </div>
     ),
   },
   {
@@ -221,9 +227,7 @@ const columns: Array<ColumnDef<Volunteer>> = [
     cell: ({ row }) => {
       const certified = volunteerHasCertificate(row.original.certificate)
       return (
-        <div className="text-center text-sm">
-          {certified ? 'Yes' : 'No'}
-        </div>
+        <div className="text-center text-sm">{certified ? 'Yes' : 'No'}</div>
       )
     },
   },
@@ -266,6 +270,11 @@ export function VolunteerTable({ setClickedRow }: VolunteerTableProps) {
     setClickedRow(row)
   }
 
+  const selectedVolunteerIds = table
+    .getSelectedRowModel()
+    .rows.map((row) => getVolunteerFirebaseId(row.original))
+    .filter((id): id is string => id.length > 0)
+
   if (isError) {
     return (
       <p className="text-sm text-red-600">
@@ -286,7 +295,22 @@ export function VolunteerTable({ setClickedRow }: VolunteerTableProps) {
     <div className="w-full">
       <div className="flex flex-col justify-between gap-4 py-4 sm:flex-row sm:items-end">
         <div className="flex flex-wrap items-end gap-2">
-          {/* <Link to="/volunteers/email"> */}
+          {selectedVolunteerIds.length > 0 ? (
+            <Button
+              type="button"
+              variant="outline"
+              className="h-8 rounded-full bg-gray-500 px-3 text-sm text-white hover:bg-gray-600"
+              asChild
+            >
+              <Link
+                to="/volunteers/email"
+                search={{ ids: selectedVolunteerIds.join(',') }}
+              >
+                <CirclePlus className="mr-1 inline h-4 w-4" />
+                Send Email
+              </Link>
+            </Button>
+          ) : (
             <Button
               type="button"
               variant="outline"
@@ -296,7 +320,7 @@ export function VolunteerTable({ setClickedRow }: VolunteerTableProps) {
               <CirclePlus className="mr-1 inline h-4 w-4" />
               Send Email
             </Button>
-          {/* </Link> */}
+          )}
           <Button
             type="button"
             variant="outline"
@@ -318,8 +342,9 @@ export function VolunteerTable({ setClickedRow }: VolunteerTableProps) {
             id="searchbar"
             placeholder="Search by name"
             value={
-              (table.getColumn('name')?.getFilterValue() as string | undefined) ||
-              ''
+              (table.getColumn('name')?.getFilterValue() as
+                | string
+                | undefined) || ''
             }
             onChange={(event) => {
               const col = table.getColumn('name')
