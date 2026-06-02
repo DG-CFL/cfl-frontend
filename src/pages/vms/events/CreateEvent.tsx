@@ -23,7 +23,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui_custom/DatePicker'
-import { useCreateEvent } from '@/operations/events'
+import { buildGoogleCalendarEventUrl } from '@/lib/googleCalendar'
+import { useCreateEvent, useSendEmailToUser } from '@/operations/events'
 import { useGetVolunteers } from '@/operations/volunteers'
 import {
   getVolunteerTrainerId,
@@ -58,9 +59,50 @@ function combineDateAndTime(date: Date, time: string): string {
   return combined.toISOString()
 }
 
+function formatEventDateRange(startDate: string, endDate: string): string {
+  const dateFormat = new Intl.DateTimeFormat('en-SG', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  })
+  return `${dateFormat.format(new Date(startDate))} to ${dateFormat.format(
+    new Date(endDate),
+  )}`
+}
+
+function buildStaffICEmail(params: {
+  name: string
+  description: string
+  startDate: string
+  endDate: string
+  venue: string
+}): string {
+  const calendarUrl = buildGoogleCalendarEventUrl({
+    title: params.name,
+    details: params.description,
+    location: params.venue,
+    start: params.startDate,
+    end: params.endDate,
+  })
+
+  return [
+    'Dear Staff Member,',
+    '',
+    `You have been selected to be coordinator for the following event: ${params.name}.`,
+    '',
+    `Event date: ${formatEventDateRange(params.startDate, params.endDate)}`,
+    `Venue: ${params.venue}`,
+    '',
+    'Please add this event to your calendar using the link below:',
+    calendarUrl,
+    '',
+    'Thank you.',
+  ].join('\n')
+}
+
 export default function CreateEvent() {
   const navigate = useNavigate()
   const createEvent = useCreateEvent()
+  const sendEmailToUser = useSendEmailToUser()
   const { data: volunteers } = useGetVolunteers()
 
   const [coverImage, setCoverImage] = useState<Array<File> | undefined>(
@@ -170,7 +212,6 @@ export default function CreateEvent() {
     )
   }
 
-  // TODO: Update Save & Publish button handler
   const onSubmit: SubmitHandler<EventCreateFormData> = async (data) => {
     try {
       const eventPayload: EventPostData = {
@@ -195,6 +236,22 @@ export default function CreateEvent() {
       }
 
       await createEvent.mutateAsync(eventPayload)
+
+      const staffICEmail = buildStaffICEmail({
+        name: eventPayload.name,
+        description: eventPayload.description,
+        startDate: eventPayload.startDate,
+        endDate: eventPayload.endDate,
+        venue: eventPayload.venue,
+      })
+
+      for (const staff of eventPayload.trainers) {
+        await sendEmailToUser.mutateAsync({
+          userId: staff.id,
+          email: staffICEmail,
+        })
+      }
+
       navigate({ to: '/events/create-success' })
     } catch (err) {
       console.error(err)

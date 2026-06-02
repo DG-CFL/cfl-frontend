@@ -15,6 +15,7 @@ import {
   getSessionEvents,
   registerEventCoordinator,
   registerEventVolunteer,
+  sendEmailToUser,
 } from '@/api/events'
 
 /**
@@ -135,5 +136,12 @@ export function useRegisterEventVolunteer(eventId: number) {
     onSuccess: async () => {
       await invalidateEventQueries(queryClient, eventId)
     },
+  })
+}
+
+export function useSendEmailToUser() {
+  return useMutation({
+    mutationFn: ({ userId, email }: { userId: string; email: string }) =>
+      sendEmailToUser(userId, email),
   })
 }

@@ -98,6 +98,18 @@ export async function deleteEvent(eventId: number): Promise<void> {
 }
 
 /**
+ * Sends a single email to a user by Firebase UID.
+ */
+export async function sendEmailToUser(
+  userId: string,
+  email: string,
+): Promise<void> {
+  await api.post(`${baseUrl}/admin/email/${encodeURIComponent(userId)}`, null, {
+    params: { email },
+  })
+}
+
+/**
  * Register current user as a Staff IC (trainer) for an event.
  * Expects 204 No Content on success.
  */
