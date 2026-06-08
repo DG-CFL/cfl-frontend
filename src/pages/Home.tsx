@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 
 import { useCurrentUser } from '@/auth/AuthProvider'
-import heroImage from '@/assets/b0bcc1e094e7d036a3aeff9e780dc240edc44799.png'
+import heroImage from '@/assets/cfl-logo.png'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -66,9 +66,14 @@ export default function Home() {
       />
 
       <main className="relative mx-auto max-w-6xl px-4 pb-16 pt-8 sm:px-6 lg:px-8 lg:pt-10">
-        <p className="mb-6 text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#5a6b45] sm:text-left">
-          Caring For Life
-        </p>
+        <div className="mb-6 flex flex-col gap-1 text-center sm:text-left">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#5a6b45]">
+            Caring For Life
+          </p>
+          <p className="text-xs italic text-[#6b7e52]">
+            Suicide prevention is everyone&apos;s business
+          </p>
+        </div>
 
         <div className="overflow-hidden rounded-3xl border border-[#d4dcc8] bg-white/90 shadow-[0_24px_60px_-20px_rgba(45,55,35,0.18)] backdrop-blur-sm">
           <div className="grid lg:grid-cols-12 lg:gap-0">
@@ -115,8 +120,8 @@ export default function Home() {
             <div className="relative min-h-[280px] lg:col-span-7 lg:min-h-[420px]">
               <img
                 src={heroImage}
-                alt="Two people sitting together on a bench in a sunlit park, sharing a supportive moment."
-                className="h-full w-full object-cover object-[center_25%] sm:object-[center_20%]"
+                alt="Caring for Life logo"
+                className="h-full w-full object-contain p-10"
               />
               <div className="absolute inset-0 bg-linear-to-t from-[#2a3320]/50 via-transparent to-[#2a3320]/10 lg:bg-linear-to-l lg:from-transparent lg:via-transparent lg:to-white/90" />
               <div className="absolute bottom-4 left-4 right-4 flex flex-col gap-1 rounded-2xl border border-white/25 bg-black/35 px-4 py-3 text-white shadow-lg backdrop-blur-md sm:bottom-6 sm:left-auto sm:right-6 sm:max-w-sm">

@@ -122,6 +122,7 @@ export default function CreateEvent() {
     handleSubmit,
     formState: { isDirty, errors },
     control,
+    watch,
   } = useForm<EventCreateFormData>({
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
@@ -137,6 +138,9 @@ export default function CreateEvent() {
       volunteers: [],
     },
   })
+
+  const startDate = watch('startDate')
+  const startTime = watch('startTime')
 
   const errorMessages = Object.values(errors)
     .map((e: any) => e?.message)
@@ -405,6 +409,16 @@ export default function CreateEvent() {
                   <Controller
                     {...register('endDate', {
                       required: 'End date is required',
+                      validate: (val) => {
+                        const startDay = new Date(startDate)
+                        startDay.setHours(0, 0, 0, 0)
+                        const endDay = new Date(val)
+                        endDay.setHours(0, 0, 0, 0)
+                        return (
+                          endDay >= startDay ||
+                          'End date must be on or after start date'
+                        )
+                      },
                     })}
                     control={control}
                     render={({ field }) => (
@@ -420,6 +434,14 @@ export default function CreateEvent() {
                     type="time"
                     {...register('endTime', {
                       required: 'End time is required',
+                      validate: (val) => {
+                        const start = combineDateAndTime(startDate, startTime)
+                        const end = combineDateAndTime(watch('endDate'), val)
+                        return (
+                          new Date(end) > new Date(start) ||
+                          'End date/time must be after start date/time'
+                        )
+                      },
                     })}
                     className="h-12 rounded-md border-slate-500"
                   />

@@ -435,6 +435,16 @@ export default function EditEvent() {
                   <Controller
                     {...register('endDate', {
                       required: 'End date is required',
+                      validate: (val) => {
+                        const startDay = new Date(startDate)
+                        startDay.setHours(0, 0, 0, 0)
+                        const endDay = new Date(val)
+                        endDay.setHours(0, 0, 0, 0)
+                        return (
+                          endDay >= startDay ||
+                          'End date must be on or after start date'
+                        )
+                      },
                     })}
                     control={control}
                     render={({ field }) => (
