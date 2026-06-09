@@ -1,4 +1,4 @@
-import { Calendar, MapPin } from 'lucide-react'
+import { Calendar, CalendarDays, MapPin } from 'lucide-react'
 import { Link, useNavigate } from '@tanstack/react-router'
 
 import { Button } from '@/components/ui/button'
@@ -35,29 +35,9 @@ export function EventCard({
               className="h-full w-full object-cover"
             />
           ) : (
-            <svg
-              viewBox="0 0 100 100"
-              className="size-full text-muted-foreground/30"
-              preserveAspectRatio="none"
-              aria-hidden="true"
-            >
-              <line
-                x1="10"
-                y1="10"
-                x2="90"
-                y2="90"
-                stroke="currentColor"
-                strokeWidth="1"
-              />
-              <line
-                x1="90"
-                y1="10"
-                x2="10"
-                y2="90"
-                stroke="currentColor"
-                strokeWidth="1"
-              />
-            </svg>
+            <div className="flex h-full w-full items-center justify-center">
+              <CalendarDays className="size-16 text-muted-foreground/30" aria-hidden="true" />
+            </div>
           )}
         </div>
       </CardHeader>
