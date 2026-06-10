@@ -410,6 +410,14 @@ function PersonListItem({
     const resolved = volunteerById.get(entry)
     const displayName = resolved?.name ?? (queryLoading ? 'Loading…' : entry)
 
+    const statsHint = resolved ? (
+      <div className="flex gap-3 text-sm text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity duration-150 mt-0.5">
+        <span>{resolved.eventsAttended ?? 0} events attended</span>
+        <span aria-hidden>·</span>
+        <span>{resolved.trainingSessionsAttended ?? 0} training sessions</span>
+      </div>
+    ) : null
+
     const body = (
       <>
         <div className="flex items-center gap-4">
@@ -422,6 +430,7 @@ function PersonListItem({
               {displayName}
             </h3>
             <p className="text-base text-muted-foreground">{defaultRole}</p>
+            {statsHint}
           </div>
         </div>
         {interactive ? (
@@ -435,7 +444,7 @@ function PersonListItem({
 
     if (!interactive) {
       return (
-        <div className="flex w-full items-center gap-4 rounded-xl px-3 py-2">
+        <div className="group flex w-full items-center gap-4 rounded-xl px-3 py-2">
           {body}
         </div>
       )
