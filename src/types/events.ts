@@ -22,12 +22,6 @@ export type Event = {
   isCurrentUserInvolved?: boolean
 }
 
-/** Matches backend `TrainerAssignment`: Firebase UID + role (see SessionCreateUpdate). */
-export type EventTrainerAssignment = {
-  id: string
-  role: string
-}
-
 export type EventPostData = {
   name: string
   description: string
@@ -36,7 +30,7 @@ export type EventPostData = {
   venue: string
   postalCode?: number
   coverImage?: string
-  trainers: Array<EventTrainerAssignment>
+  trainers: Array<string>
   volunteers: Array<string>
 }
 

@@ -4,7 +4,7 @@ import { useNavigate, useParams } from '@tanstack/react-router'
 import { AlertCircle, ChevronLeft, CloudUpload, Trash2 } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
 import type { SubmitHandler } from 'react-hook-form'
-import type { EventPutData, EventTrainerAssignment } from '@/types/events'
+import type { EventPutData } from '@/types/events'
 import type { Volunteer } from '@/types/volunteers'
 import {
   getVolunteerTrainerId,
@@ -260,11 +260,8 @@ export default function EditEvent() {
           ? await fileToDataUrl(coverImage[0])
           : existingCoverImage,
         trainers: selectedStaffIC
-          .map((volunteer) => {
-            const id = getVolunteerTrainerId(volunteer)
-            return id ? { id, role: 'public' } : null
-          })
-          .filter((entry): entry is EventTrainerAssignment => entry !== null),
+          .map((volunteer) => getVolunteerTrainerId(volunteer))
+          .filter((id): id is string => id.length > 0),
         volunteers: selectedVolunteers
           .map((volunteer) => getVolunteerTrainerId(volunteer))
           .filter((id): id is string => id.length > 0),

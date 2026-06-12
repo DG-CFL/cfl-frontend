@@ -3,7 +3,7 @@ import { AlertCircle, ChevronLeft, CloudUpload, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import type { SubmitHandler } from 'react-hook-form'
-import type { EventPostData, EventTrainerAssignment } from '@/types/events'
+import type { EventPostData } from '@/types/events'
 import type { Volunteer } from '@/types/volunteers'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -229,11 +229,8 @@ export default function CreateEvent() {
           ? await fileToDataUrl(coverImage[0])
           : undefined,
         trainers: selectedStaffIC
-          .map((volunteer) => {
-            const id = getVolunteerTrainerId(volunteer)
-            return id ? { id, role: 'public' } : null
-          })
-          .filter((entry): entry is EventTrainerAssignment => entry !== null),
+          .map((volunteer) => getVolunteerTrainerId(volunteer))
+          .filter((id): id is string => id.length > 0),
         volunteers: selectedVolunteers
           .map((volunteer) => getVolunteerTrainerId(volunteer))
           .filter((id): id is string => id.length > 0),
@@ -249,9 +246,9 @@ export default function CreateEvent() {
         venue: eventPayload.venue,
       })
 
-      for (const staff of eventPayload.trainers) {
+      for (const staffId of eventPayload.trainers) {
         await sendEmailToUser.mutateAsync({
-          userId: staff.id,
+          userId: staffId,
           email: staffICEmail,
         })
       }
